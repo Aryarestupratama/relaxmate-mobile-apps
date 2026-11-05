@@ -4,8 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:relaxmate/core/router/app_router.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_theme.dart';
+import 'package:relaxmate/features/startup/ui/startup_gate.dart';
 
-/// Akar aplikasi: tema token, Bahasa Indonesia, dan router.
+/// Akar aplikasi: tema token, Bahasa Indonesia, router, dan pemeriksaan versi awal.
 class RelaxMateApp extends ConsumerWidget {
   const RelaxMateApp({super.key});
 
@@ -23,6 +24,9 @@ class RelaxMateApp extends ConsumerWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       routerConfig: ref.watch(routerProvider),
+      builder: (context, child) => StartupGate(
+        child: child ?? const SizedBox.shrink(),
+      ),
     );
   }
 }

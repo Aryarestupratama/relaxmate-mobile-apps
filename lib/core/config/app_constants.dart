@@ -6,4 +6,14 @@ abstract final class AppConstants {
 
   /// Timeout permintaan; lewat batas ini dianggap `ai_unavailable` (FR-M007).
   static const Duration requestTimeout = Duration(seconds: 20);
+
+  /// Pemeriksaan versi saat pembuka tidak boleh menahan aplikasi lama-lama.
+  static const Duration versionCheckTimeout = Duration(seconds: 5);
+
+  /// Nama kunci token di penyimpanan aman.
+  static const String tokenStorageKey = 'auth_token';
+
+  /// Halaman aplikasi di Play Store. `[Assumption]` Application ID A-MA5.
+  static const String storeUrl =
+      'https://play.google.com/store/apps/details?id=id.my.relaxboss.relaxmate';
 }
