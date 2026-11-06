@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Progress
-Version: 0.6 | Status: Living document | Last updated: 2026-11-06
+Version: 0.7 | Status: Living document | Last updated: 2026-11-06
 Owner: Founder (solo developer)
 
 Dokumen ini dibaca pertama setiap mulai bekerja di proyek mobile. Perbarui di akhir setiap task atau sesi. Dokumen proyek disimpan **di luar repo kode** (RULE-M014). Task di sisi backend (repo web RelaxBoss) mengikuti `Rules.md` web dan juga dicatat di sini, dengan awalan `TASK-M`, agar satu sumber kebenaran untuk fitur mobile. Perubahan di repo web tetap mengikuti Doc Sync web (`progress.md` web diperbarui bila menyentuh perilaku web).
@@ -11,7 +11,7 @@ Dokumen ini dibaca pertama setiap mulai bekerja di proyek mobile. Perbarui di ak
 | Hal | Status terbaru |
 |---|---|
 | Tahap | Implementasi berjalan. Selesai: **TASK-M012, M013, dan M014** (backend, repo web) serta **TASK-M020 dan M021** (fondasi Flutter; repo mobile commit `8014c38`). **TASK-M022** (Daftar, Masuk, Lupa sandi, Cek email) kodenya selesai dan **menunggu uji manual founder**. Dokumen mobile: PRD v0.4, Architecture v0.4, Schema v0.1 (**perlu pembaruan**, lihat Utang dokumen), Design v0.5, Rules v0.5, progress v0.5. Sejak 2026-11-06 **dokumen mengikuti kode**. |
-| Berikutnya | Backend dulu (keputusan 2026-11-06): **TASK-M010** (kode selesai, menunggu uji manual web), lalu **M011**, **M015**, **M016**, **M017**; sesudahnya mobile **M023** (Consent AI) dan **M024** (layar chat). TASK-M001 (menutup dokumen) tersisa sebagian. |
+| Berikutnya | Backend dulu: **TASK-M011** (kode selesai, menunggu uji manual), lalu **M015**, **M016**, **M017**; sesudahnya mobile **M023** (Consent AI) dan **M024** (layar chat). M010 dan M022 sudah `Done`. TASK-M001 (menutup dokumen) tersisa sebagian. |
 | Pemblokir | Prasyarat web untuk **rilis**: TASK-031 (go-live), OQ-3 (kontak krisis terverifikasi), OQ-5 (telaah hukum data AI dan pelatihan, termasuk layanan suara pihak ketiga). Tanpa itu, tidak ada rilis mobile. **Keputusan founder (sesi 2026-11-05/06, dicatat di sini sebagai keputusan tertulis):** task kode dibuka tanpa menunggu TASK-M002. TASK-M002 tetap `Blocked` dan wajib selesai sebelum TASK-M045. |
 | Alur kerja | Kerja di `main`, commit lalu push, pesan commit bahasa Inggris. Dokumen di luar repo. Uji manual wajib; tanpa CI. |
 | Data | Sebelum TASK-M044, hanya data dummy bertanda jelas (akun `example.test`, kontak krisis `dummy`). Build `prod` tidak boleh memuat dummy (RULE-M048). |
@@ -59,8 +59,8 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 
 | ID | Task | Repo | Rujukan | Status |
 |---|---|---|---|---|
-| TASK-M010 | Ekstrak `SendChatMessage` (Action) dari `ChatMessageController` (nama sebenarnya di repo web; `RelaxMateController` hanya halaman); web memakainya. Uji manual alur chat web sebelum dan sesudah (kirim, batas harian, 503, krisis) | W | Architecture-M 6.2, 9; RULE-022 | **Doing** (kode selesai 2026-11-06; menunggu uji manual web) |
-| TASK-M011 | `DailyConversationResolver` + config `relaxboss.mobile.*` (cutoff 4, min app version, masa token) | W | FR-M004, Architecture-M 6.1 | Todo |
+| TASK-M010 | Ekstrak `SendChatMessage` (Action) dari `ChatMessageController` (nama sebenarnya di repo web; `RelaxMateController` hanya halaman); web memakainya. Uji manual alur chat web sebelum dan sesudah (kirim, batas harian, 503, krisis) | W | Architecture-M 6.2, 9; RULE-022 | **Done** (uji manual web lolos 2026-11-06) |
+| TASK-M011 | `DailyConversationResolver` + config `relaxboss.mobile.*` (cutoff 4, min app version, masa token) | W | FR-M004, Architecture-M 6.1 | **Doing** (kode selesai 2026-11-06; menunggu uji manual) |
 | TASK-M012 | Pasang Sanctum (`install:api`), migration token, named limiter; catat alasan di Architecture web bagian 13 dan revisi ADR-013 | W | ADR-M02, Schema-M 2, RULE-060 web | **Done** (2026-11-06) |
 | TASK-M013 | Auth API: register, login, logout, forgot, resend; rute verifikasi email tanpa login (sesuai OQ-MA2) | W | API-M001..M005, FR-M001 | **Done** (2026-11-06) |
 | TASK-M014 | API ringkasan: `/me`, `/config`, `/consent` (GET dan POST), training consent, `/crisis-contacts`; middleware `verified` varian API (403 `unverified`) | W | API-M006..M011 | **Done** (2026-11-06) |
@@ -264,6 +264,7 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 | 2026-11-06 (lanjutan) | TASK-M014 (backend) selesai. Dokumen disinkronkan ke kode mobile (commit `8014c38`): PRD, Architecture, Design, Rules, progress. Dipastikan Architecture-M adalah dokumen mobile di folder dokumen, bukan Architecture web; perubahan backend M014 dicatat di Architecture-M bagian 5, 7, 9, sedangkan Doc Sync web tetap terpisah. Repo web (`9afd27c`) kemudian diperiksa dan cocok dengan catatan M012 sampai M014; fakta backend kini berlabel `[Verified]`. |
 | 2026-11-06 (sesi M022) | Repo mobile dan web dibaca ulang; TASK-M022 dikodekan (auth, sesi, router, `ErrorAlert`, `WebLauncher`), izin `INTERNET` ditambahkan ke manifest utama, `tool/mock_api.mjs` mendapat mode `auth` dan diuji dengan curl. Dokumen disinkronkan (progress 0.5, Architecture 0.4, Design 0.5, Rules 0.5). Kode belum dianalisis dan diuji di Flutter; menunggu uji manual founder. |
 | 2026-11-06 (sesi M010) | Alur backend lebih dulu: M010, M011, M015, M016, M017. M022 `Done`; utang Doc Sync web M012-M014 dihapus (dokumen web sudah diperbarui). OQ-MA4, MA6, MA7 diputuskan. TASK-M010: `SendChatMessage` (Action), `ChatTurnRejectedException`, `SendChatMessageResult`; `ChatMessageController::store()` menjadi tipis; perilaku dan teks galat web tidak berubah. Menunggu uji manual web. progress.md v0.6. |
+| 2026-11-06 (sesi M011) | M010 `Done` (uji manual web lolos). TASK-M011: `Services\Chat\DailyConversationResolver` (`today()`, `window()`; hari percakapan berganti 04.00 WIB, kunci cache terpisah dari kunci giliran chat) dan `relaxboss.mobile.day_cutoff_hour` = 4. Token (60 hari) dan `min_app_version` sudah ada dari M012/M014. Menunggu uji manual lewat tinker. progress.md v0.7. |
 
 ---
 
@@ -280,6 +281,7 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.7 | 2026-11-06 | M010 `Done`; M011 `Doing` (kode selesai); log sesi M011. |
 | 0.6 | 2026-11-06 | M022 `Done`; M010 `Doing` (kode selesai); OQ-MA4, MA6, MA7 diputuskan; utang Doc Sync web M012-M014 dihapus; urutan berikutnya M010, M011, M015, M016, M017. |
 | 0.5 | 2026-11-06 | TASK-M022 `Doing` (kode selesai, menunggu uji manual) beserta catatan hasil; OQ-MA10 (paket ikon); keputusan baru (sesi bertingkat, sinyal 401, form Daftar, aturan sandi di server, tautan web, izin INTERNET); utang baru; utang 401 diperbarui. |
 | 0.4 | 2026-11-06 | TASK-M014 Done; M022 menjadi Next; catatan hasil M014; verifikasi dokumen terhadap kode mobile; OQ-MA8 ditutup; keputusan baru (sidik kontak, `min_app_version` bawaan, teks consent di server, dokumen mengikuti kode); utang baru dari audit kode dan Doc Sync web; fakta backend diperiksa ke repo web (`9afd27c`). |
