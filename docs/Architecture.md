@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Architecture
-Version: 0.5 | Status: Draft | Last updated: 2026-11-06
+Version: 0.6 | Status: Draft | Last updated: 2026-11-06
 Depends on: PRD RelaxMate Mobile v0.3, Architecture RelaxBoss (web), Schema RelaxBoss (web), Rules v1.5 | Owner: Founder (solo developer)
 
 Label: `[Verified]` ada sumber (sisi mobile: repo `relaxmate-mobile-apps` commit `8014c38`; sisi backend: repo `RELAXBOSS_WEBSITE` commit `9afd27c`), `[Inference]` kesimpulan, `[Assumption]` bisa diubah. **Dokumen ini mengikuti kode:** bila berbeda dari kode, kode yang benar. Kedalaman: **Lite**. Dokumen ini hanya mengatur sisi mobile dan tambahan di backend. Subsistem AI (rotasi key, `ChatbotService`, `CrisisDetector`), enkripsi, dan admin tetap di Architecture web dan tidak diulang di sini.
@@ -128,7 +128,7 @@ Semua endpoint JSON, HTTPS saja. Format sukses `{ "data": {...} }`, gagal `{ "er
 | API-M014 | ~~`POST .../messages/{message}/retry`~~ **Tidak dibuat** (OQ-MA6): retry memakai API-M013 dengan `{ "retry": true }` | - | Panggil ulang balasan untuk pesan pengguna terakhir yang belum dijawab; tidak menambah hitungan harian | 409 `nothing_to_retry` |
 | API-M015 | `GET /relaxmate/days` | Token + `api.verified` + `ai.consent`, `api-user` | Riwayat: Percakapan yang sudah berisi pesan, terbaru dulu, `history_per_page` (15) per halaman, kursor `?cursor=` `[Verified: kode, belum diuji]` | n/a |
 | API-M016 | `GET /relaxmate/conversations/{id}/messages` | Token + `api.verified` + `ai.consent`, milik sendiri | Baca satu percakapan, hanya baca, urut lama ke baru, 30 per halaman, kursor `?cursor=` `[Verified: kode, belum diuji]` | 404 |
-| API-M017 | `DELETE /account` | Token + konfirmasi sandi | Hapus akun dan seluruh data (API-016 web); semua token dicabut | Galat `password`, `account` |
+| API-M017 | `DELETE /account` | Token + `api.active`, `api-user`; tanpa `api.verified` (agar yang salah mengetik email tetap bisa menghapus data) | Badan `{ "password" }`. Memakai Action `DeleteUserAccount` yang sama dengan web (batas `delete_account_per_minute`, tolak admin terakhir); semua token pengguna dihapus di dalam transaksi. Sukses 204 tanpa isi `[Verified: kode, belum diuji]` | 422 `validation_failed` dengan `errors.password` (sandi salah atau terlalu banyak percobaan) atau `errors.account` (admin terakhir); 401 |
 
 **Bentuk nyata API-M001 sampai M005 `[Verified]` (TASK-M013).** Semua galat memakai amplop `{ "error": { "code", "message" } }` dengan `message` Bahasa Indonesia; validasi 422 menambah `errors` per kolom.
 
@@ -234,8 +234,8 @@ Karena overlay tidak merekam dan tidak memanggil jaringan, mikrofon hanya pernah
 | Jenis | Token pribadi Sanctum (stateless), tanpa cookie dan tanpa CSRF; web tetap memakai session |
 | Penerbitan | API-M001 (register) dan API-M002 (login) lewat `IssueMobileToken`; satu token per perangkat bernama `mobile-android`; kemampuan (`abilities`) `['relaxmate']` `[Assumption]` |
 | Masa berlaku | 60 hari: `sanctum.expiration` 86.400 menit (dari config `relaxboss.mobile.token_expiration_days`) dan `expires_at` eksplisit pada token; token dibuat ulang lewat login `[Assumption]` |
-| Pencabutan | Logout, hapus akun, atau akun dinonaktifkan admin (middleware `active` menolak dan mencabut). **Penolakan token akun nonaktif baru berlaku setelah TASK-M016**; sebelumnya token pengguna nonaktif belum ditolak |
-| Middleware | `auth:sanctum` (TASK-M013); `api.verified` (403 `unverified`, sudah ada, TASK-M014 `[Verified]`); `active` varian API yang menolak dan mencabut token (TASK-M016, karena `active` web memakai sesi); `EnsureAiConsent` untuk rute AI (sama dengan web) |
+| Pencabutan | Logout, hapus akun, atau akun dinonaktifkan admin (middleware `active` menolak dan mencabut). Middleware `api.active` (TASK-M016) menolak token akun nonaktif dengan 403 `account_inactive` dan menghapus semua token pengguna itu pada permintaan berikutnya |
+| Middleware | `auth:sanctum` (TASK-M013); `api.verified` (403 `unverified`, sudah ada, TASK-M014 `[Verified]`); `api.active` (TASK-M016 `[Verified: kode]`: 403 `account_inactive`, mencabut semua token; dipasang setelah `auth:sanctum` pada semua rute bertoken kecuali logout dan kirim ulang verifikasi); `EnsureAiConsent` untuk rute AI (sama dengan web) |
 | Penyimpanan klien | `flutter_secure_storage` (Keystore); dihapus saat logout, 401, atau hapus akun |
 | Batas | Login 5 gagal/menit per akun+IP (Action `LoginUser`) dan 20/menit per IP (`api-guest`); register 5/menit per IP (`api-register`); kirim ulang 3/jam (Action); rute publik lain `api-public` dan rute bertoken `api-user` (angka dari `relaxboss.mobile.public_per_minute` dan `user_per_minute`, TASK-M014 `[Verified]`) |
 | Log | Dilarang mencatat token atau isi pesan (RULE-040); hanya kode, ID, rute, dan durasi |
@@ -396,6 +396,7 @@ Alat pengembangan di luar aplikasi: Node.js untuk `tool/mock_api.mjs` (tanpa dep
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.6 | 2026-11-06 | TASK-M016: API-M017 bentuk nyata (422 per kolom, 204), middleware `api.active`, token dihapus saat akun dihapus. |
 | 0.5 | 2026-11-06 | TASK-M015: bentuk nyata API-M012, M013, M015, M016; API-M014 tidak dibuat (retry lewat M013); kode galat chat termasuk `conversation_closed`; A-MA4 terjawab. |
 | 0.4 | 2026-11-06 | TASK-M022: struktur folder `features/auth`, `core/launch`, `session_expired_signal`, `auth_redirect`, `ErrorAlert`; paragraf Sesi dan pengalihan layar; izin `INTERNET` pindah ke manifest utama; `tool/mock_api.mjs` punya mode `auth`. |
 | 0.3 | 2026-11-06 | Sinkronisasi ke kode mobile (commit `8014c38`) dan hasil TASK-M014: struktur folder dan versi paket nyata, API-M006 sampai M011 final dan sudah dicocokkan dengan repo web (`9afd27c`, bentuk JSON lengkap), middleware `api.verified`, limiter `api-public`/`api-user`, konfigurasi `mobile.*` dan bagian `consent`, validasi `AppConfig`, perilaku timeout dan cek versi apa adanya, status penerapan privasi, utang penandatanganan rilis; OQ-MA8 ditutup, A-MA7 terjawab, A-MA8 baru; label `[Verified]`. |

@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Progress
-Version: 0.8 | Status: Living document | Last updated: 2026-11-06
+Version: 0.9 | Status: Living document | Last updated: 2026-11-06
 Owner: Founder (solo developer)
 
 Dokumen ini dibaca pertama setiap mulai bekerja di proyek mobile. Perbarui di akhir setiap task atau sesi. Dokumen proyek disimpan **di luar repo kode** (RULE-M014). Task di sisi backend (repo web RelaxBoss) mengikuti `Rules.md` web dan juga dicatat di sini, dengan awalan `TASK-M`, agar satu sumber kebenaran untuk fitur mobile. Perubahan di repo web tetap mengikuti Doc Sync web (`progress.md` web diperbarui bila menyentuh perilaku web).
@@ -11,11 +11,11 @@ Dokumen ini dibaca pertama setiap mulai bekerja di proyek mobile. Perbarui di ak
 | Hal | Status terbaru |
 |---|---|
 | Tahap | Implementasi berjalan. Selesai: **TASK-M012, M013, dan M014** (backend, repo web) serta **TASK-M020 dan M021** (fondasi Flutter; repo mobile commit `8014c38`). **TASK-M022** (Daftar, Masuk, Lupa sandi, Cek email) kodenya selesai dan **menunggu uji manual founder**. Dokumen mobile: PRD v0.4, Architecture v0.4, Schema v0.1 (**perlu pembaruan**, lihat Utang dokumen), Design v0.5, Rules v0.5, progress v0.5. Sejak 2026-11-06 **dokumen mengikuti kode**. |
-| Berikutnya | Backend: uji manual **TASK-M011** lalu **TASK-M015** (kode selesai 2026-11-06, daftar uji di catatan hasil), kemudian **M016**, **M017**; sesudahnya mobile **M023** (Consent AI) dan **M024** (layar chat). M010 dan M022 sudah `Done`. TASK-M001 (menutup dokumen) tersisa sebagian. |
+| Berikutnya | Backend: uji manual **TASK-M016** (kode selesai 2026-11-06), lalu **M017** (uji manual API menyeluruh); sesudahnya mobile **M023** (Consent AI) dan **M024** (layar chat). M010, M011, M015, M022 sudah `Done`. TASK-M001 (menutup dokumen) tersisa sebagian. |
 | Pemblokir | Prasyarat web untuk **rilis**: TASK-031 (go-live), OQ-3 (kontak krisis terverifikasi), OQ-5 (telaah hukum data AI dan pelatihan, termasuk layanan suara pihak ketiga). Tanpa itu, tidak ada rilis mobile. **Keputusan founder (sesi 2026-11-05/06, dicatat di sini sebagai keputusan tertulis):** task kode dibuka tanpa menunggu TASK-M002. TASK-M002 tetap `Blocked` dan wajib selesai sebelum TASK-M045. |
 | Alur kerja | Kerja di `main`, commit lalu push, pesan commit bahasa Inggris. Dokumen di luar repo. Uji manual wajib; tanpa CI. |
 | Data | Sebelum TASK-M044, hanya data dummy bertanda jelas (akun `example.test`, kontak krisis `dummy`). Build `prod` tidak boleh memuat dummy (RULE-M048). |
-| Versi dokumen | PRD-Mobile 0.4, Architecture-Mobile 0.5, Schema-Mobile 0.1 (**perlu pembaruan**, lihat Utang dokumen), Design-Mobile 0.5, Rules-Mobile 0.5, progress 0.8. |
+| Versi dokumen | PRD-Mobile 0.4, Architecture-Mobile 0.5, Schema-Mobile 0.1 (**perlu pembaruan**, lihat Utang dokumen), Design-Mobile 0.5, Rules-Mobile 0.5, progress 0.9. |
 
 > Status task yang perlu uji manual atau konfirmasi founder tidak dianggap terverifikasi hanya karena catatan Doc Sync sudah ditulis.
 
@@ -60,12 +60,12 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 | ID | Task | Repo | Rujukan | Status |
 |---|---|---|---|---|
 | TASK-M010 | Ekstrak `SendChatMessage` (Action) dari `ChatMessageController` (nama sebenarnya di repo web; `RelaxMateController` hanya halaman); web memakainya. Uji manual alur chat web sebelum dan sesudah (kirim, batas harian, 503, krisis) | W | Architecture-M 6.2, 9; RULE-022 | **Done** (uji manual web lolos 2026-11-06) |
-| TASK-M011 | `DailyConversationResolver` + config `relaxboss.mobile.*` (cutoff 4, min app version, masa token) | W | FR-M004, Architecture-M 6.1 | **Doing** (kode selesai 2026-11-06; menunggu uji manual) |
+| TASK-M011 | `DailyConversationResolver` + config `relaxboss.mobile.*` (cutoff 4, min app version, masa token) | W | FR-M004, Architecture-M 6.1 | **Done** (uji manual lolos 2026-11-06) |
 | TASK-M012 | Pasang Sanctum (`install:api`), migration token, named limiter; catat alasan di Architecture web bagian 13 dan revisi ADR-013 | W | ADR-M02, Schema-M 2, RULE-060 web | **Done** (2026-11-06) |
 | TASK-M013 | Auth API: register, login, logout, forgot, resend; rute verifikasi email tanpa login (sesuai OQ-MA2) | W | API-M001..M005, FR-M001 | **Done** (2026-11-06) |
 | TASK-M014 | API ringkasan: `/me`, `/config`, `/consent` (GET dan POST), training consent, `/crisis-contacts`; middleware `verified` varian API (403 `unverified`) | W | API-M006..M011 | **Done** (2026-11-06) |
-| TASK-M015 | API chat: `today`, kirim pesan (retry sudah ada di web lewat `retry=true`, lihat OQ-MA6), `days`, riwayat per percakapan | W | API-M012..M016, FR-M004..M009 | **Doing** (kode selesai 2026-11-06; menunggu uji manual, mengandalkan M011) |
-| TASK-M016 | Hapus akun via API; token dicabut; `active` varian API menolak dan mencabut token (middleware web `active` memakai sesi) | W | API-M017, FR-M003 | Todo |
+| TASK-M015 | API chat: `today`, kirim pesan (retry sudah ada di web lewat `retry=true`, lihat OQ-MA6), `days`, riwayat per percakapan | W | API-M012..M016, FR-M004..M009 | **Done** (uji manual lolos 2026-11-06) |
+| TASK-M016 | Hapus akun via API; token dicabut; `active` varian API menolak dan mencabut token (middleware web `active` memakai sesi) | W | API-M017, FR-M003 | **Doing** (kode selesai 2026-11-06; menunggu uji manual) |
 | TASK-M017 | Uji manual API: skenario Postman/curl (isolasi pengguna A vs B, batas, 503), pastikan log bebas isi pesan dan token (RULE-040) | W | NFR-M01, NFR-M02 | Todo |
 
 ### MM2 - Fondasi Flutter, Auth, Consent
@@ -133,7 +133,9 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 
 ### Catatan hasil task selesai
 
-**TASK-M015 (web; kode selesai 2026-11-06, belum diverifikasi).** Empat endpoint chat di grup bertoken `routes/api.php` (`auth:sanctum`, `api-user`, lalu `api.verified` dan `ai.consent`), controller tipis di `app/Http/Controllers/Api/V1/Chat/`: `TodayController` (API-M012), `SendMessageController` (API-M013, memakai Action `SendChatMessage` dan `StoreChatMessageRequest` yang sama dengan web, limiter `chat`), `DaysController` (API-M015, `cursorPaginate` 15), `MessagesController` (API-M016, `cursorPaginate` 30, urut `id` naik). Tambahan kecil: `ChatPresenter::apiMessage()` (bentuk web + `created_at` ISO UTC; payload Inertia web tidak berubah) dan `DailyConversationResolver::dayKey()` serta `isCurrent()`. Bentuk JSON lengkap ada di Architecture-M bagian 5. Retry lewat `{ "retry": true }` pada API-M013 (API-M014 tidak dibuat). Keputusan baru: POST ke Percakapan di luar hari percakapan ditolak 409 `conversation_closed` (OQ-MA11). Sintaks PHP dicek dengan `php -l`; **Laravel tidak dijalankan di sandbox** (tanpa Composer/vendor), jadi semua perilaku menunggu uji manual founder.
+**TASK-M016 (web; kode selesai 2026-11-06, belum diverifikasi).** Middleware `EnsureApiUserIsActive` (alias `api.active`) dipasang di grup bertoken `routes/api.php` setelah `auth:sanctum`: akun `is_active = false` dijawab 403 `account_inactive` (pesan sama dengan login) dan semua tokennya dihapus; logout dan kirim ulang verifikasi (grup terpisah) tidak terkena. `DELETE /api/v1/account` (`Api\V1\DeleteAccountController`, `DeleteAccountRequest` web) memakai Action `DeleteUserAccount` yang sama dengan web; Action kini juga menghapus token Sanctum pengguna di dalam transaksi (tabel `personal_access_tokens` tanpa FK, jadi tanpa ini token yatim tertinggal; berlaku juga bagi penghapusan dari web). Sukses 204; galat 422 `validation_failed` dengan `errors.password` atau `errors.account`. Tanpa `api.verified` (keputusan: hak hapus data tidak boleh tertahan verifikasi email; web mensyaratkannya, jadi perlu konfirmasi). `php -l` lolos; Laravel belum dijalankan.
+
+**TASK-M015 (web; uji manual lolos 2026-11-06).** Empat endpoint chat di grup bertoken `routes/api.php` (`auth:sanctum`, `api-user`, lalu `api.verified` dan `ai.consent`), controller tipis di `app/Http/Controllers/Api/V1/Chat/`: `TodayController` (API-M012), `SendMessageController` (API-M013, memakai Action `SendChatMessage` dan `StoreChatMessageRequest` yang sama dengan web, limiter `chat`), `DaysController` (API-M015, `cursorPaginate` 15), `MessagesController` (API-M016, `cursorPaginate` 30, urut `id` naik). Tambahan kecil: `ChatPresenter::apiMessage()` (bentuk web + `created_at` ISO UTC; payload Inertia web tidak berubah) dan `DailyConversationResolver::dayKey()` serta `isCurrent()`. Bentuk JSON lengkap ada di Architecture-M bagian 5. Retry lewat `{ "retry": true }` pada API-M013 (API-M014 tidak dibuat). Keputusan baru: POST ke Percakapan di luar hari percakapan ditolak 409 `conversation_closed` (OQ-MA11). Sintaks PHP dicek dengan `php -l`; **Laravel tidak dijalankan di sandbox** (tanpa Composer/vendor), jadi semua perilaku menunggu uji manual founder.
 
 
 **TASK-M012 (web, commit `26b7fdb`).** Sanctum 4.3.3 lewat `install:api` (migration `personal_access_tokens`, `config/sanctum.php`). `routes/api.php` dengan grup `v1`. `Support/ApiError` dan `Support/ApiExceptionRenderer` menyeragamkan galat `/api/*` ke `{ "error": { "code", "message" } }`. Limiter `api-register` (5/menit per IP) dan `api-guest` (20/menit per IP). Blok `relaxboss.mobile` (`token_name`, `token_abilities`, `token_expiration_days`, `guest_per_minute`); `sanctum.expiration` diisi dari config di `AppServiceProvider`. `User` memakai `HasApiTokens`. Pemasangan juga menaikkan 36 paket lain dalam rentang semver (`laravel/framework` v13.34.0 ke v13.40.0, dan seterusnya). Diuji manual: `route:list`, amplop 404, token lewat tinker (abilities, masa berlaku 86400 menit), limiter terdaftar.
@@ -239,7 +241,7 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 | Utang dokumen | Sinkronisasi nama OQ-MA/OQ-M dan nomor FR antar dokumen | Dicek di TASK-M001 |
 | Utang dokumen | Schema-Mobile belum memuat tabel `personal_access_tokens` (Schema-M bagian 2); file tidak ikut serta dalam sinkronisasi ini | Tambahkan: `id`, `tokenable_type`, `tokenable_id`, `name`, `token` (hash, unik), `abilities`, `last_used_at`, `expires_at`, `created_at`, `updated_at` |
 | Utang web | Pemasangan Sanctum ikut menaikkan 36 paket (framework v13.40.0); `composer audit` belum dilaporkan | Jalankan `composer audit` dan catat hasilnya |
-| Utang web | Middleware `active` web memakai sesi (`session()->invalidate()`), tidak bisa dipakai di rute token | Varian API di TASK-M016 |
+| Utang web | ~~Middleware `active` web memakai sesi~~ **Varian API dibuat di kode TASK-M016** (`api.active`) | Tandai selesai setelah uji M016 |
 | Utang mobile | Layar "Perbarui aplikasi" belum punya tautan Kontak bantuan (menyalahi Design-M prinsip 4) | `TODO(TASK-M025)`; jangan rilis sebelum M025 |
 | Utang mobile | Jalur 401 (`ApiClient` menghapus token, `SessionExpiredSignal`, lalu layar Masuk) sudah dikodekan di M022 tetapi belum diuji | Uji lewat `/__expire` di server tiruan (panduan uji M022); hapus baris ini setelah lolos |
 | Utang dokumen | Rincian uji manual TASK-M014 belum tercatat (repo hanya memuat kode) | Lengkapi di catatan hasil |
@@ -270,13 +272,14 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 | 2026-11-06 (sesi M010) | Alur backend lebih dulu: M010, M011, M015, M016, M017. M022 `Done`; utang Doc Sync web M012-M014 dihapus (dokumen web sudah diperbarui). OQ-MA4, MA6, MA7 diputuskan. TASK-M010: `SendChatMessage` (Action), `ChatTurnRejectedException`, `SendChatMessageResult`; `ChatMessageController::store()` menjadi tipis; perilaku dan teks galat web tidak berubah. Menunggu uji manual web. progress.md v0.6. |
 | 2026-11-06 (sesi M011) | M010 `Done` (uji manual web lolos). TASK-M011: `Services\Chat\DailyConversationResolver` (`today()`, `window()`; hari percakapan berganti 04.00 WIB, kunci cache terpisah dari kunci giliran chat) dan `relaxboss.mobile.day_cutoff_hour` = 4. Token (60 hari) dan `min_app_version` sudah ada dari M012/M014. Menunggu uji manual lewat tinker. progress.md v0.7. |
 | 2026-11-06 (sesi M015) | Repo dibaca ulang (web `4258424`, mobile `c1bdbd1`). TASK-M015 dikodekan: API-M012, M013, M015, M016 (+ `ChatPresenter::apiMessage`, `DailyConversationResolver::dayKey/isCurrent`). Retry lewat M013, API-M014 tidak dibuat. Architecture-M v0.5, progress v0.8. Menunggu uji manual (M011 dan M015). |
+| 2026-11-06 (sesi M016) | Founder melaporkan uji M011 dan M015 lolos (`Done`). TASK-M016 dikodekan: `api.active`, `DELETE /account`, pencabutan token di `DeleteUserAccount`. Menunggu uji manual. Architecture-M v0.6, progress v0.9. |
 
 ---
 
 ## 9. Catatan Serah Terima
 
 1. Mulai dari task berstatus `Next` (sekarang TASK-M022: kode selesai, tinggal uji manual, lalu M023). Task kode sudah dibuka lebih awal lewat keputusan founder 2026-11-05/06; prasyarat web (TASK-M002) tetap wajib sebelum rilis (TASK-M045).
-2. Urutan kerja: MM1 (backend) dan MM2 (Flutter) boleh berselang-seling. Yang sudah ditempuh: M010, M012, M013, M014, M020, M021, M022; kode M011 dan M015 menunggu uji manual. Yang disarankan berikutnya: uji M011 dan M015, lalu M016, M017, M023, dan seterusnya sampai MM6. Fase 2 dan 3 dirilis sesudahnya.
+2. Urutan kerja: MM1 (backend) dan MM2 (Flutter) boleh berselang-seling. Yang sudah ditempuh: M010, M012, M013, M014, M020, M021, M022; M011, M015 (uji lolos); kode M016 menunggu uji manual. Yang disarankan berikutnya: uji M016, lalu M017, M023, dan seterusnya sampai MM6. Fase 2 dan 3 dirilis sesudahnya.
 3. Spike TASK-M003 sebaiknya dikerjakan lebih awal karena overlay adalah bagian paling berisiko; bila hasilnya buruk, putuskan apakah overlay keluar dari Fase 1 (ubah PRD-M).
 4. Setiap perubahan perilaku, route, skema, atau keputusan memperbarui dokumen terkait dan progress ini di akhir task yang sama (RULE-M005).
 5. Cara menerapkan hasil task: backend berupa zip untuk ditimpa di root repo web (periksa `git diff --stat` sebelum commit); mobile berupa zip untuk ditimpa di root repo mobile. Sandbox tidak punya PHP penuh, Composer, atau Flutter, jadi verifikasi selalu lewat uji manual lokal.
@@ -286,6 +289,7 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.9 | 2026-11-06 | M011 dan M015 `Done`; M016 `Doing` (kode selesai): catatan hasil, utang `active` varian API, log sesi. |
 | 0.8 | 2026-11-06 | TASK-M015 `Doing` (kode selesai, menunggu uji manual): catatan hasil, OQ-MA11, log sesi, urutan berikutnya. |
 | 0.7 | 2026-11-06 | M010 `Done`; M011 `Doing` (kode selesai); log sesi M011. |
 | 0.6 | 2026-11-06 | M022 `Done`; M010 `Doing` (kode selesai); OQ-MA4, MA6, MA7 diputuskan; utang Doc Sync web M012-M014 dihapus; urutan berikutnya M010, M011, M015, M016, M017. |
