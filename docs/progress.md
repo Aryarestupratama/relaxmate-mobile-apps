@@ -1,0 +1,271 @@
+# RelaxMate Mobile - Progress
+Version: 0.4 | Status: Living document | Last updated: 2026-11-06
+Owner: Founder (solo developer)
+
+Dokumen ini dibaca pertama setiap mulai bekerja di proyek mobile. Perbarui di akhir setiap task atau sesi. Dokumen proyek disimpan **di luar repo kode** (RULE-M014). Task di sisi backend (repo web RelaxBoss) mengikuti `Rules.md` web dan juga dicatat di sini, dengan awalan `TASK-M`, agar satu sumber kebenaran untuk fitur mobile. Perubahan di repo web tetap mengikuti Doc Sync web (`progress.md` web diperbarui bila menyentuh perilaku web).
+
+---
+
+## 1. Status Proyek
+
+| Hal | Status terbaru |
+|---|---|
+| Tahap | Implementasi berjalan. Selesai: **TASK-M012, M013, dan M014** (backend, repo web) serta **TASK-M020 dan M021** (fondasi Flutter; repo mobile commit `8014c38`). Dokumen mobile: PRD v0.4, Architecture v0.3, Schema v0.1 (**perlu pembaruan**, lihat Utang dokumen), Design v0.4, Rules v0.4, progress v0.4. Sejak 2026-11-06 **dokumen mengikuti kode**. |
+| Berikutnya | **TASK-M022** (Flutter: Daftar dan Masuk) sudah bisa dikerjakan karena M013 dan M014 selesai; alternatifnya TASK-M010 dan M011 (backend), lalu M015 (chat). Sebelum M022, uji ulang cek versi aplikasi terhadap `/config` asli. TASK-M001 (menutup dokumen) tersisa sebagian. |
+| Pemblokir | Prasyarat web untuk **rilis**: TASK-031 (go-live), OQ-3 (kontak krisis terverifikasi), OQ-5 (telaah hukum data AI dan pelatihan, termasuk layanan suara pihak ketiga). Tanpa itu, tidak ada rilis mobile. **Keputusan founder (sesi 2026-11-05/06, dicatat di sini sebagai keputusan tertulis):** task kode dibuka tanpa menunggu TASK-M002. TASK-M002 tetap `Blocked` dan wajib selesai sebelum TASK-M045. |
+| Alur kerja | Kerja di `main`, commit lalu push, pesan commit bahasa Inggris. Dokumen di luar repo. Uji manual wajib; tanpa CI. |
+| Data | Sebelum TASK-M044, hanya data dummy bertanda jelas (akun `example.test`, kontak krisis `dummy`). Build `prod` tidak boleh memuat dummy (RULE-M048). |
+| Versi dokumen | PRD-Mobile 0.4, Architecture-Mobile 0.3, Schema-Mobile 0.1 (**perlu pembaruan**, lihat Utang dokumen), Design-Mobile 0.4, Rules-Mobile 0.4, progress 0.4. |
+
+> Status task yang perlu uji manual atau konfirmasi founder tidak dianggap terverifikasi hanya karena catatan Doc Sync sudah ditulis.
+
+---
+
+## 2. Roadmap
+
+Estimasi dalam minggu kerja satu orang `[Assumption]`, belum bertanggal karena menunggu penutupan prasyarat web.
+
+| Milestone | Isi | Estimasi | Task |
+|---|---|---|---|
+| MM0 | Dokumen, prasyarat, spike | 1-2 mgg | TASK-M001 s.d. M005 |
+| MM1 | Backend API `/api/v1` (repo web) | 2-3 mgg | TASK-M010 s.d. M017 |
+| MM2 | Fondasi Flutter, Auth, Consent | 2 mgg | TASK-M020 s.d. M023 |
+| MM3 | Chat inti, krisis, saran, riwayat | 3 mgg | TASK-M024 s.d. M027 |
+| MM4 | Cek Rasa, latihan, maskot dalam app, pengaturan | 2 mgg | TASK-M028 s.d. M031 |
+| MM5 | Maskot mengambang (Android) | 2-3 mgg | TASK-M032 s.d. M034 |
+| MM6 | Hardening dan rilis Fase 1 (closed testing) | 2-3 mgg | TASK-M040 s.d. M045 |
+| MM7 | Fase 2: suara | 3-4 mgg | TASK-M050 s.d. M054 |
+| MM8 | Fase 3: TTS percobaan | 1-2 mgg | TASK-M060 s.d. M061 |
+
+Fase 1 (MVP) = MM1 s.d. MM6. Fase 2 = MM7. Fase 3 = MM8.
+
+---
+
+## 3. Task Board
+
+Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu waktu. Migration ditulis pada task fiturnya (RULE-031 web). Kolom Repo: **W** = repo web (Laravel), **M** = repo mobile (Flutter), **D** = dokumen.
+
+### MM0 - Dokumen, prasyarat, spike
+
+| ID | Task | Repo | Rujukan | Status |
+|---|---|---|---|---|
+| TASK-M001 | Menutup dokumen mobile: baca ulang PRD, Architecture, Schema, Design, Rules; pastikan nomor FR/OQ antar dokumen sinkron; serahkan ke folder dokumen | D | Semua | Todo (sebagian: kontrak API dan nama kode diselaraskan di Architecture-M v0.2; sisa: nomor FR/OQ antar dokumen) |
+| TASK-M002 | Prasyarat web: TASK-031 selesai, TASK-050 selesai, OQ-3 dan OQ-5 dijawab (atau keputusan tertulis untuk mulai API tanpa menunggu) | W | PRD-M 10 | Blocked |
+| TASK-M003 | Spike overlay Android: plugin vs Kotlin sendiri, jenis foreground service (Android 14+), izin, kebijakan Play. Keluaran: catatan keputusan di Architecture-M (menutup OQ-MA1) | M | Architecture-M 6.4, OQ-MA1 | Todo |
+| TASK-M004 | Spike STT: kualitas Bahasa Indonesia di 2-3 perangkat, perilaku jeda dan offline (menutup OQ-MA3) | M | Architecture-M 6.3, OQ-MA3 | Todo |
+| TASK-M005 | Putuskan OQ yang menghalangi: OQ-M2 (ejaan dan cara menyapa), OQ-M3 (Cek Rasa dan Mood Entry), OQ-MA2 (**selesai 2026-11-06**: tautan tanpa login hanya untuk email dari API), OQ-MA4 (`SendChatMessage` sekarang atau bungkus dulu) | D | PRD-M, Architecture-M | Todo |
+
+### MM1 - Backend API (repo web)
+
+| ID | Task | Repo | Rujukan | Status |
+|---|---|---|---|---|
+| TASK-M010 | Ekstrak `SendChatMessage` (Action) dari `ChatMessageController` (nama sebenarnya di repo web; `RelaxMateController` hanya halaman); web memakainya. Uji manual alur chat web sebelum dan sesudah (kirim, batas harian, 503, krisis) | W | Architecture-M 6.2, 9; RULE-022 | Todo |
+| TASK-M011 | `DailyConversationResolver` + config `relaxboss.mobile.*` (cutoff 4, min app version, masa token) | W | FR-M004, Architecture-M 6.1 | Todo |
+| TASK-M012 | Pasang Sanctum (`install:api`), migration token, named limiter; catat alasan di Architecture web bagian 13 dan revisi ADR-013 | W | ADR-M02, Schema-M 2, RULE-060 web | **Done** (2026-11-06) |
+| TASK-M013 | Auth API: register, login, logout, forgot, resend; rute verifikasi email tanpa login (sesuai OQ-MA2) | W | API-M001..M005, FR-M001 | **Done** (2026-11-06) |
+| TASK-M014 | API ringkasan: `/me`, `/config`, `/consent` (GET dan POST), training consent, `/crisis-contacts`; middleware `verified` varian API (403 `unverified`) | W | API-M006..M011 | **Done** (2026-11-06) |
+| TASK-M015 | API chat: `today`, kirim pesan (retry sudah ada di web lewat `retry=true`, lihat OQ-MA6), `days`, riwayat per percakapan | W | API-M012..M016, FR-M004..M009 | Todo |
+| TASK-M016 | Hapus akun via API; token dicabut; `active` varian API menolak dan mencabut token (middleware web `active` memakai sesi) | W | API-M017, FR-M003 | Todo |
+| TASK-M017 | Uji manual API: skenario Postman/curl (isolasi pengguna A vs B, batas, 503), pastikan log bebas isi pesan dan token (RULE-040) | W | NFR-M01, NFR-M02 | Todo |
+
+### MM2 - Fondasi Flutter, Auth, Consent
+
+| ID | Task | Repo | Rujukan | Status |
+|---|---|---|---|---|
+| TASK-M020 | Proyek Flutter: struktur folder, flavor `dev`/`prod`, `--dart-define`, `.gitignore` (keystore, `key.properties`), `README.md`, tema token dan font, `analysis_options` ketat | M | Architecture-M 4, 10; Design-M 2 | **Done** (2026-11-06) |
+| TASK-M021 | API client (`dio`): token, `X-App-Version`, pemetaan error, `flutter_secure_storage`, layar "Perbarui aplikasi" | M | Architecture-M 5, 7, 11 | **Done** (2026-11-06) |
+| TASK-M022 | Layar Daftar, Masuk, Lupa sandi, Cek email (kirim ulang); status memuat/galat/sukses | M | FR-M001, SCR-M03..M06 | Next |
+| TASK-M023 | Consent AI dan persetujuan pelatihan (teks dari API-M008), pengaturan dapat diubah | M | FR-M002, SCR-M07 | Todo |
+
+### MM3 - Chat inti
+
+| ID | Task | Repo | Rujukan | Status |
+|---|---|---|---|---|
+| TASK-M024 | Layar chat harian: aliran per hari, kirim, indikator mengetik, galat, "Coba lagi" (retry), sisa kuota, input nonaktif saat batas harian | M | FR-M004, M006, M007, SCR-M08 | Todo |
+| TASK-M025 | Crisis Response: banner permanen, kontak bantuan (cache + fallback aset, bukan dummy di `prod`), tombol `tel:`, uji manual kasus krisis dari `cases.json` lewat aplikasi | M | FR-M010, M011, SCR-M16 | Todo |
+| TASK-M026 | Saran tindakan: chip dan peta intent/`suggestion.type` ke tujuan (napas, grounding, kontak, Konsultasi web) | M | FR-M008 | Todo |
+| TASK-M027 | Riwayat: garis waktu per tanggal (hanya baca) | M | FR-M005, SCR-M14, M15 | Todo |
+
+### MM4 - Cek Rasa, latihan, maskot, pengaturan
+
+| ID | Task | Repo | Rujukan | Status |
+|---|---|---|---|---|
+| TASK-M028 | Cek Rasa harian: baris blob mood, jawaban dikirim sebagai pesan chat, dapat dilewati | M | FR-M013, SCR-M09 | Todo |
+| TASK-M029 | Latihan napas dan grounding 5-4-3-2-1 lokal (visual + getar opsional; panduan suara ditunda ke Fase 2, keputusan founder) | M | FR-M014, SCR-M11, M12 | Todo |
+| TASK-M030 | Maskot dalam aplikasi (animasi: diam, menyimak, berpikir, bicara) dan mode "Temani saja" | M | FR-M015, Design-M 9, SCR-M13 | Todo |
+| TASK-M031 | Pengaturan, hapus akun, tautan Privasi dan Ketentuan, lapisan privasi di daftar aplikasi terbaru | M | FR-M003, FR-M025, NFR-M01 | Todo |
+
+### MM5 - Maskot mengambang (Android)
+
+| ID | Task | Repo | Rujukan | Status |
+|---|---|---|---|---|
+| TASK-M032 | Alur izin: penjelasan, `SYSTEM_ALERT_WINDOW`, `POST_NOTIFICATIONS`, status izin, default mati | M | FR-M022, Design-M SCR-M18 | Todo |
+| TASK-M033 | `OverlayService` (foreground service + notifikasi dengan tombol "Nonaktifkan"), gelembung geser/tempel tepi, mini-panel, "Istirahatkan" (1 jam / sampai besok) | M | FR-M022..M024, Architecture-M 6.4 | Todo |
+| TASK-M034 | Pengaturan overlay (aktif/nonaktif, snooze), deep link "Ngobrol" dan "Bicara" ke aplikasi, tanpa mikrofon/jaringan di overlay; uji di beberapa versi Android | M | FR-M023, ADR-M06 | Todo |
+
+### MM6 - Hardening dan rilis Fase 1
+
+| ID | Task | Repo | Rujukan | Status |
+|---|---|---|---|---|
+| TASK-M040 | Audit privasi perangkat: `allowBackup=false`, tanpa cleartext di `prod`, `logcat` bebas isi pesan dan token, penyimpanan hanya sesuai Schema-M 4 | M | NFR-M01, RULE-M040 | Todo |
+| TASK-M041 | Perluas `cases.json` (repo web) dengan >= 10 kasus transkrip suara (salah dengar umum); jalankan `relaxboss:check-crisis` dan periksa lewat aplikasi | W | FR-M017, RULE-047 web | Todo |
+| TASK-M042 | Aksesibilitas: TalkBack, target >= 48dp, teks 200%, kontras, reduce motion | M | NFR-M03, Design-M 8 | Todo |
+| TASK-M043 | Preflight mobile dan build rilis: keystore di luar repo, R8, `debuggable=false`, kontak bantuan bukan dummy, uji di >= 2 perangkat nyata | M | Architecture-M 10, RULE-M048 | Todo |
+| TASK-M044 | Aset dan berkas toko: ikon, tangkapan layar, deskripsi, kebijakan privasi diperbarui (web), Data Safety, deklarasi izin overlay dan foreground service; klaim publik hanya yang terkonfirmasi (RULE-049) | D/M | NFR-M07 | Todo |
+| TASK-M045 | Internal testing lalu closed testing; kumpulkan masukan; keputusan lanjut produksi | M | OQ-MA5 | Todo |
+
+### MM7 - Fase 2: suara
+
+| ID | Task | Repo | Rujukan | Status |
+|---|---|---|---|---|
+| TASK-M050 | STT: tombol ketuk-bicara, gelembung, hitung mundur kirim otomatis (batal), konfirmasi hasil rendah; audio tidak disimpan | M | FR-M016, M017 | Todo |
+| TASK-M051 | Mode percakapan suara (mesin keadaan), interupsi (telepon, fokus audio, latar belakang) kembali ke `idle` | M | FR-M018, Architecture-M 6.3 | Todo |
+| TASK-M052 | Klip suara: inventaris, generate dari ElevenLabs **selagi paket berbayar aktif**, simpan master di luar repo, `clips.json`, pemutar, latihan napas bersuara | D/M | FR-M020, ADR-M05, R-M5, R-M7 | Todo |
+| TASK-M053 | Kasus uji krisis suara diperluas dan keputusan penyesuaian `keywords.id.php` bila perlu | W | R-M3 | Todo |
+| TASK-M054 | (Could) Kata panggil "Mates" saat aplikasi atau mini-panel di depan layar, deteksi di perangkat | M | FR-M019 | Todo |
+
+### MM8 - Fase 3: TTS percobaan
+
+| ID | Task | Repo | Rujukan | Status |
+|---|---|---|---|---|
+| TASK-M060 | TTS balasan dengan suara perangkat: default mati, tombol berhenti, peringatan privasi, krisis tidak dibacakan otomatis | M | FR-M021 | Todo |
+| TASK-M061 | Evaluasi suara premium terbatas (OQ-M6): baca syarat resmi, telaah privasi, putuskan | D | OQ-M6 | Todo |
+
+### Catatan hasil task selesai
+
+**TASK-M012 (web, commit `26b7fdb`).** Sanctum 4.3.3 lewat `install:api` (migration `personal_access_tokens`, `config/sanctum.php`). `routes/api.php` dengan grup `v1`. `Support/ApiError` dan `Support/ApiExceptionRenderer` menyeragamkan galat `/api/*` ke `{ "error": { "code", "message" } }`. Limiter `api-register` (5/menit per IP) dan `api-guest` (20/menit per IP). Blok `relaxboss.mobile` (`token_name`, `token_abilities`, `token_expiration_days`, `guest_per_minute`); `sanctum.expiration` diisi dari config di `AppServiceProvider`. `User` memakai `HasApiTokens`. Pemasangan juga menaikkan 36 paket lain dalam rentang semver (`laravel/framework` v13.34.0 ke v13.40.0, dan seterusnya). Diuji manual: `route:list`, amplop 404, token lewat tinker (abilities, masa berlaku 86400 menit), limiter terdaftar.
+
+**TASK-M013 (web).** Lima endpoint `/api/v1/auth` (register, login, logout, forgot-password, resend-verification). `LoginUser` dipecah menjadi `verify()` (tanpa sesi) dan `handle()` (web, perilaku dan pesan tidak berubah) dengan `LoginFailedException`. `IssueMobileToken` (satu token per perangkat; token lama dicabut). Resource `AuthSessionResource` dan `UserSummaryResource`. Tautan verifikasi tanpa login untuk email yang dipicu API (`verification.verify.guest`, `GuestEmailVerificationController`, pesan di `Masuk.tsx`). CORS dimatikan (`config/cors.php`). Diuji manual: validasi 422, daftar, duplikat, kirim ulang (3 lalu 429), tautan verifikasi API vs web, login, pencabutan token lama, logout, akun nonaktif 403, lupa sandi (respons sama), CORS tanpa header, batas login 5 lalu 429, rute terdaftar; regresi web (login, daftar, halaman utama) dinyatakan aman oleh founder.
+
+**TASK-M014 (web, commit `9afd27c`; diperiksa ke repo web 2026-11-06).** Enam endpoint API-M006 sampai M011 di `routes/api.php`: `GET /me` (`user`, `consent`, `limits`, `crisis_contacts_version`), `GET /config` (publik; `min_app_version`, `crisis_contacts_version`, `features.overlay`), `GET /consent` (`ai`, `training`, `state`), `POST /relaxmate/consent`, `POST /account/training-consent` (`choice`), `GET /crisis-contacts` (`version`, `contacts`). Middleware `api.verified` (`EnsureEmailVerifiedApi`, 403 `unverified`) hanya pada dua POST. Limiter `api-public` (per IP) dan `api-user` (per pengguna), masing-masing 60/menit dari `relaxboss.mobile.public_per_minute` dan `user_per_minute`. `min_app_version` bawaan `0.0.0` dari `MOBILE_MIN_APP_VERSION`; `features.overlay` bawaan `true`. `crisis_contacts_version` adalah 12 karakter pertama SHA-1 dari isi daftar. Teks consent di `config/relaxboss.php` bagian `consent` (dipakai web lewat `ConsentInfo` dan API); naikkan `ai_consent_version` atau `ai_training_consent_version` bila teks berubah (OQ-MA8 ditutup). Sanctum 4.3.3 dan Laravel v13.40.0 sesuai `composer.lock`. OQ-MA9 tetap terbuka sampai M025 (`phone` dikirim apa adanya: `119 ext 8`). Token pengguna nonaktif baru ditolak di M016. Hasil uji manual dilaporkan lolos oleh founder; rincian skenarionya tidak ada di repo dan belum tercatat di sini.
+
+**TASK-M020 (mobile).** Proyek Flutter (paket Dart `relaxmate`, Application ID `id.my.relaxboss.relaxmate`, `minSdk 26`). Struktur folder sesuai Architecture-M bagian 4. Flavor `dev` (suffix `.dev`) dan `prod`, `--dart-define=API_BASE_URL` (flavor `prod` menolak non-HTTPS), `ConfigErrorApp` bila konfigurasi tidak valid. Token tema (`RbColors`, `RbText`, `RbSpace`, `RbRadius`, `RbSize`, `RbShadow`, `RbMotion`) dan `RbTheme`, Plus Jakarta Sans dibundel. Manifest: `allowBackup=false`, portrait, cleartext hanya di `src/debug`. Gradle memakai DSL AGP 9 (`extensions.configure<ApplicationExtension>`, `buildFeatures { resValues = true }`). `flutter analyze` bersih; emulator, kasus konfigurasi gagal, dan build debug lolos.
+
+**TASK-M021 (mobile).** `ApiClient` (`dio`; `Authorization`, `X-App-Version`; tanpa log isi atau token), `ApiException` dan `error_mapper` (amplop galat, validasi Laravel, `Retry-After`, timeout, offline), `TokenStorage` (`flutter_secure_storage`), `AppVersion`, fitur `startup` (`StartupGate`, `SplashView`, `UpdateRequiredScreen`, cek `min_app_version` **gagal-terbuka** dengan batas 5 detik), alat `tool/mock_api.mjs`. Paket terpasang: `dio`, `flutter_secure_storage`, `package_info_plus`, `url_launcher`. Diuji manual dengan server tiruan (mode `ok`, `old`, `slow`, `error`, `unauthorized`, server mati) dan backend Laravel asli (`/config` masih 404, aplikasi lanjut).
+
+**Verifikasi dokumen terhadap kode mobile (2026-11-06, commit `8014c38`).** Repo `relaxmate-mobile-apps` dibaca penuh (`lib/`, `android/`, `pubspec`, `analysis_options`, `tool/`). Cocok dengan dokumen: nilai token `Rb*` dan teks `AppTexts` sama dengan Design-M; flavor, `minSdk 26`, Application ID, `allowBackup=false`, cleartext hanya debug, dan portrait; `ApiException`/`error_mapper`; cek versi gagal-terbuka 5 detik; paket dan versi terpasang. Yang diperbarui di dokumen karena kode berbeda atau lebih rinci: struktur folder nyata, versi paket, validasi `AppConfig`, timeout per fase dan pemetaannya ke `timeout` (bukan `ai_unavailable`), cek versi sekali per pembukaan, tema komponen `RbTheme`, nilai bayangan, daftar lint, dan status penerapan privasi. Tidak ada `print`, `// ignore:`, `Colors.*`/`Color(0x...)` di luar `rb_colors.dart`, atau null-bang di `lib/` (pencarian teks). `flutter analyze` dan build tidak dijalankan ulang di sesi ini (tanpa Flutter di sandbox). Repo web (`RELAXBOSS_WEBSITE`, commit `9afd27c`) dibaca untuk TASK-M012 sampai M014: rute, controller, middleware, limiter, dan config sesuai dengan catatan; bentuk JSON `/config` cocok dengan parser `ServerConfig` mobile.
+
+---
+
+## 4. Keterlacakan (ringkas)
+
+| Kebutuhan | Task |
+|---|---|
+| Akun, consent, hapus akun (FR-M001..M003) | M012, M013, M014, M016, M022, M023, M031 |
+| Percakapan harian dan riwayat (FR-M004..M009) | M010, M011, M015, M024, M027 |
+| Keselamatan (FR-M010..M012) | M025, M041, M053 |
+| Cek Rasa dan latihan (FR-M013..M015) | M028, M029, M030 |
+| Suara (FR-M016..M020) | M050, M051, M052, M054 |
+| Suara balasan dan maskot mengambang (FR-M021..M024) | M032, M033, M034, M060 |
+| Pengaturan (FR-M025, M026) | M031 |
+| NFR dan rilis (NFR-M01..M07) | M017, M040, M042, M043, M044, M045 |
+
+---
+
+## 5. Pertanyaan Terbuka
+
+| ID | Pertanyaan | Dibutuhkan sebelum |
+|---|---|---|
+| OQ-MP1 | **Ditutup 2026-11-05:** panduan suara latihan napas ke Fase 2; US-M07 dan FR-M014 di PRD-Mobile v0.3 diperbarui. | - |
+| OQ-M2 | Ejaan "RelaxMate" vs "RelaxMates" dan cara maskot menyapa pengguna | TASK-M030 |
+| OQ-M3 | Cek Rasa hanya pesan chat, atau juga menulis Mood Entry | TASK-M028 |
+| OQ-M4 | Ingatan lintas hari (ringkasan terenkripsi) | Setelah MVP |
+| OQ-M5 | Batas harian untuk obrolan suara | TASK-M050 |
+| OQ-M6 | TTS: suara perangkat saja atau ElevenLabs API terbatas | TASK-M061 |
+| OQ-MA1 | Plugin overlay vs Kotlin; jenis foreground service | TASK-M003 |
+| OQ-MA2 | **Ditutup 2026-11-06:** email verifikasi yang dipicu API memakai rute bertanda tangan tanpa login (`verification.verify.guest`); email dari alur web tidak berubah (ADR-M09). | - |
+| OQ-MA3 | Kualitas STT Bahasa Indonesia, paket bahasa | TASK-M004 |
+| OQ-MA4 | `SendChatMessage` diekstrak sekarang atau bungkus dulu. Temuan 2026-11-06: logika ada di satu metode `ChatMessageController::store()` dan retry sudah ada (`retry=true`), jadi ekstraksi terbatas dan jelas batasnya | TASK-M010 |
+| OQ-MA5 | Android minimum, aturan closed testing Play, Data Safety | TASK-M043 |
+| OQ-MA6 | Bentuk respons dan kode galat API chat (API-M013, M014): ikuti presenter web (`user_message`, `assistant_message`, `has_crisis`, `remaining_today`, kode `invalid_message`, `busy`, `daily_limit`, `rate_limited`, `ai_unavailable`, `nothing_to_retry`) dan tambahkan `created_at` ISO UTC (RULE-M033), atau bentuk di Architecture-M bagian 5. Usulan: ikuti web dan hapus endpoint retry terpisah | TASK-M015 |
+| OQ-MA7 | Batas hari kuota (`ChatQuota` mulai 00.00 WIB) berbeda dari hari percakapan (`DailyConversationResolver`, 04.00 WIB). Antara 00.00 dan 04.00 keduanya tidak sejajar | TASK-M011 |
+| OQ-MA8 | **Ditutup 2026-11-06 (TASK-M014):** teks consent ada di `config/relaxboss.php` bagian `consent`; naikkan `ai_consent_version` atau `ai_training_consent_version` bila teks berubah. | - |
+| OQ-MA9 | Kontak krisis web memuat `119 ext 8`; format `tel:` untuk ekstensi perlu diputuskan dan diuji di perangkat | TASK-M025 |
+| OQ-3, OQ-5 (web) | Kontak krisis terverifikasi; telaah hukum data AI, pelatihan, dan layanan suara | TASK-M045 |
+
+---
+
+## 6. Keputusan Kunci (ringkas)
+
+| Keputusan | Sumber |
+|---|---|
+| Flutter, Android dulu | ADR-M01 |
+| Sanctum token untuk mobile (merevisi ADR-013 web) | ADR-M02 |
+| Satu percakapan per hari lewat resolver, tanpa mengubah skema | ADR-M03 |
+| Tanpa streaming | ADR-M04 |
+| Klip suara rekaman dibundel + suara perangkat untuk balasan panjang | ADR-M05 |
+| Overlay tanpa mikrofon, jaringan, data pengguna, atau AccessibilityService | ADR-M06 |
+| Isi chat tidak di disk perangkat | ADR-M07 |
+| Mikrofon tidak aktif di latar belakang (keputusan founder 2026-11-04: cari aman) | PRD-M Non-goals |
+| Karakter orisinal RelaxMate, panggilan "Mates"; tidak meniru karakter pihak lain | PRD-M 1 |
+| Nilai token warna mengikuti kode website (`app.css`), bukan tabel Design web yang belum sinkron | Design-M 2, RULE-M050 |
+| Panduan suara latihan napas ditunda ke Fase 2; Fase 1 visual + getar | PRD-M v0.3, TASK-M029 |
+| Urutan backend: M012, M013, M014 lebih dulu karena membuka layar Masuk (M022); M010 dan M011 hanya dibutuhkan chat (M015) | Keputusan 2026-11-06 |
+| Email verifikasi dari API memakai tautan tanpa login; alur web tidak berubah | ADR-M09, OQ-MA2 |
+| Satu token per perangkat; login baru mencabut token lama bernama sama | ADR-M10 |
+| Galat `/api/*` seragam `{ "error": { "code", "message" } }`; kode final `invalid_credentials` (401), `account_inactive` (403), `rate_limited` (429), `validation_failed` (422), `unauthenticated` (401) | ADR-M11 |
+| CORS dimatikan (klien hanya aplikasi native) | ADR-M12 |
+| Pemeriksaan versi aplikasi gagal-terbuka (batas 5 detik) | ADR-M13 |
+| `crisis_contacts_version` adalah sidik isi daftar kontak (12 karakter pertama SHA-1 dari JSON daftar; berubah hanya bila isi berubah); klien membandingkannya untuk memperbarui cache | Architecture-M 5 (TASK-M014) |
+| `min_app_version` bawaan `0.0.0` (env `MOBILE_MIN_APP_VERSION`); penanda `features.overlay` ada di config server untuk R-M4 | Architecture-M 5, 9 (TASK-M014) |
+| Teks consent di server (`config/relaxboss.php` bagian `consent`); versi consent AI dan pelatihan dinaikkan terpisah | Architecture-M 5, 9 (TASK-M014) |
+| **Dokumen mengikuti kode:** bila dokumen dan kode berbeda, kode yang dianggap benar dan dokumen diperbarui | Keputusan founder 2026-11-06 |
+| Paket Dart `relaxmate`; flavor `dev` ber-suffix `.dev`; teks UI di `core/texts/app_texts.dart` | Architecture-M 4, 10 |
+
+---
+
+## 7. Risiko dan Utang
+
+| ID | Risiko / utang | Catatan |
+|---|---|---|
+| R-M1 | Penolakan toko | Karakter orisinal, disclaimer, hapus akun, overlay default mati |
+| R-M3 | Krisis terlewat karena salah dengar | TASK-M041, M053 |
+| R-M4 | Aturan foreground service/overlay berubah; Fase 1 lebih berat karena overlay ikut MVP | Spike TASK-M003; modul overlay terpisah dan bisa dimatikan lewat feature flag |
+| R-M5/M7 | Biaya dan konsistensi suara | Generate semua klip dalam satu sesi selagi paket berbayar aktif |
+| Utang web | Refaktor `SendChatMessage` menyentuh produksi web | Uji manual sebelum dan sesudah (TASK-M010) |
+| Utang dokumen | Sinkronisasi nama OQ-MA/OQ-M dan nomor FR antar dokumen | Dicek di TASK-M001 |
+| Utang dokumen | Schema-Mobile belum memuat tabel `personal_access_tokens` (Schema-M bagian 2); file tidak ikut serta dalam sinkronisasi ini | Tambahkan: `id`, `tokenable_type`, `tokenable_id`, `name`, `token` (hash, unik), `abilities`, `last_used_at`, `expires_at`, `created_at`, `updated_at` |
+| Utang web | Pemasangan Sanctum ikut menaikkan 36 paket (framework v13.40.0); `composer audit` belum dilaporkan | Jalankan `composer audit` dan catat hasilnya |
+| Utang web | Middleware `active` web memakai sesi (`session()->invalidate()`), tidak bisa dipakai di rute token | Varian API di TASK-M016 |
+| Utang mobile | Layar "Perbarui aplikasi" belum punya tautan Kontak bantuan (menyalahi Design-M prinsip 4) | `TODO(TASK-M025)`; jangan rilis sebelum M025 |
+| Utang mobile | `onUnauthorized` baru menghapus token; pengalihan ke layar Masuk belum ada | `TODO(TASK-M022)`; jalur 401 baru teruji penuh di M022 |
+| Utang web | Doc Sync web untuk TASK-M012 sampai M014 (Architecture web, Schema web, `progress.md` web): dokumen web tidak ada di repo web sehingga statusnya tidak bisa diperiksa dari sini | Periksa dan perbarui di folder dokumen web |
+| Utang dokumen | Rincian uji manual TASK-M014 belum tercatat (repo hanya memuat kode) | Lengkapi di catatan hasil |
+| Utang mobile | `ServerConfig` baru membaca `min_app_version`; `crisis_contacts_version` (string 12 hex) dan `features.overlay` (boolean) sudah dikirim `/config` tetapi belum dibaca | M025 dan M033/M034 |
+| Utang mobile | Cek versi baru diuji dengan server tiruan; `/config` asli ada sejak M014 dan bentuknya cocok dengan parser (diperiksa lewat kode, belum dijalankan) | Uji jalan terhadap backend asli sebelum M022 |
+| Utang mobile | `android/app/build.gradle.kts`: rilis masih ditandatangani kunci debug dan ada dua `TODO` templat tanpa ID (RULE-M027) | TASK-M043; jangan rilis sebelumnya |
+| Utang mobile | Komentar di `pubspec.yaml` ("Versi `any` hanya untuk setup awal...") usang karena versi sudah memakai `^` | Hapus di commit berikutnya |
+| Utang mobile | `AppConstants.requestTimeout` berlaku per fase (connect, send, receive) dan dipetakan ke `timeout`, bukan `ai_unavailable` seperti tertulis di komentarnya | Putuskan perlakuan di M024; samakan komentar |
+| Catatan web | `GET /crisis-contacts` memuat penanda `dummy` per kontak; preflight RULE-M048 dapat memakainya. Daftar produksi saat ini hanya Healing119.id (`119 ext 8`); kontak Laboratorium muncul bila `PSYCH_LAB_HOTLINE_PHONE` terisi | M025, M043 |
+| Observasi mobile | `StartupGate` menahan seluruh aplikasi sampai cek versi selesai (maks. 5 detik); kelak kontak bantuan harus bisa dibuka tanpa menunggu (Design-M prinsip 4, RULE-M034) | Evaluasi di M025 |
+
+---
+
+## 8. Log Sesi
+
+| Tanggal | Ringkasan |
+|---|---|
+| 2026-11-05 | Dokumen mobile disusun: PRD v0.2, Architecture v0.1, Schema v0.1, Design v0.1, Rules v0.1, progress v0.1. Ditemukan inkonsistensi US-M07 vs klip suara (OQ-MP1). |
+| 2026-11-05 (lanjutan) | Keputusan founder: warna mengikuti kode website; panduan suara napas ke Fase 2. PRD-M v0.3, Design-M v0.2, Rules-M v0.2 diperbarui; OQ-MP1 dan OQ-D1 ditutup. |
+| 2026-11-06 | Sesi implementasi. Repo web dan dokumen dibaca; ditemukan ketidakcocokan dokumen dan kode (nama controller chat, bentuk respons dan kode galat, batas hari kuota, sumber teks consent, format `tel:`) dan dicatat sebagai OQ-MA6 s.d. MA9. Founder membuka task kode lebih awal. TASK-M020 dan M021 (Flutter) selesai dan lolos uji manual; TASK-M012 dan M013 (backend) selesai dan di-push ke `main` repo web. |
+| 2026-11-06 (lanjutan) | TASK-M014 (backend) selesai. Dokumen disinkronkan ke kode mobile (commit `8014c38`): PRD, Architecture, Design, Rules, progress. Dipastikan Architecture-M adalah dokumen mobile di folder dokumen, bukan Architecture web; perubahan backend M014 dicatat di Architecture-M bagian 5, 7, 9, sedangkan Doc Sync web tetap terpisah. Repo web (`9afd27c`) kemudian diperiksa dan cocok dengan catatan M012 sampai M014; fakta backend kini berlabel `[Verified]`. |
+
+---
+
+## 9. Catatan Serah Terima
+
+1. Mulai dari task berstatus `Next` (sekarang TASK-M022). Task kode sudah dibuka lebih awal lewat keputusan founder 2026-11-05/06; prasyarat web (TASK-M002) tetap wajib sebelum rilis (TASK-M045).
+2. Urutan kerja: MM1 (backend) dan MM2 (Flutter) boleh berselang-seling. Yang sudah ditempuh: M012, M013, M014, M020, M021. Yang disarankan berikutnya: M022, M023, lalu M010, M011, M015, M016, M017, dan seterusnya sampai MM6. Fase 2 dan 3 dirilis sesudahnya.
+3. Spike TASK-M003 sebaiknya dikerjakan lebih awal karena overlay adalah bagian paling berisiko; bila hasilnya buruk, putuskan apakah overlay keluar dari Fase 1 (ubah PRD-M).
+4. Setiap perubahan perilaku, route, skema, atau keputusan memperbarui dokumen terkait dan progress ini di akhir task yang sama (RULE-M005).
+5. Cara menerapkan hasil task: backend berupa zip untuk ditimpa di root repo web (periksa `git diff --stat` sebelum commit); mobile berupa zip untuk ditimpa di root repo mobile. Sandbox tidak punya PHP penuh, Composer, atau Flutter, jadi verifikasi selalu lewat uji manual lokal.
+6. **Dokumen mengikuti kode** (keputusan 2026-11-06): sebelum menulis dokumen, baca kode; bila berbeda, perbarui dokumen. Fakta web diperiksa ke repo `RELAXBOSS_WEBSITE` (bukan hanya dari catatan); yang belum bisa diperiksa ditandai jelas sebagai belum diverifikasi.
+
+## Change Log
+
+| Versi | Tanggal | Perubahan |
+|---|---|---|
+| 0.4 | 2026-11-06 | TASK-M014 Done; M022 menjadi Next; catatan hasil M014; verifikasi dokumen terhadap kode mobile; OQ-MA8 ditutup; keputusan baru (sidik kontak, `min_app_version` bawaan, teks consent di server, dokumen mengikuti kode); utang baru dari audit kode dan Doc Sync web; fakta backend diperiksa ke repo web (`9afd27c`). |
+| 0.3 | 2026-11-06 | Sinkronisasi setelah TASK-M012, M013, M020, M021 selesai: status task, catatan hasil, OQ-MA2 ditutup, OQ-MA6 s.d. MA9 baru, keputusan kunci, risiko dan utang, log sesi, catatan serah terima. |
+| 0.2 | 2026-11-05 | OQ-MP1 dan OQ-D1 ditutup; keputusan warna dan panduan suara napas; versi dokumen disinkronkan. |
+| 0.1 | 2026-11-05 | Draf awal: roadmap MM0-MM8, Task Board TASK-M001..M061, keterlacakan, OQ, keputusan, risiko. |

@@ -1,0 +1,307 @@
+# RelaxMate Mobile - Design System dan Spesifikasi Layar
+Version: 0.4 | Status: Draft | Last updated: 2026-11-06
+Depends on: PRD-Mobile v0.3, Architecture-Mobile v0.3, Design RelaxBoss (web) | Owner: Founder (solo developer)
+
+Label: `[Assumption]` bisa diubah. Kedalaman: **Lite**. Platform: Android (phone) dulu, mode terang. Tata letak layar yang tidak tertulis dibangun sederhana (fungsi dulu) memakai token dan komponen di dokumen ini (RULE-M007).
+
+---
+
+## 1. Prinsip Desain
+
+1. **Hangat dan tenang.** Nada "kamu", warna lembut, gerak pelan; tidak ada elemen yang menekan atau mengejar.
+2. **Satu aksi utama per layar.** Chat adalah rumah; fitur lain dijangkau darinya.
+3. **Maskot adalah penghubung,** bukan hiasan: ia menyimak, berpikir, berbicara, dan menemani. Karakter orisinal RelaxMate (aset dari web), tidak meniru karakter pihak lain.
+4. **Bantuan nyata tidak pernah tersembunyi.** Jalur ke kontak bantuan selalu ada, bekerja tanpa internet, dan menang atas animasi, suara, dan overlay.
+5. **Suara sama pentingnya dengan teks.** Setiap hal yang terdengar punya padanan teks; setiap input suara terlihat sebagai teks.
+6. **Jujur tentang batas.** Disclaimer "bukan layanan medis", penanda "AI", dan tidak mengaku punya perasaan.
+7. **Konsisten dengan web.** Token, font, dan nada sama dengan RelaxBoss web agar terasa satu produk.
+
+---
+
+## 2. Token
+
+**Sumber nilai: kode website, yaitu `resources/css/app.css`.** Tabel token di dokumen Design web belum sinkron dengan kode (keputusan founder 2026-11-05), jadi bukan acuan warna; bila website mengubah token, mobile diperbarui di task yang sama. Di Flutter dibuat sebagai `ThemeExtension` (`RbColors`, `RbText`, `RbSpace`); **dilarang nilai langsung di widget** (RULE-M050). Diterapkan di TASK-M020 `[Verified]`: selain tiga `ThemeExtension` itu ada kelas konstanta `RbRadius`, `RbSize` (target sentuh 48, avatar 40/56/72, ikon 24), `RbShadow`, `RbMotion`, dan `RbTheme.light()`; widget mengaksesnya lewat `context.rbColors`, `context.rbText`, `context.rbSpace`.
+
+### Tema komponen Material (`RbTheme.light()`) `[Verified]`
+
+Mode terang, `useMaterial3`, latar layar `pageBg`. `ColorScheme`: `primary`/`onPrimary` dari token, `secondary` = `softLavender`, `error` = `danger`, `surface` = `card`, `outline` = `inputBorder`, `outlineVariant` = `border`. Komponen bawaan sudah mengikuti token sehingga widget cukup memakai `FilledButton`, `OutlinedButton`, `TextButton`, `TextField`, dan `SnackBar`:
+
+| Komponen | Gaya |
+|---|---|
+| `FilledButton` | Bentuk pil, minimal 48 x 48, latar `primary`; ditekan `navHover`; nonaktif latar `surfaceAlt` dan teks `textMuted` |
+| `OutlinedButton` | Pil, minimal 48 x 48, bingkai `primary` 2dp |
+| `TextButton` | Minimal 48 x 48, teks `primary` |
+| Kolom isian | Berlatar `card`, radius 8, bingkai `inputBorder`; fokus `primary` 2dp; galat `danger` (2dp saat fokus); isi horizontal 16 dan vertikal 12 |
+| `SnackBar` | Mengambang, latar `primary`, teks `onPrimary`, radius 12 |
+| `AppBar` | Latar `pageBg`, tanpa bayangan, judul gaya H3 |
+
+### Warna
+
+| Token | Nilai | Pemakaian |
+|---|---|---|
+| `primary` | `#0A2244` | Tombol utama, ikon utama, fokus, teks utama (`text` = `primary`) |
+| `onPrimary` | `#FFFFFF` | Teks di atas `primary` |
+| `pageBg` / `card` | `#FFFFFF` | Latar layar dan kartu |
+| `textSecondary` | `#42506A` | Teks pendukung (di atas putih/mist) |
+| `textMuted` | `#555B72` | Keterangan, placeholder |
+| `border` | `#D5DCE8` | Garis dekoratif kartu |
+| `inputBorder` | `#76819A` | Batas input dan kontrol |
+| `surfaceAlt` | `#EEF2F8` | Gelembung balasan maskot, panel sekunder |
+| `softLavender` | `#DED4FF` | Gelembung pesan pengguna, avatar, lencana "AI", kartu hiasan |
+| `softSky` / `softMint` / `softPeach` | Alias ke `softLavender` (`#DED4FF`), sama seperti `app.css` saat ini | Kartu hiasan; jangan membuat nilai sendiri sampai website mengubahnya |
+| `brandSoft` | `#C3B1FF` | Hanya lencana di atas permukaan gelap dan tint aktif |
+| `mood1`..`mood5` | `#A98BFF`, `#9CCBF2`, `#FFB997`, `#ABEAA2`, `#FCE46F` | Skala mood dan blob (ungu, biru, persik, hijau, kuning) |
+| `success` | `#047857` | Sukses |
+| `warning` | `#B45309` | Peringatan |
+| `danger` | `#DC2626` | Galat, aksi merusak |
+| `crisisBg` / `crisisText` | `#FEF2F2` / `#991B1B` | Banner Crisis Response |
+| `navHover` | `#163A6B` | Keadaan tekan tombol navy |
+
+**Aturan:** teks di atas pastel dan warna mood selalu `primary`/navy; teks putih dilarang di atas pastel (kontras). Warna mood bukan penanda status; galat dan krisis memakai `danger` dan `crisis*`. Warna tidak pernah satu-satunya pembawa makna.
+
+**Latar gradien tenang** (splash, onboarding, Temani saja, latar video promosi): putih di atas yang memudar ke biru muda lalu lavender di bawah (aset `bg-gradient.png`, 4:5). `[Assumption]` nilai ujung: atas `#FCFCFD`, tengah `#B9D0FF`, bawah `#BFADFF`; teks navy di atas bagian terang, kartu putih di atas bagian berwarna. Nilai tersimpan sebagai `gradientTop`, `gradientMid`, `gradientBottom` di `RbColors`; belum dipakai layar mana pun.
+
+### Tipografi
+
+Plus Jakarta Sans (400-800), dibundel sebagai aset (TTF berat 400, 500, 600, 700, 800 di `assets/fonts`, lisensi SIL OFL); tema tidak menetapkan `fontFamilyFallback` (Flutter memakai font sistem untuk glyph yang tidak ada) `[Verified]`. Ukuran dalam `sp` (mengikuti skala teks pengguna).
+
+| Peran | Ukuran | Berat | Tinggi baris |
+|---|---|---|---|
+| Teks isi / pesan chat | 16 | 500 | 1,5 |
+| Teks kecil | 14 | 400 | 1,5 |
+| Keterangan | 12 | 400 | 1,4 |
+| H3 | 18 | 600 | 1,4 |
+| H2 | 22 | 700 | 1,3 |
+| H1 | 28 | 800 | 1,2 |
+| Tombol | 16 | 700 | 1,2 |
+
+Pemetaan ke `TextTheme` Material: H1 = `headlineMedium`, H2 = `titleLarge`, H3 = `titleMedium`, teks isi = `bodyLarge`, teks kecil = `bodyMedium`, keterangan = `bodySmall`, tombol = `labelLarge` (`RbTheme.light()`).
+
+Teks layar penting (judul sambutan, krisis) tidak lebih kecil dari 16sp.
+
+### Jarak, bentuk, bayangan, gerak
+
+- Jarak (basis 4): 4, 8, 12, 16, 24, 32, 48.
+- Radius: 8 (input kecil), 12 (kartu), 20 (gelembung chat), 24 (panel/sheet), pil penuh (chip, tombol utama besar).
+- Bayangan: diturunkan dari `primary` (6% kartu, 12% panel/overlay), bukan angka terpisah. Kartu: blur 12, offset (0, 4); panel/overlay: blur 24, offset (0, 8) (`RbShadow.card` dan `RbShadow.panel`) `[Verified]`.
+- Gerak: 150 ms ease-out untuk umpan balik; transisi layar 250 ms; maskot bergerak pelan (napas 3-4 dtk). Hormati `MediaQuery.disableAnimations` (matikan gerak non-esensial; maskot menjadi gambar diam).
+- Target sentuh minimal **48 x 48 dp**; jarak antar target >= 8dp.
+- Hanya portrait pada rilis pertama `[Assumption]`.
+
+---
+
+## 3. Komponen
+
+| ID | Komponen | Spesifikasi |
+|---|---|---|
+| CMP-M01 | `MateAvatar` | Lingkaran 40/56/72dp berisi avatar RelaxMate (aset web) di atas `softLavender`. Dibangun di TASK-M020 (`MateAvatar`, ukuran `small`/`medium`/`large`) |
+| CMP-M02 | `ChatBubble` | Pengguna: rata kanan, `softLavender`; RelaxMate: rata kiri, `surfaceAlt` + `MateAvatar` kecil; radius 20 (sudut dekat pengirim 6); teks isi; lebar maks. 80% layar; teks biasa; `Semantics` "RelaxMate berkata: ..." |
+| CMP-M03 | `TypingIndicator` | Tiga titik navy bergantian di gelembung RelaxMate; teks tersembunyi "RelaxMate sedang menulis" untuk TalkBack; maks. 20 detik |
+| CMP-M04 | `CrisisBanner` | Latar `crisisBg`, teks `crisisText`, ikon, tombol "Hubungi bantuan" (`tel:`); menempel di atas daftar pesan, **tidak dapat ditutup** setelah krisis terdeteksi |
+| CMP-M05 | `SuggestionChip` | Pil putih berbingkai navy 2dp, label + ikon; di bawah balasan; chip `escalate_crisis` tidak dapat ditutup |
+| CMP-M06 | `ChatInputBar` | Kolom teks 1-4 baris (`inputBorder`), placeholder, tombol mikrofon (kiri tombol kirim), tombol kirim navy; dinonaktifkan dengan penjelasan saat batas harian tercapai |
+| CMP-M07 | `VoiceButton` | Lingkaran 56dp navy dengan ikon mikrofon; keadaan idle, mendengarkan (cincin berdenyut), nonaktif; selalu ada label teks |
+| CMP-M08 | `Waveform` | 18 batang navy yang bergerak mengikuti level suara; tidak membawa makna selain "sedang mendengar" (ada label teks) |
+| CMP-M09 | `SendCountdown` | Bilah tipis yang menyusut 1,5 dtk + teks "Mengirim dalam 1,5 detik" + tombol "Batal"; setelah kirim: "Terkirim otomatis" |
+| CMP-M10 | `MoodBlobRow` | Lima blob `mood1..5` 56dp dengan label teks di bawah (tidak hanya warna); satu terpilih diberi cincin navy |
+| CMP-M11 | `BreathingGuide` | Lingkaran yang membesar/mengecil mengikuti ritme, instruksi teks besar ("Tarik napas", "Tahan", "Embuskan"), hitung putaran, tombol "Selesai" |
+| CMP-M12 | `EmptyState` | Maskot kecil + satu kalimat hangat + satu aksi |
+| CMP-M13 | `ErrorAlert` | Kartu `surfaceAlt` dengan ikon `danger`, pesan ramah, tombol "Coba lagi"; tanpa detail teknis; tidak memakai warna krisis agar merah krisis hanya untuk keselamatan |
+| CMP-M14 | `ConsentSheet` | Bottom sheet penuh: judul, teks dari API-M008 (dapat digulir), dua tombol; persetujuan pelatihan sebagai pilihan terpisah tanpa nilai awal |
+| CMP-M15 | `SettingToggleRow` | Judul, keterangan satu baris, `Switch`; tinggi >= 56dp |
+| CMP-M16 | `DaySeparator` | Pil kecil "Hari ini", "Kemarin", atau tanggal WIB |
+| CMP-M17 | `OverlayBubble` | Lingkaran 64dp, avatar RelaxMate, bayangan panel, dapat digeser dan menempel ke tepi; melayang ringan |
+| CMP-M18 | `OverlayPanel` | Kartu 280dp: avatar + nama, sapaan lokal, tiga aksi (Ngobrol, Bicara, Istirahatkan), tombol tutup |
+| CMP-M19 | `Snack` | Snackbar singkat untuk sukses/galat non-kritis; galat validasi tetap di dekat kolom |
+
+
+---
+
+## 4. Status Standar (semua layar)
+
+| Status | Perilaku |
+|---|---|
+| Memuat | Skeleton sebentuk konten; tombol menampilkan "Memproses..." dan dinonaktifkan |
+| Kosong | `EmptyState` dengan pesan hangat dan satu aksi |
+| Galat validasi | Pesan di bawah kolom; fokus ke kolom pertama yang salah; diumumkan ke TalkBack |
+| Galat sistem | `ErrorAlert` dengan "Coba lagi"; pesan pengguna yang belum terjawab tetap tampil |
+| Sukses | `Snack` singkat atau perubahan status yang jelas |
+| Offline | Banner halus "Koneksi terputus"; isian tidak hilang; kontak bantuan, latihan, dan klip tetap bisa dibuka |
+
+### 4.1 Penerapan pada layar yang sudah dibangun
+
+| Layar | Memuat | Kosong | Galat | Sukses | Offline |
+|---|---|---|---|---|---|
+| SCR-M01 Pembuka dan cek versi (`SplashView`, `StartupGate`) | Maskot besar dan indikator putar berlabel "Memuat..." (pengecualian dari skeleton karena belum ada konten untuk dibentuk) | n/a | Konfigurasi build tidak valid: `ConfigErrorApp` dengan teks "Konfigurasi aplikasi belum lengkap. Hubungi pengembang." Galat pemeriksaan versi tidak ditampilkan (gagal-terbuka) | Lanjut ke aplikasi | Lanjut ke aplikasi; kontak bantuan dan latihan tetap bisa dibuka |
+| SCR-M20 Perbarui aplikasi (`UpdateRequiredScreen`) | n/a | n/a | `Snack` "Toko aplikasi belum bisa dibuka. Coba lagi nanti." bila toko gagal dibuka | Tombol membuka halaman aplikasi di toko | Layar tetap tampil; tombol toko dapat gagal dan menampilkan `Snack` yang sama |
+| SCR-M08 RelaxMate (`ChatScreen`, sementara) | n/a | Sambutan statis: avatar besar, judul "RelaxMate", teks sambutan, dan "Mode pengembangan" hanya di flavor `dev` | n/a | n/a | n/a (diganti di TASK-M024) |
+
+Pemeriksaan versi berjalan **sekali per pembukaan aplikasi** (bukan saat kembali dari latar belakang) dan membungkus seluruh router lewat `StartupGate` di `MaterialApp.builder`; selama pemeriksaan (maks. 5 detik) hanya `SplashView` yang tampil. Judul SCR-M20 diberi `Semantics(header: true)` `[Verified]`.
+
+Utang: SCR-M20 belum memuat tautan Kontak bantuan; Design-M prinsip 4 mewajibkan bantuan nyata tidak tersembunyi (`TODO(TASK-M025)`).
+
+---
+
+## 5. Inventaris Layar
+
+| ID | Layar | Akses | Rujukan |
+|---|---|---|---|
+| SCR-M01 | Pembuka dan cek versi | Semua | FR-M001, Architecture-M 11 |
+| SCR-M02 | Sambutan singkat (1 layar) | Tamu | PRD-M 4 |
+| SCR-M03 | Daftar | Tamu | FR-M001 |
+| SCR-M04 | Masuk | Tamu | FR-M001 |
+| SCR-M05 | Lupa kata sandi | Tamu | API-M004 |
+| SCR-M06 | Cek email / verifikasi | Login | API-M005 |
+| SCR-M07 | Consent AI dan persetujuan pelatihan | Login | FR-M002 |
+| SCR-M08 | **RelaxMate (aliran harian)** | Login + consent | FR-M004..M009 |
+| SCR-M09 | Cek Rasa (sheet pembuka sesi) | Login + consent | FR-M013 |
+| SCR-M10 | Mode percakapan suara | Login + consent | FR-M016..M018 (Fase 2) |
+| SCR-M11 | Latihan napas | Login | FR-M014 |
+| SCR-M12 | Grounding 5-4-3-2-1 | Login | FR-M014 |
+| SCR-M13 | Temani saja | Login | FR-M015 |
+| SCR-M14 | Riwayat (garis waktu) | Login + consent | FR-M005 |
+| SCR-M15 | Detail hari (hanya baca) | Login + consent | FR-M005 |
+| SCR-M16 | Kontak bantuan | Semua | FR-M010, M011 |
+| SCR-M17 | Pengaturan | Login | FR-M025 |
+| SCR-M18 | Maskot mengambang (penjelasan izin dan pengaturan) | Login | FR-M022 |
+| SCR-M19 | Hapus akun | Login | FR-M003 |
+| SCR-M20 | Perbarui aplikasi | Semua | API-M007 |
+| OVL-M01 | Gelembung maskot (overlay) | Android | FR-M022 |
+| OVL-M02 | Mini-panel maskot (overlay) | Android | FR-M024 |
+
+---
+
+## 6. Spesifikasi Layar Utama
+
+### SCR-M08 RelaxMate (aliran harian)
+- **Bilah atas:** `MateAvatar` + "RelaxMate" + lencana "AI"; menu (Riwayat, Latihan, Kontak bantuan, Pengaturan).
+- **Isi:** `DaySeparator` ("Hari ini"), daftar pesan (rata kanan untuk pengguna, rata kiri untuk RelaxMate), `SuggestionChip` di bawah balasan sesuai prioritas intent; `CrisisBanner` menempel di atas setelah krisis terdeteksi.
+- **Awal sesi harian:** `MoodBlobRow` di kartu sambutan ("Hari ini, kamu yang mana?"); dapat dilewati.
+- **Input:** `ChatInputBar` dengan mikrofon (Fase 2); tombol kirim aktif bila ada teks.
+- **Perilaku:** gulir otomatis ke pesan terbaru; keyboard tidak menutup input; pesan gagal menampilkan "Coba lagi" di bawah gelembung; saat 503 saran statis dan latihan lokal ditawarkan; batas harian: input nonaktif dengan penjelasan.
+- **Aksesibilitas:** pesan baru diumumkan lewat live region (sopan); urutan fokus: bilah atas, banner, pesan, chip, input.
+
+### SCR-M09 Cek Rasa
+Sheet dari bawah: "Hari ini, kamu yang mana?" + `MoodBlobRow` + tombol "Kirim ke RelaxMate" dan "Lewati". Jawaban dikirim sebagai pesan chat biasa (teks hasil template, mis. "Hari ini aku merasa: sedih"). Tidak membuat Mood Entry (OQ-M3).
+
+### SCR-M10 Mode percakapan suara (Fase 2)
+Layar penuh berlatar gradien tenang: maskot besar (menyimak / berpikir / bicara), `Waveform` dan teks hasil transkripsi besar di bawah, `SendCountdown`, tombol "Berhenti" jelas. Keadaan mengikuti mesin keadaan Architecture-M 6.3. Teks balasan tetap tampil di bawah maskot (padanan teks untuk suara). Krisis: Crisis Response muncul penuh di layar ini (teks tetap + tombol telepon) dan mode berhenti.
+
+### SCR-M11 / M12 Latihan
+Napas: `BreathingGuide` dengan pilihan durasi (1, 3, 5 menit); getar halus opsional; Fase 2 menambah panduan suara (klip). Grounding: lima langkah berurutan (lihat 5, rasakan 4, dengar 3, cium 2, cecap 1), satu langkah per layar, tombol "Lanjut". Keduanya lokal dan offline.
+
+### SCR-M13 Temani saja
+Layar gradien tenang, maskot napas pelan, satu kalimat ("Aku di sini. Tidak perlu bicara."), tombol "Selesai". Tanpa AI dan tanpa kuota.
+
+### SCR-M18 Maskot mengambang
+Penjelasan sederhana sebelum izin: "Maskot bisa muncul kecil di layarmu supaya kamu merasa ditemani. Maskot tidak membaca layarmu dan tidak mendengarkan." Toggle aktif/nonaktif, status izin ("Izin tampil di atas aplikasi lain: aktif/belum"), tombol "Buka pengaturan izin", pilihan istirahat. Default mati.
+
+### OVL-M01 / M02 Overlay
+Gelembung 64dp di tepi layar; sentuh membuka mini-panel dengan sapaan dari teks lokal dan tiga aksi: **Ngobrol** (buka aplikasi), **Bicara** (buka aplikasi di mode suara), **Istirahatkan** (1 jam / sampai besok). Tidak tampil di layar kunci; tidak merekam; tidak memuat data pengguna.
+
+---
+
+## 7. Bank Teks (UX Writing)
+
+Nada: hangat, sederhana, tidak menggurui, memakai "kamu". Teks yang sama dengan web (consent, Crisis Response, disclaimer) **diambil dari sumber yang sama lewat API** (API-M008) atau dari Design web, bukan disalin ulang, agar tidak berbeda (RULE-049). Di kode, bank teks UI pendek ada di `core/texts/app_texts.dart` (`AppTexts`); teks baru ditambahkan di sana dan di tabel ini.
+
+| Konteks | Teks |
+|---|---|
+| Sambutan | "Halo, aku RelaxMate. Teman ceritamu. Aku bukan psikolog atau layanan medis, tapi aku siap mendengarkan." |
+| Cek Rasa | "Hari ini, kamu yang mana?"; tombol "Kirim ke RelaxMate", "Lewati" |
+| Placeholder input | "Bicara atau ketik..." |
+| Mengetik | "RelaxMate sedang menulis..." |
+| AI tidak tersedia | "RelaxMate sedang tidak bisa membalas. Pesanmu tetap tersimpan. Coba lagi sebentar lagi." Tombol: "Coba lagi" |
+| Batas harian | "Kamu sudah mencapai batas percakapan hari ini. Besok kamu bisa lanjut bercerita. Kalau kamu butuh bantuan sekarang, lihat kontak bantuan." |
+| Offline | "Koneksi terputus. Pesanmu belum terkirim. Latihan napas dan kontak bantuan tetap bisa dibuka." |
+| Suara: mendengarkan | "Mendengarkan..." |
+| Suara: hitung mundur | "Mengirim dalam 1,5 detik" ; "Batal" ; "Terkirim otomatis" |
+| Suara: kurang jelas | "Aku kurang menangkap itu. Coba ulangi, ya?" |
+| Suara: izin mikrofon | "Untuk bicara denganku, izinkan akses mikrofon. Suaramu hanya diubah jadi teks di HP-mu, dan tidak disimpan." |
+| Suara: izin ditolak | "Mikrofon belum diizinkan. Kamu tetap bisa mengetik." |
+| TTS pertama kali | "Balasan akan dibacakan. Hati-hati, orang di sekitarmu bisa ikut mendengar." |
+| Maskot: izin | "Maskot bisa muncul kecil di layarmu supaya kamu merasa ditemani. Maskot tidak membaca layarmu dan tidak mendengarkan." |
+| Maskot: notifikasi | "RelaxMate menemanimu" ; tombol "Nonaktifkan" |
+| Maskot: istirahat | "Istirahatkan 1 jam" ; "Sampai besok" |
+| Maskot: sapaan panel | "Hai! Hari ini rasanya gimana?" |
+| Penutup khas | "Aku di sini kapan pun kamu butuh. Jaga dirimu, ya." |
+| Pengingat batas karakter | "Aku asisten AI, bukan pengganti orang-orang terdekatmu atau profesional. Kalau terasa berat, bicara dengan mereka juga ya." |
+| Latihan napas | "Tarik napas...", "Tahan...", "Embuskan pelan-pelan..." ; "Selesai" |
+| Grounding | "Sebutkan 5 hal yang kamu lihat." "4 hal yang bisa kamu sentuh." "3 hal yang kamu dengar." "2 hal yang kamu cium." "1 hal yang kamu rasa." |
+| Temani saja | "Aku di sini. Tidak perlu bicara." |
+| Perbarui aplikasi | "Versi aplikasi ini sudah terlalu lama. Perbarui dulu supaya semuanya berjalan aman." |
+| Hapus akun | Sama dengan web: "Semua datamu akan dihapus permanen dan tidak bisa dikembalikan. Masukkan kata sandi untuk melanjutkan." |
+| Galat umum | "Ada yang tidak berjalan semestinya. Coba lagi, ya." |
+| Memuat | "Memuat..." (label aksesibilitas indikator putar) |
+| Label aksesibilitas maskot | "Maskot RelaxMate" (`AppTexts.mascotLabel`) |
+| Penanda flavor `dev` | "Mode pengembangan" (hanya flavor `dev`; `AppTexts.devBadge`) |
+| Perbarui aplikasi: tombol | "Perbarui sekarang" ; toko gagal dibuka: "Toko aplikasi belum bisa dibuka. Coba lagi nanti." |
+| Galat jaringan: offline | "Koneksi terputus. Periksa internetmu, lalu coba lagi." |
+| Galat jaringan: terlalu lama | "Permintaan terlalu lama. Coba lagi sebentar lagi, ya." |
+| Sesi berakhir | "Sesimu sudah berakhir. Silakan masuk lagi." |
+| Tidak boleh mengakses | "Kamu belum bisa mengakses ini." |
+| Tidak ditemukan | "Yang kamu cari tidak ditemukan." |
+| Sudah diproses | "Permintaan ini sudah pernah diproses." |
+| Validasi umum | "Periksa lagi isianmu, ya." |
+| Terlalu banyak percobaan | "Terlalu banyak percobaan. Coba lagi sebentar lagi." ; dengan sisa waktu: "Terlalu banyak percobaan. Coba lagi dalam N detik." |
+| Layanan bermasalah | "Layanan sedang bermasalah. Coba lagi sebentar lagi." |
+| Konfigurasi tidak lengkap | "Konfigurasi aplikasi belum lengkap. Hubungi pengembang." (hanya pada build yang salah konfigurasi) |
+| Email terverifikasi (halaman Masuk web) | "Emailmu sudah terverifikasi. Kembali ke aplikasi RelaxMate, atau masuk di sini." |
+
+Kontak bantuan tidak ditulis di bank teks; selalu dari API-M011 atau aset fallback yang sudah diverifikasi (OQ-3).
+
+---
+
+## 8. Aksesibilitas
+
+- Kontras mengikuti token (teks `primary` di atas putih/pastel).
+- Semua kontrol punya `Semantics` (label, peran, status); gambar dekoratif dikecualikan.
+- Pesan baru dan perubahan status suara diumumkan lewat live region sopan; urutan fokus logis.
+- Target sentuh >= 48dp; teks tetap utuh pada skala 200%; tanpa gulir horizontal.
+- Setiap suara punya padanan teks; setiap input suara tampak sebagai teks; tombol kirim otomatis dapat dibatalkan.
+- Warna bukan satu-satunya pembawa makna (blob mood selalu berlabel).
+- Hormati pengurangan gerak; getar opsional.
+- Pemeriksaan manual per milestone: TalkBack, skala teks 200%, mode kontras tinggi, perangkat kecil (360dp).
+
+---
+
+## 9. Maskot, Aset, dan Gerak
+
+| Keadaan | Dipakai di | Aset |
+|---|---|---|
+| Diam / bernapas | Beranda, Temani saja, overlay | `idle` (sprite web) atau `half` |
+| Menyimak | Mode suara saat mendengarkan | `listening` `[Assumption: dibuat dari sprite web]` |
+| Berpikir | Menunggu balasan | `thinking` (sprite web) |
+| Bicara | Balasan terbaca / klip diputar | `speaking` (sprite web) |
+| Pelukan virtual | Saat pengguna berat | Animasi singkat tanpa suara `[Assumption]` |
+
+Aset sumber: `relaxmate-avatar.webp`, `relaxmate-half.webp`, dan sprite `idle`/`speaking`/`thinking`/`walk` dari repo web/reel. Konversi ke format animasi (Rive atau Lottie) diputuskan di TASK-M030. Gaya gambar tidak dicampur dalam satu layar (sprite pixel vs ilustrasi mulus) tanpa alasan; pilih satu keluarga per layar. Karakter orisinal RelaxMate: tidak meniru karakter, bentuk, atau suara pihak lain.
+
+Ikon: satu set (`[Assumption]` Lucide untuk Flutter), ukuran 24dp, stroke 2.
+
+---
+
+## Assumptions
+- A-D1: Mode terang saja, portrait saja untuk rilis pertama.
+- A-D2: Nilai warna ujung gradien adalah perkiraan dari gambar latar (sudah tersimpan di `RbColors`); final di Task tema.
+- A-D3: Label skala mood mengikuti web (SCR-016); Cek Rasa memakai blob, bukan angka.
+- A-D4: Ukuran gelembung overlay 64dp dan panel 280dp dapat disesuaikan setelah spike TASK-M003.
+- A-D5: Layar pembuka memakai indikator putar tanpa skeleton karena belum ada konten untuk dibentuk (pengecualian bagian 4).
+
+## Open Questions
+
+| ID | Pertanyaan | Dibutuhkan sebelum |
+|---|---|---|
+| OQ-D1 | **Ditutup 2026-11-05:** mobile mengikuti kode website (`app.css`); alias `soft-sky/mint/peach` = lavender. | - |
+| OQ-D2 | Format animasi maskot: Rive atau Lottie; sumber sprite untuk keadaan menyimak dan pelukan | TASK-M030 |
+| OQ-D3 | Apakah onboarding perlu lebih dari satu layar? | TASK-M022 |
+| OQ-D4 | Nama dan ejaan final maskot (OQ-M2) memengaruhi seluruh bank teks | TASK-M030 |
+
+## Change Log
+
+| Versi | Tanggal | Perubahan |
+|---|---|---|
+| 0.4 | 2026-11-06 | Sinkronisasi ke kode (commit `8014c38`): bagian Tema komponen Material, nilai bayangan, pemetaan `TextTheme`, tanpa `fontFamilyFallback` eksplisit, isi `ChatScreen` sementara, cek versi sekali per pembukaan, teks `mascotLabel` dan `devBadge` di bank teks. |
+| 0.3 | 2026-11-06 | Sinkronisasi setelah TASK-M020 dan M021: token diwujudkan di kode (`Rb*`), font dibundel, `MateAvatar`, bagian 4.1 (status layar yang sudah dibangun), bank teks galat jaringan dan perbarui aplikasi, A-D5. |
+| 0.2 | 2026-11-05 | Keputusan founder: nilai token mengikuti kode website (`app.css`), bukan tabel Design web; alias `soft-*` = lavender; OQ-D1 ditutup. |
+| 0.1 | 2026-11-05 | Draf awal: token (dari `app.css` web), komponen CMP-M01..M19, inventaris layar SCR-M01..M20 dan OVL, spesifikasi layar utama, bank teks, aksesibilitas, aset maskot. |
