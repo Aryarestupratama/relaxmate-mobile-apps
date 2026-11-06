@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Architecture
-Version: 0.4 | Status: Draft | Last updated: 2026-11-06
+Version: 0.5 | Status: Draft | Last updated: 2026-11-06
 Depends on: PRD RelaxMate Mobile v0.3, Architecture RelaxBoss (web), Schema RelaxBoss (web), Rules v1.5 | Owner: Founder (solo developer)
 
 Label: `[Verified]` ada sumber (sisi mobile: repo `relaxmate-mobile-apps` commit `8014c38`; sisi backend: repo `RELAXBOSS_WEBSITE` commit `9afd27c`), `[Inference]` kesimpulan, `[Assumption]` bisa diubah. **Dokumen ini mengikuti kode:** bila berbeda dari kode, kode yang benar. Kedalaman: **Lite**. Dokumen ini hanya mengatur sisi mobile dan tambahan di backend. Subsistem AI (rotasi key, `ChatbotService`, `CrisisDetector`), enkripsi, dan admin tetap di Architecture web dan tidak diulang di sini.
@@ -123,11 +123,11 @@ Semua endpoint JSON, HTTPS saja. Format sukses `{ "data": {...} }`, gagal `{ "er
 | API-M009 | `POST /relaxmate/consent` | Token + `api.verified`, `api-user` | Catat consent AI versi terbaru (Action sama dengan web, idempoten); tanpa badan permintaan; balasan `{ "data": { "consent": <state> } }` `[Verified]` | 403 `unverified` |
 | API-M010 | `POST /account/training-consent` | Token + `api.verified`, `api-user` | Badan `{ "choice": "granted" \| "denied" }` (wajib, tanpa nilai awal); balasan `{ "data": { "consent": <state> } }`; dapat diubah kapan saja `[Verified]` | 403 `unverified`; 422 `validation_failed` (`choice`) |
 | API-M011 | `GET /crisis-contacts` | Token, `api-user` | `{ "data": { "version", "contacts": [ { "name", "phone", "url", "note", "dummy" } ] } }`. `version` = 12 karakter pertama SHA-1 dari isi daftar, jadi berubah hanya bila isi berubah (sama dengan `crisis_contacts_version` di `/me` dan `/config`). `phone` dikirim apa adanya (saat ini `119 ext 8`; format `tel:` diputuskan di TASK-M025, OQ-MA9); `url` hanya `https` atau `null`; `dummy` menandai kontak contoh (dasar preflight RULE-M048) `[Verified]` | n/a |
-| API-M012 | `GET /relaxmate/today` | Token + consent | Ambil atau buat Percakapan hari ini (bagian 6.1); kembalikan pesan terakhir, `has_crisis`, sisa kuota | 403 `consent_required`; 403 `unverified` |
-| API-M013 | `POST /relaxmate/conversations/{id}/messages` | Token + consent, 5/menit dan 20/hari | Kirim pesan, terima balasan (API-015 web) | 422 `message_too_long`; 429 `daily_limit` atau `busy`; 503 `ai_unavailable` (pesan pengguna tetap tersimpan) |
-| API-M014 | `POST /relaxmate/conversations/{id}/messages/{message}/retry` | Token + consent, milik sendiri | Panggil ulang balasan untuk pesan pengguna yang belum dijawab (`ChatbotService::respond()` boleh diulang). Web sudah punya retry lewat parameter `retry=true` pada endpoint kirim pesan; endpoint terpisah mungkin tidak perlu (OQ-MA6) | 409 `already_answered` (web: `nothing_to_retry`); sama dengan API-M013 |
-| API-M015 | `GET /relaxmate/days` | Token + consent | Daftar tanggal yang punya percakapan (kursor) | n/a |
-| API-M016 | `GET /relaxmate/conversations/{id}/messages` | Token + consent, milik sendiri | Baca riwayat satu percakapan (30 per halaman, kursor, hanya baca) | 404 |
+| API-M012 | `GET /relaxmate/today` | Token + `api.verified` + `ai.consent`, `api-user` | Ambil atau buat Percakapan hari ini (bagian 6.1); kembalikan `conversation`, seluruh `messages` hari itu, `unanswered`, `limits` (bentuk di bawah) `[Verified: kode, belum diuji]` | 403 `unverified`; 403 `consent_required` |
+| API-M013 | `POST /relaxmate/conversations/{id}/messages` | Token + `api.verified` + `ai.consent`, limiter `chat` 5/menit + `api-user`, 20/hari di Action | Kirim pesan `{ "content" }`, atau ulang balasan `{ "retry": true }` (tanpa `content`); logika sama dengan web lewat `SendChatMessage` `[Verified: kode, belum diuji]` | 422 `invalid_message`; 429 `daily_limit`, `busy`, `rate_limited`; 409 `nothing_to_retry`; 409 `conversation_closed` (Percakapan bukan hari ini); 503 `ai_unavailable` (pesan pengguna tetap tersimpan); 404 |
+| API-M014 | ~~`POST .../messages/{message}/retry`~~ **Tidak dibuat** (OQ-MA6): retry memakai API-M013 dengan `{ "retry": true }` | - | Panggil ulang balasan untuk pesan pengguna terakhir yang belum dijawab; tidak menambah hitungan harian | 409 `nothing_to_retry` |
+| API-M015 | `GET /relaxmate/days` | Token + `api.verified` + `ai.consent`, `api-user` | Riwayat: Percakapan yang sudah berisi pesan, terbaru dulu, `history_per_page` (15) per halaman, kursor `?cursor=` `[Verified: kode, belum diuji]` | n/a |
+| API-M016 | `GET /relaxmate/conversations/{id}/messages` | Token + `api.verified` + `ai.consent`, milik sendiri | Baca satu percakapan, hanya baca, urut lama ke baru, 30 per halaman, kursor `?cursor=` `[Verified: kode, belum diuji]` | 404 |
 | API-M017 | `DELETE /account` | Token + konfirmasi sandi | Hapus akun dan seluruh data (API-016 web); semua token dicabut | Galat `password`, `account` |
 
 **Bentuk nyata API-M001 sampai M005 `[Verified]` (TASK-M013).** Semua galat memakai amplop `{ "error": { "code", "message" } }` dengan `message` Bahasa Indonesia; validasi 422 menambah `errors` per kolom.
@@ -147,20 +147,27 @@ Semua endpoint JSON, HTTPS saja. Format sukses `{ "data": {...} }`, gagal `{ "er
 - Galat memakai amplop seragam (ADR-M11); limiter melebihi batas membalas 429 `rate_limited`.
 - Sisi klien `[Verified]`: aplikasi baru memanggil `GET /config` dan membaca `min_app_version` saja (`ServerConfig`); bentuk `/config` asli cocok dengan parser klien. `/me`, `/consent`, dan `/crisis-contacts` belum dipakai (TASK-M022, M023, M025).
 
-Bentuk balasan API-M013 `[Assumption]`:
+**Bentuk nyata API-M012, M013, M015, M016 (TASK-M015; kode di repo web, belum diuji manual).** Format sukses `{ "data": {...} }`. Semua waktu `created_at` berformat ISO-8601 UTC (`2026-11-06T09:30:00Z`, RULE-M033); `time` adalah teks WIB siap tampil dari presenter web.
+
+Objek `message` (sama untuk keempat endpoint):
 
 ```
-{ "data": {
-  "user_message": { "id": 0, "turn": 1 },
-  "reply": { "id": 0, "text": "...", "intent": "academic_pressure",
-             "suggestion": { "type": "recommend_support", "dismissible": true },
-             "is_crisis": false },
-  "crisis": { "active": false },
-  "quota": { "remaining": 17, "limit": 20 }
-} }
+{ "id": 12, "role": "user" | "assistant", "content": "...", "time": "14.30 WIB",
+  "is_crisis": false,
+  "suggestion": null | { "type": "recommend_support", "priority": 3, "dismissible": true },
+  "created_at": "2026-11-06T07:30:00Z" }
 ```
 
-**Temuan 2026-11-06 (OQ-MA6):** presenter web hari ini mengembalikan `user_message`, `assistant_message`, `has_crisis`, dan `remaining_today`; pesan berisi `id`, `role`, `content`, `time` (teks "14.30 WIB"), `is_crisis`, dan `suggestion` (`type`, `priority`, `dismissible`); `intent` tidak dikirim ke klien. Kode galat web: `invalid_message`, `busy`, `daily_limit`, `rate_limited`, `ai_unavailable`, `nothing_to_retry`, `consent_required`, `account_inactive`. Bentuk final API-M013 diputuskan di TASK-M015 dan harus menambah `created_at` ISO UTC (RULE-M033).
+`suggestion` hanya ada pada pesan `assistant`; `suggestion.type` ada di enum `SuggestionType` server (klien mengabaikan nilai yang tidak dikenal). `intent` tidak dikirim.
+
+- `GET /relaxmate/today`: `{ "conversation": { "id": "<uuid>", "has_crisis": false, "day": "2026-11-06", "created_at" }, "messages": [message...], "unanswered": false, "limits": { "message_max_chars": 2000, "per_day": 20, "remaining_today": 17 } }`. `unanswered` true bila pesan terakhir adalah pesan pengguna tanpa balasan (mis. AI gagal): klien menampilkan "Coba lagi". Memanggilnya membuat Percakapan hari ini bila belum ada (resolver, bagian 6.1).
+- `POST /relaxmate/conversations/{id}/messages`: badan `{ "content": "..." }` atau `{ "retry": true }`. Sukses 200: `{ "user_message": message, "assistant_message": message, "has_crisis": false, "remaining_today": 16 }`. Galat memakai amplop seragam; kode: `invalid_message` 422 (pesan kosong atau lebih dari `message_max_chars`; kolom `content` tidak dipakai, hanya `message`), `daily_limit` 429, `busy` 429, `rate_limited` 429 (+ `Retry-After`), `nothing_to_retry` 409, `conversation_closed` 409, `ai_unavailable` 503, `consent_required` 403, `unverified` 403, `not_found` 404 (Percakapan orang lain sama dengan tidak ada). Pada `ai_unavailable` pesan pengguna sudah tersimpan: klien memuat ulang `today` atau memanggil ulang dengan `retry`.
+- `GET /relaxmate/days`: `{ "days": [ { "id": "<uuid>", "day": "2026-11-06", "label": "6 November 2026, 14.30 WIB", "total_turns": 8, "has_crisis": false } ], "next_cursor": "..." | null }`. Satu baris per Percakapan; beberapa Percakapan dari web di hari yang sama muncul sebagai beberapa baris dengan `day` sama. `day` memakai jam batas hari percakapan (04.00 WIB).
+- `GET /relaxmate/conversations/{id}/messages`: `{ "conversation": { "id", "has_crisis", "label" }, "messages": [message...], "next_cursor": "..." | null }`, urut lama ke baru. Kursor diteruskan apa adanya sebagai `?cursor=`.
+
+Keputusan TASK-M015 (perlu dikonfirmasi founder, OQ-MA11): POST ke Percakapan yang **bukan hari ini** (jendela 04.00 WIB) ditolak 409 `conversation_closed`, supaya riwayat tetap hanya baca (FR-M005) dan klien yang lupa berganti hari tidak menulis ke hari kemarin. Percakapan dari web di jendela hari yang sama tetap boleh menerima pesan.
+
+**Temuan 2026-11-06 (OQ-MA6):** presenter web hari ini mengembalikan `user_message`, `assistant_message`, `has_crisis`, dan `remaining_today`; pesan berisi `id`, `role`, `content`, `time` (teks "14.30 WIB"), `is_crisis`, dan `suggestion` (`type`, `priority`, `dismissible`); `intent` tidak dikirim ke klien. Kode galat web: `invalid_message`, `busy`, `daily_limit`, `rate_limited`, `ai_unavailable`, `nothing_to_retry`, `consent_required`, `account_inactive`. Bentuk final diputuskan di TASK-M015 (di atas): mengikuti presenter web dan menambah `created_at` ISO UTC (RULE-M033).
 
 Klien memetakan `suggestion.type` dan `intent` ke tujuan di aplikasi (latihan napas, grounding, kontak bantuan, halaman Konsultasi web). Kode intent yang tidak dikenal diabaikan tanpa galat (daftar intent ada di server, ADR-017 web). Balasan ditampilkan sebagai teks biasa. Bentuk data lengkap ada di Schema mobile.
 
@@ -183,7 +190,7 @@ Skema `conversations` dan `messages` (ENT-007, ENT-008) tidak berubah. Aturan �
 
 Urutan sama dengan bagian 6.2 Architecture web: consent, rate limit, panjang pesan, `Cache::lock` per pengguna, `ChatbotService::handle()` yang menyimpan pesan pengguna, memeriksa `CrisisDetector`, lalu memanggil `ChatCompletionClient` atau mengembalikan Crisis Response statis. Pemeriksaan itu hari ini ada di `ChatMessageController::store()` (TASK-020; `RelaxMateController` hanya halaman); agar tidak digandakan, **diekstrak ke Action `SendChatMessage`** yang dipanggil web dan API (bagian 9).
 
-Bila terputus atau 503, aplikasi menampilkan pesan pengguna dengan tombol “Coba lagi” yang memanggil API-M014; pesan tidak dikirim ulang sebagai pesan baru.
+Bila terputus atau 503, aplikasi menampilkan pesan pengguna dengan tombol “Coba lagi” yang memanggil API-M013 dengan `{ "retry": true }` (tanpa endpoint terpisah, OQ-MA6); pesan tidak dikirim ulang sebagai pesan baru.
 
 ### 6.3 Suara
 
@@ -301,7 +308,7 @@ Refaktor `SendChatMessage` menyentuh jalur produksi web, jadi dikerjakan sebagai
 | 401 | `ApiClient` menghapus token hanya bila permintaan membawa token (login yang salah tidak dianggap sesi berakhir); mengarahkan ke Masuk menunggu TASK-M022; tidak menampilkan isi galat teknis |
 | 403 `consent_required` | Tampilkan consent versi terbaru |
 | 429 `daily_limit` / `busy` | Pesan ramah dengan sisa kuota atau tunggu sebentar |
-| 503 `ai_unavailable` | Pesan pengguna tetap tampil, tombol “Coba lagi” (API-M014); saran statis dan latihan lokal ditawarkan |
+| 503 `ai_unavailable` | Pesan pengguna tetap tampil, tombol “Coba lagi” (API-M013 dengan `retry`); saran statis dan latihan lokal ditawarkan |
 | Timeout 20 dtk | `AppConstants.requestTimeout` berlaku **per fase** (connect, send, receive), bukan total. Saat ini `error_mapper` memetakannya ke `ApiErrorKind.timeout` dengan pesan `errorTimeout`, bukan ke `ai_unavailable` `[Verified]`; perlakuan setara `ai_unavailable` (pesan pengguna tetap tampil + "Coba lagi") ditetapkan di layar chat, TASK-M024 |
 | Galat login | 401 `invalid_credentials` (pesan umum), 403 `account_inactive`, 429 `rate_limited` dengan `Retry-After`; ditampilkan dengan pesan dari server |
 | Pemetaan galat klien | `error_mapper` mengubah galat `dio` menjadi `ApiException` (jenis: `offline`, `timeout`, `unauthorized`, `forbidden`, `notFound`, `conflict`, `validation`, `rateLimited`, `server`, `unknown`) dengan pesan dari amplop server atau teks bawaan `AppTexts`; `toString()` tanpa pesan agar aman di log. `ApiException` juga membawa `code`, `statusCode`, `retryAfterSeconds` (header `Retry-After`), dan `fieldErrors` (pesan pertama per kolom, dari `errors`); 409 dipetakan ke `conflict`, 5xx ke `server`, 4xx lain ke `unknown` |
@@ -365,7 +372,7 @@ Alat pengembangan di luar aplikasi: Node.js untuk `tool/mock_api.mjs` (tanpa dep
 - A-MA1: Android minimum API 26; iOS tidak masuk rilis pertama.
 - A-MA2: Satu token per perangkat, masa berlaku 60 hari (diterapkan, TASK-M012 dan M013).
 - A-MA3: Jam batas “hari” 04.00 WIB, bisa diubah di config.
-- A-MA4: Bentuk JSON API-M013 dan nama endpoint belum final sampai TASK-M015 (API-M001 sampai M005 sudah final).
+- A-MA4: **Terjawab (TASK-M015, kode):** bentuk JSON dan nama endpoint chat final seperti di bagian 5; belum diuji manual.
 - A-MA5: Application ID `id.my.relaxboss.relaxmate`.
 - A-MA6: Batas kasar rute tamu 20/menit per IP (`relaxboss.mobile.guest_per_minute`), bisa diubah di config.
 - A-MA7: **Terjawab (TASK-M014):** kolom bernama `min_app_version`; klien (`ServerConfig`) sudah memakai nama itu.
@@ -389,6 +396,7 @@ Alat pengembangan di luar aplikasi: Node.js untuk `tool/mock_api.mjs` (tanpa dep
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.5 | 2026-11-06 | TASK-M015: bentuk nyata API-M012, M013, M015, M016; API-M014 tidak dibuat (retry lewat M013); kode galat chat termasuk `conversation_closed`; A-MA4 terjawab. |
 | 0.4 | 2026-11-06 | TASK-M022: struktur folder `features/auth`, `core/launch`, `session_expired_signal`, `auth_redirect`, `ErrorAlert`; paragraf Sesi dan pengalihan layar; izin `INTERNET` pindah ke manifest utama; `tool/mock_api.mjs` punya mode `auth`. |
 | 0.3 | 2026-11-06 | Sinkronisasi ke kode mobile (commit `8014c38`) dan hasil TASK-M014: struktur folder dan versi paket nyata, API-M006 sampai M011 final dan sudah dicocokkan dengan repo web (`9afd27c`, bentuk JSON lengkap), middleware `api.verified`, limiter `api-public`/`api-user`, konfigurasi `mobile.*` dan bagian `consent`, validasi `AppConfig`, perilaku timeout dan cek versi apa adanya, status penerapan privasi, utang penandatanganan rilis; OQ-MA8 ditutup, A-MA7 terjawab, A-MA8 baru; label `[Verified]`. |
 | 0.2 | 2026-11-06 | Sinkronisasi setelah TASK-M012, M013, M020, M021: struktur folder nyata, bentuk API-M001 sampai M005 dan kode galat, Sanctum dan perubahan backend, flavor dan Gradle AGP 9, penanganan galat dan cek versi, status dependency, ADR-M09 sampai M13, OQ-MA2 ditutup, OQ-MA6 sampai MA9. |
