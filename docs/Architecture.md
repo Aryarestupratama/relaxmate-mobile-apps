@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Architecture
-Version: 0.3 | Status: Draft | Last updated: 2026-11-06
+Version: 0.4 | Status: Draft | Last updated: 2026-11-06
 Depends on: PRD RelaxMate Mobile v0.3, Architecture RelaxBoss (web), Schema RelaxBoss (web), Rules v1.5 | Owner: Founder (solo developer)
 
 Label: `[Verified]` ada sumber (sisi mobile: repo `relaxmate-mobile-apps` commit `8014c38`; sisi backend: repo `RELAXBOSS_WEBSITE` commit `9afd27c`), `[Inference]` kesimpulan, `[Assumption]` bisa diubah. **Dokumen ini mengikuti kode:** bila berbeda dari kode, kode yang benar. Kedalaman: **Lite**. Dokumen ini hanya mengatur sisi mobile dan tambahan di backend. Subsistem AI (rotasi key, `ChatbotService`, `CrisisDetector`), enkripsi, dan admin tetap di Architecture web dan tidak diulang di sini.
@@ -64,37 +64,45 @@ relaxmate-mobile-apps/              # nama repo; paket Dart: relaxmate
     app.dart                        # MaterialApp.router: tema, locale id, router, StartupGate (di builder)
     config_error_app.dart           # tampil bila konfigurasi build tidak valid
     core/
-      config/     # AppFlavor, AppConfig (+ appConfigProvider), AppConstants, AppVersion, AppAssets
-      api/        # ApiClient (dio), api_providers (token, versi aplikasi, ApiClient), JsonMap
+      config/     # AppFlavor, AppConfig (+ appConfigProvider, webUri), AppConstants, AppVersion, AppAssets
+      api/        # ApiClient (dio), api_providers (token, versi aplikasi, ApiClient), JsonMap,
+                  # SessionExpiredSignal (401 dari jaringan ke fitur sesi)
+      launch/     # WebLauncher (buka halaman web di peramban perangkat)
       error/      # ApiException, ApiErrorKind, error_mapper
       storage/    # TokenStorage (flutter_secure_storage)
       theme/      # RbColors, RbText, RbSpace (ThemeExtension); RbRadius, RbSize, RbShadow, RbMotion (konstanta);
                   # RbTheme.light(), RbThemeContext (context.rbColors / rbText / rbSpace)
-      router/     # AppRoutes, routerProvider (go_router; baru satu rute: chat)
+      router/     # AppRoutes, authRedirect (layar yang boleh tampil menurut sesi), routerProvider (go_router)
       texts/      # bank teks UI (AppTexts)
     features/
       startup/    # data/ (ServerConfig, ServerConfigRepository, StoreLauncher),
                   # state/ (versionGateProvider, VersionGateStatus),
                   # ui/ (StartupGate, SplashView, UpdateRequiredScreen)
       chat/       # ui/chat_screen.dart (sementara, TASK-M024); data/ dan state/ masih .gitkeep
-      auth/ consent/ checkin/ exercises/ voice/ mascot/ overlay/ settings/   # masih .gitkeep
+      auth/       # data/ (UserSummary, AuthSession, ResendResult, AuthRepository),
+                  # state/ (AuthState, AuthController),
+                  # ui/ (LoginScreen, RegisterScreen, ForgotPasswordScreen, CheckEmailScreen,
+                  #      SessionErrorScreen, AuthScaffold, PasswordField, AuthValidators)
+      consent/ checkin/ exercises/ voice/ mascot/ overlay/ settings/   # masih .gitkeep
     shared/
-      widgets/    # MateAvatar + MateAvatarSize (CMP-M01)
+      widgets/    # MateAvatar + MateAvatarSize (CMP-M01), ErrorAlert (CMP-M13)
   assets/
     fonts/          # Plus Jakarta Sans (OFL)
     images/mascot/  # avatar RelaxMate (dari aset web); satu-satunya folder aset yang terdaftar di pubspec
     audio/clips/    # klip rekaman + clips.json (intent -> daftar klip); masih .gitkeep
     crisis/         # fallback kontak bantuan (tanpa data dummy di rilis); masih .gitkeep
     texts/          # teks panjang (privasi, ketentuan); masih .gitkeep
-  tool/             # alat pengembangan, bukan bagian aplikasi (mock_api.mjs, hanya melayani GET /api/v1/config)
+  tool/             # alat pengembangan, bukan bagian aplikasi (mock_api.mjs: mode cek versi dan mode auth)
   android/app/
     build.gradle.kts                                  # flavor dev/prod, minSdk 26
-    src/main/AndroidManifest.xml, kotlin/id/my/relaxboss/relaxmate/MainActivity.kt
-    src/debug/AndroidManifest.xml                     # INTERNET + cleartext hanya untuk debug
+    src/main/AndroidManifest.xml, kotlin/id/my/relaxboss/relaxmate/MainActivity.kt   # izin INTERNET di sini (sejak M022)
+    src/debug/AndroidManifest.xml                     # cleartext hanya untuk debug
     src/main/kotlin/.../overlay/                      # direncanakan (TASK-M033), belum ada
 ```
 
 Aturan: satu fitur satu folder; tiap fitur berisi `data/` (repository), `state/` (provider), `ui/`. Widget tidak memanggil `dio` langsung, hanya lewat repository dan `ApiClient`. Folder fitur yang belum dikerjakan berisi `.gitkeep`. Folder aset audio, crisis, dan texts baru didaftarkan di `pubspec.yaml` pada task yang mengisinya.
+
+**Sesi dan pengalihan layar (TASK-M022) `[Verified]` terhadap kode.** `AuthController` (Riverpod `Notifier`) memegang `AuthState`: `AuthRestoring` (membaca token tersimpan dan memeriksanya lewat `GET /me`), `AuthUnauthenticated`, `AuthAuthenticated(user)`, dan `AuthSessionCheckFailed` (token ada tetapi pemeriksaan gagal bukan 401: offline, timeout, galat server; token tidak dihapus). Router memanggil `authRedirect(state, lokasi)` setiap keadaan berubah: pemeriksaan sesi hanya `/memuat`; sesi belum bisa diperiksa hanya `/sesi`; tamu hanya `/masuk`, `/daftar`, `/lupa-sandi`; sudah masuk tetapi email belum terverifikasi hanya `/cek-email`; terverifikasi tidak boleh di layar tamu atau peralihan (dialihkan ke `/`). Saat server menolak token (401), `ApiClient` menghapus token lalu `SessionExpiredSignal.fire()`; `AuthController` mendengarkan dan menjadi `AuthUnauthenticated`. Dengan sinyal itu `core/` tidak mengimpor `features/`. Keluar memanggil API-M003 lalu menghapus token; bila panggilan gagal (mis. offline) token di perangkat tetap dihapus.
 
 ---
 
@@ -381,6 +389,7 @@ Alat pengembangan di luar aplikasi: Node.js untuk `tool/mock_api.mjs` (tanpa dep
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.4 | 2026-11-06 | TASK-M022: struktur folder `features/auth`, `core/launch`, `session_expired_signal`, `auth_redirect`, `ErrorAlert`; paragraf Sesi dan pengalihan layar; izin `INTERNET` pindah ke manifest utama; `tool/mock_api.mjs` punya mode `auth`. |
 | 0.3 | 2026-11-06 | Sinkronisasi ke kode mobile (commit `8014c38`) dan hasil TASK-M014: struktur folder dan versi paket nyata, API-M006 sampai M011 final dan sudah dicocokkan dengan repo web (`9afd27c`, bentuk JSON lengkap), middleware `api.verified`, limiter `api-public`/`api-user`, konfigurasi `mobile.*` dan bagian `consent`, validasi `AppConfig`, perilaku timeout dan cek versi apa adanya, status penerapan privasi, utang penandatanganan rilis; OQ-MA8 ditutup, A-MA7 terjawab, A-MA8 baru; label `[Verified]`. |
 | 0.2 | 2026-11-06 | Sinkronisasi setelah TASK-M012, M013, M020, M021: struktur folder nyata, bentuk API-M001 sampai M005 dan kode galat, Sanctum dan perubahan backend, flavor dan Gradle AGP 9, penanganan galat dan cek versi, status dependency, ADR-M09 sampai M13, OQ-MA2 ditutup, OQ-MA6 sampai MA9. |
 | 0.1 | 2026-11-05 | Draf awal: stack, container, kontrak API, alur harian/suara/overlay, Sanctum, privasi perangkat, ADR-M01 s.d. M08. |

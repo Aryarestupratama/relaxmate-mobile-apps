@@ -23,6 +23,11 @@ class AppConfig {
   /// Alamat dasar API, sudah mengandung `/api/v1`, tanpa garis miring penutup.
   final Uri apiBaseUrl;
 
+  /// Alamat halaman web RelaxBoss (mis. `/ketentuan`). Web dan API satu aplikasi
+  /// Laravel di host yang sama, jadi tidak ada URL kedua yang ditulis di klien
+  /// (RULE-M026).
+  Uri webUri(String path) => apiBaseUrl.replace(path: path);
+
   /// Membaca `API_BASE_URL` dari `--dart-define`.
   /// `rawApiBaseUrl` hanya untuk pengujian manual atau unit test.
   ///

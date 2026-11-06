@@ -24,11 +24,12 @@ Build debug: `flutter build apk --debug --flavor dev -t lib/main_dev.dart --dart
 
 ## Server tiruan (sebelum API ada)
 
-`tool/mock_api.mjs` melayani `GET /api/v1/config` untuk menguji pemeriksaan versi. Butuh Node.js.
+`tool/mock_api.mjs` adalah server tiruan untuk uji manual tanpa backend: mode cek versi (`GET /api/v1/config`) dan mode `auth` (Daftar, Masuk, Lupa sandi, Cek email, `/me`, dengan data di memori). Butuh Node.js.
 
 ```bash
 node tool/mock_api.mjs old        # versi minimum 9.0.0 -> layar "Perbarui aplikasi"
 node tool/mock_api.mjs ok 8001    # aplikasi lanjut normal (port bawaan 8001)
+node tool/mock_api.mjs auth       # alur akun; akun contoh dan pembantu dijelaskan di kepala berkas
 ```
 
 Lalu jalankan aplikasi dengan `API_BASE_URL=http://10.0.2.2:8001`. Mode lain: `slow`, `error`, `unauthorized`.

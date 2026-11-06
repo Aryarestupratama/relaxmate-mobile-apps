@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Aplikasi memanggil API RelaxBoss (HTTPS di prod), jadi izin INTERNET wajib di manifest
+         utama agar build rilis juga bisa terhubung (TASK-M022). Sebelumnya hanya ada di debug. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <!-- allowBackup=false: token dan data tidak ikut cadangan (RULE-M048, Architecture-M bagian 8).
          Tidak ada usesCleartextTraffic di sini: bawaan false (targetSdk >= 28); hanya build debug
          yang mengaktifkannya lewat src/debug/AndroidManifest.xml. -->

@@ -16,4 +16,9 @@ abstract final class AppConstants {
   /// Halaman aplikasi di Play Store. `[Assumption]` Application ID A-MA5.
   static const String storeUrl =
       'https://play.google.com/store/apps/details?id=id.my.relaxboss.relaxmate';
+
+  /// Halaman web RelaxBoss yang dibuka dari aplikasi (host sama dengan API,
+  /// lihat `AppConfig.webUri`). Teks Ketentuan dan Privasi tetap milik web.
+  static const String termsPath = '/ketentuan';
+  static const String privacyPath = '/privasi';
 }

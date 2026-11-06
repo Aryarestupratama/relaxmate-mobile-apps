@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Design System dan Spesifikasi Layar
-Version: 0.4 | Status: Draft | Last updated: 2026-11-06
+Version: 0.5 | Status: Draft | Last updated: 2026-11-06
 Depends on: PRD-Mobile v0.3, Architecture-Mobile v0.3, Design RelaxBoss (web) | Owner: Founder (solo developer)
 
 Label: `[Assumption]` bisa diubah. Kedalaman: **Lite**. Platform: Android (phone) dulu, mode terang. Tata letak layar yang tidak tertulis dibangun sederhana (fungsi dulu) memakai token dan komponen di dokumen ini (RULE-M007).
@@ -135,10 +135,15 @@ Teks layar penting (judul sambutan, krisis) tidak lebih kecil dari 16sp.
 | SCR-M01 Pembuka dan cek versi (`SplashView`, `StartupGate`) | Maskot besar dan indikator putar berlabel "Memuat..." (pengecualian dari skeleton karena belum ada konten untuk dibentuk) | n/a | Konfigurasi build tidak valid: `ConfigErrorApp` dengan teks "Konfigurasi aplikasi belum lengkap. Hubungi pengembang." Galat pemeriksaan versi tidak ditampilkan (gagal-terbuka) | Lanjut ke aplikasi | Lanjut ke aplikasi; kontak bantuan dan latihan tetap bisa dibuka |
 | SCR-M20 Perbarui aplikasi (`UpdateRequiredScreen`) | n/a | n/a | `Snack` "Toko aplikasi belum bisa dibuka. Coba lagi nanti." bila toko gagal dibuka | Tombol membuka halaman aplikasi di toko | Layar tetap tampil; tombol toko dapat gagal dan menampilkan `Snack` yang sama |
 | SCR-M08 RelaxMate (`ChatScreen`, sementara) | n/a | Sambutan statis: avatar besar, judul "RelaxMate", teks sambutan, dan "Mode pengembangan" hanya di flavor `dev` | n/a | n/a | n/a (diganti di TASK-M024) |
+| SCR-M04 Masuk (`LoginScreen`) | Tombol "Memproses..." dan dinonaktifkan; kolom hanya-baca | n/a | Kolom wajib/format: pesan di bawah kolom dan fokus ke kolom pertama yang salah. Galat server per kolom (422) tampil di kolomnya; selain itu (401 salah sandi, 403 nonaktif, 429, offline, timeout) `ErrorAlert` di atas tombol | Router memindahkan ke Cek email (belum verifikasi) atau layar utama | Pesan "Koneksi terputus..." lewat `ErrorAlert`; isian tidak hilang |
+| SCR-M03 Daftar (`RegisterScreen`) | Sama dengan Masuk | n/a | Sama dengan Masuk; centang Ketentuan wajib (pesan di bawah centang); tautan "Baca Ketentuan" dan "Baca Kebijakan Privasi" membuka halaman web, gagal buka: `Snack` | Pengguna langsung masuk; router memindahkan ke Cek email | Sama dengan Masuk |
+| SCR-M05 Lupa kata sandi (`ForgotPasswordScreen`) | Tombol "Memproses..." | n/a | Format email di bawah kolom; galat lain lewat `ErrorAlert` | Formulir diganti catatan sukses (ikon + pesan server yang sama untuk email terdaftar atau tidak) dan tombol "Kembali ke masuk" | Sama dengan Masuk |
+| SCR-M06 Cek email (`CheckEmailScreen`) | Tombol yang sedang bekerja "Memproses...", tiga tombol lain nonaktif | n/a | `ErrorAlert` (mis. 429 "terlalu banyak email"); "Saya sudah verifikasi" saat belum terverifikasi: `Snack` "Emailmu belum terverifikasi..." | Kirim ulang: `Snack` "Email verifikasi sudah dikirim ulang...". Terverifikasi: router memindahkan ke layar utama (juga diperiksa diam-diam saat aplikasi kembali ke depan layar) | Galat jaringan lewat `ErrorAlert` |
+| Sesi belum bisa diperiksa (`SessionErrorScreen`, tambahan di luar inventaris) | `SplashView` selama pemeriksaan ulang | n/a | `ErrorAlert` dengan "Coba lagi"; tombol "Keluar" menghapus token di perangkat saja | Kembali ke alur normal | Layar inilah yang tampil saat offline dengan token tersimpan |
 
 Pemeriksaan versi berjalan **sekali per pembukaan aplikasi** (bukan saat kembali dari latar belakang) dan membungkus seluruh router lewat `StartupGate` di `MaterialApp.builder`; selama pemeriksaan (maks. 5 detik) hanya `SplashView` yang tampil. Judul SCR-M20 diberi `Semantics(header: true)` `[Verified]`.
 
-Utang: SCR-M20 belum memuat tautan Kontak bantuan; Design-M prinsip 4 mewajibkan bantuan nyata tidak tersembunyi (`TODO(TASK-M025)`).
+Utang: SCR-M20 dan semua layar tamu dan sesi (`AuthScaffold`) belum memuat tautan Kontak bantuan; Design-M prinsip 4 mewajibkan bantuan nyata tidak tersembunyi (`TODO(TASK-M025)`).
 
 ---
 
@@ -246,6 +251,13 @@ Nada: hangat, sederhana, tidak menggurui, memakai "kamu". Teks yang sama dengan 
 | Terlalu banyak percobaan | "Terlalu banyak percobaan. Coba lagi sebentar lagi." ; dengan sisa waktu: "Terlalu banyak percobaan. Coba lagi dalam N detik." |
 | Layanan bermasalah | "Layanan sedang bermasalah. Coba lagi sebentar lagi." |
 | Konfigurasi tidak lengkap | "Konfigurasi aplikasi belum lengkap. Hubungi pengembang." (hanya pada build yang salah konfigurasi) |
+| Masuk | Judul "Masuk"; keterangan "Lanjutkan ceritamu bersama RelaxMate."; tombol "Masuk"; tautan "Lupa kata sandi?" dan "Belum punya akun? Daftar" |
+| Daftar | Judul "Buat akun"; keterangan "Akun ini sama dengan akun RelaxBoss di website."; kolom Nama, Email, Kata sandi; centang "Aku sudah membaca dan menyetujui Ketentuan dan Kebijakan Privasi."; tautan "Baca Ketentuan", "Baca Kebijakan Privasi"; tombol "Daftar"; "Sudah punya akun? Masuk" |
+| Lupa kata sandi | Judul "Lupa kata sandi"; keterangan "Masukkan emailmu. Kami kirim tautan untuk mengatur ulang kata sandi."; tombol "Kirim tautan"; "Kembali ke masuk"; pesan sukses dari server (cadangan: "Jika email itu terdaftar, tautan untuk mengatur ulang kata sandi sudah dikirim. Cek kotak masukmu, ya.") |
+| Cek email | Judul "Cek emailmu"; "Kami mengirim tautan verifikasi ke {email}. Buka tautannya, lalu kembali ke sini."; tombol "Saya sudah verifikasi", "Kirim ulang email", "Keluar"; "Emailmu belum terverifikasi. Cek kotak masuk atau folder spam, ya."; "Email verifikasi sudah dikirim ulang. Cek kotak masukmu, ya." |
+| Validasi kolom | "Nama wajib diisi.", "Email wajib diisi.", "Format email belum benar.", "Kata sandi wajib diisi.", "Centang dulu bahwa kamu sudah membaca ketentuan." (sama dengan pesan server) |
+| Sesi belum bisa diperiksa | Judul "Belum bisa memeriksa sesimu"; "Kamu masih masuk di perangkat ini. Pastikan internetmu aktif, lalu coba lagi." |
+| Umum (tombol) | "Memproses...", "Coba lagi", "Keluar"; label ikon sandi "Tampilkan kata sandi" / "Sembunyikan kata sandi"; "Halaman belum bisa dibuka. Coba lagi nanti." |
 | Email terverifikasi (halaman Masuk web) | "Emailmu sudah terverifikasi. Kembali ke aplikasi RelaxMate, atau masuk di sini." |
 
 Kontak bantuan tidak ditulis di bank teks; selalu dari API-M011 atau aset fallback yang sudah diverifikasi (OQ-3).
@@ -277,7 +289,7 @@ Kontak bantuan tidak ditulis di bank teks; selalu dari API-M011 atau aset fallba
 
 Aset sumber: `relaxmate-avatar.webp`, `relaxmate-half.webp`, dan sprite `idle`/`speaking`/`thinking`/`walk` dari repo web/reel. Konversi ke format animasi (Rive atau Lottie) diputuskan di TASK-M030. Gaya gambar tidak dicampur dalam satu layar (sprite pixel vs ilustrasi mulus) tanpa alasan; pilih satu keluarga per layar. Karakter orisinal RelaxMate: tidak meniru karakter, bentuk, atau suara pihak lain.
 
-Ikon: satu set (`[Assumption]` Lucide untuk Flutter), ukuran 24dp, stroke 2.
+Ikon: satu set (`[Assumption]` Lucide untuk Flutter), ukuran 24dp, stroke 2. Sementara (TASK-M022) layar auth memakai `Icons` bawaan Material karena paket ikon belum diputuskan (OQ-MA10).
 
 ---
 
@@ -287,6 +299,8 @@ Ikon: satu set (`[Assumption]` Lucide untuk Flutter), ukuran 24dp, stroke 2.
 - A-D3: Label skala mood mengikuti web (SCR-016); Cek Rasa memakai blob, bukan angka.
 - A-D4: Ukuran gelembung overlay 64dp dan panel 280dp dapat disesuaikan setelah spike TASK-M003.
 - A-D5: Layar pembuka memakai indikator putar tanpa skeleton karena belum ada konten untuk dibentuk (pengecualian bagian 4).
+- A-D6: Layar tamu memakai satu kerangka (`AuthScaffold`: avatar, judul, keterangan, isi; bisa digulir) tanpa AppBar; kembali dari Daftar dan Lupa sandi lewat tombol kembali sistem. Tanpa onboarding terpisah.
+- A-D7: Form Daftar tidak menanyakan Jurusan dan Kampus (opsional di server); dapat diisi di web.
 
 ## Open Questions
 
@@ -294,13 +308,14 @@ Ikon: satu set (`[Assumption]` Lucide untuk Flutter), ukuran 24dp, stroke 2.
 |---|---|---|
 | OQ-D1 | **Ditutup 2026-11-05:** mobile mengikuti kode website (`app.css`); alias `soft-sky/mint/peach` = lavender. | - |
 | OQ-D2 | Format animasi maskot: Rive atau Lottie; sumber sprite untuk keadaan menyimak dan pelukan | TASK-M030 |
-| OQ-D3 | Apakah onboarding perlu lebih dari satu layar? | TASK-M022 |
+| OQ-D3 | Apakah onboarding perlu lebih dari satu layar? M022 tidak menambahnya (tamu langsung ke Masuk atau Daftar) | TASK-M023 |
 | OQ-D4 | Nama dan ejaan final maskot (OQ-M2) memengaruhi seluruh bank teks | TASK-M030 |
 
 ## Change Log
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.5 | 2026-11-06 | TASK-M022: status layar SCR-M03 sampai M06 dan layar sesi di bagian 4.1; bank teks auth; `ErrorAlert` diterapkan; A-D6, A-D7; ikon sementara; OQ-D3 digeser ke M023. |
 | 0.4 | 2026-11-06 | Sinkronisasi ke kode (commit `8014c38`): bagian Tema komponen Material, nilai bayangan, pemetaan `TextTheme`, tanpa `fontFamilyFallback` eksplisit, isi `ChatScreen` sementara, cek versi sekali per pembukaan, teks `mascotLabel` dan `devBadge` di bank teks. |
 | 0.3 | 2026-11-06 | Sinkronisasi setelah TASK-M020 dan M021: token diwujudkan di kode (`Rb*`), font dibundel, `MateAvatar`, bagian 4.1 (status layar yang sudah dibangun), bank teks galat jaringan dan perbarui aplikasi, A-D5. |
 | 0.2 | 2026-11-05 | Keputusan founder: nilai token mengikuti kode website (`app.css`), bukan tabel Design web; alias `soft-*` = lavender; OQ-D1 ditutup. |

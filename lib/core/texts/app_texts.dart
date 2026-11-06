@@ -47,4 +47,74 @@ abstract final class AppTexts {
 
   static String rateLimitedIn(int seconds) =>
       'Terlalu banyak percobaan. Coba lagi dalam $seconds detik.';
+
+  // Umum.
+  static const String processing = 'Memproses...';
+  static const String retry = 'Coba lagi';
+  static const String logout = 'Keluar';
+  static const String showPassword = 'Tampilkan kata sandi';
+  static const String hidePassword = 'Sembunyikan kata sandi';
+  static const String webOpenFailed =
+      'Halaman belum bisa dibuka. Coba lagi nanti.';
+
+  // Kolom isian dan validasi klien (sama dengan pesan server agar konsisten).
+  static const String fieldName = 'Nama';
+  static const String fieldEmail = 'Email';
+  static const String fieldPassword = 'Kata sandi';
+  static const String fieldNameRequired = 'Nama wajib diisi.';
+  static const String fieldEmailRequired = 'Email wajib diisi.';
+  static const String fieldEmailInvalid = 'Format email belum benar.';
+  static const String fieldPasswordRequired = 'Kata sandi wajib diisi.';
+  static const String termsRequired =
+      'Centang dulu bahwa kamu sudah membaca ketentuan.';
+
+  // Masuk (SCR-M04).
+  static const String loginTitle = 'Masuk';
+  static const String loginSubtitle = 'Lanjutkan ceritamu bersama RelaxMate.';
+  static const String loginAction = 'Masuk';
+  static const String loginToForgot = 'Lupa kata sandi?';
+  static const String loginToRegister = 'Belum punya akun? Daftar';
+
+  // Daftar (SCR-M03).
+  static const String registerTitle = 'Buat akun';
+  static const String registerSubtitle =
+      'Akun ini sama dengan akun RelaxBoss di website.';
+  static const String registerAction = 'Daftar';
+  static const String registerToLogin = 'Sudah punya akun? Masuk';
+  static const String termsAccept =
+      'Aku sudah membaca dan menyetujui Ketentuan dan Kebijakan Privasi.';
+  static const String termsLink = 'Baca Ketentuan';
+  static const String privacyLink = 'Baca Kebijakan Privasi';
+
+  // Lupa kata sandi (SCR-M05).
+  static const String forgotTitle = 'Lupa kata sandi';
+  static const String forgotSubtitle =
+      'Masukkan emailmu. Kami kirim tautan untuk mengatur ulang kata sandi.';
+  static const String forgotAction = 'Kirim tautan';
+  static const String forgotSentFallback =
+      'Jika email itu terdaftar, tautan untuk mengatur ulang kata sandi sudah '
+      'dikirim. Cek kotak masukmu, ya.';
+  static const String forgotBack = 'Kembali ke masuk';
+
+  // Cek email (SCR-M06).
+  static const String checkEmailTitle = 'Cek emailmu';
+  static const String checkEmailDone = 'Saya sudah verifikasi';
+  static const String checkEmailResend = 'Kirim ulang email';
+  static const String checkEmailResent =
+      'Email verifikasi sudah dikirim ulang. Cek kotak masukmu, ya.';
+  static const String checkEmailNotYet =
+      'Emailmu belum terverifikasi. Cek kotak masuk atau folder spam, ya.';
+
+  static String checkEmailBody(String email) =>
+      'Kami mengirim tautan verifikasi ke $email. Buka tautannya, lalu kembali '
+      'ke sini.';
+
+  // Sesi belum bisa diperiksa (offline, timeout, galat server).
+  static const String sessionCheckTitle = 'Belum bisa memeriksa sesimu';
+  static const String sessionCheckBody =
+      'Kamu masih masuk di perangkat ini. Pastikan internetmu aktif, lalu coba '
+      'lagi.';
+
+  // Layar sambutan sementara (TASK-M024 menggantinya).
+  static String signedInAs(String email) => 'Masuk sebagai $email';
 }
