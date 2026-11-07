@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Rules (Aturan Proyek)
-Version: 0.10 | Status: Draft | Last updated: 2026-11-07
+Version: 0.11 | Status: Draft | Last updated: 2026-11-07
 Depends on: PRD-Mobile v0.4, Architecture-Mobile v0.3, Schema-Mobile v0.1, Design-Mobile v0.4, Rules RelaxBoss (web) v1.5 | Owner: Founder (solo developer)
 
 Dokumen ini adalah panduan kerja founder sebagai pengembang tunggal untuk **repo mobile (Flutter)**; bantuan AI boleh dipakai dengan tetap mengikuti seluruh aturan, melakukan verifikasi manual, dan tidak menganggap keluaran otomatis sebagai bukti kebenaran. Untuk pekerjaan di **repo web** (task backend `TASK-M01x`), `Rules.md` web tetap berlaku penuh; aturan di sini hanya menambah. Kata MUST, MUST NOT, SHOULD dipakai secara tegas. Kedalaman: **Lite**. Prinsip: sederhana, fungsi dulu, aman dulu.
@@ -17,6 +17,7 @@ Dokumen ini adalah panduan kerja founder sebagai pengembang tunggal untuk **repo
 | RULE-M006 | Bila dokumen ambigu atau bertentangan, catat sebagai Open Question di `progress.md` dan putuskan sebelum melanjutkan; jangan menebak lalu menulisnya seolah fakta. |
 | RULE-M007 | **Desain:** token dan komponen di `Design-Mobile` adalah acuan. Tata letak layar yang belum ditulis dibangun sederhana (fungsi dulu) memakai token dan komponen yang ada; jangan berhenti menunggu desain final. |
 | RULE-M008 | **Data:** sebelum TASK-M044, hanya data dummy bertanda jelas (akun `example.test`, kontak krisis `dummy`). Build `prod` tidak boleh memuat dummy (RULE-M048). |
+| RULE-M009 | **Panduan uji manual** diberikan di obrolan pada setiap task (command dan langkah uji), tidak disimpan sebagai berkas di `docs/`. Berkas panduan uji yang sudah ada dihapus. |
 
 ---
 
@@ -144,6 +145,7 @@ Jangan: menambah fitur di luar PRD, memanggil Groq atau layanan suara langsung d
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.11 | 2026-11-07 | RULE-M009 (panduan uji manual di obrolan, bukan di `docs/`). |
 | 0.10 | 2026-11-07 | A-R10 (pemeriksaan kode M026). |
 | 0.9 | 2026-11-07 | A-R9 (pemeriksaan kode M025). |
 | 0.8 | 2026-11-07 | RULE-M051 diperbarui (OQ-MA10 diputuskan); A-R8 (pemeriksaan kode M024). |

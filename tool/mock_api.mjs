@@ -37,6 +37,13 @@
 //                 dan satu kontak bertanda dummy (tidak boleh tampil di build prod).
 //                   GET /__contacts-v2       ganti isi daftar kontak (versi baru) untuk uji penyegaran cache
 //                   GET /__contacts-v1       kembalikan daftar awal
+//                 Riwayat (TASK-M027, API-M015 dan M016): GET /relaxmate/days (15 per halaman, kursor) dan
+//                 GET /relaxmate/conversations/{id}/messages (30 per halaman, kursor). Percakapan hari ini
+//                 ikut muncul di riwayat bila sudah berisi pesan, seperti server asli.
+//                   GET /__seed-history?email=...&n=40  buat n hari lampau (tiap 4 hari berisi 40 pesan untuk uji
+//                                            halaman pesan; tiap 5 hari berisi balasan krisis; tiap 6 hari ada
+//                                            dua percakapan di hari yang sama)
+//                   GET /__fail-history      GET riwayat (days atau messages) berikutnya dijawab 503 (sekali)
 //                 Halaman /ketentuan dan /privasi disajikan sebagai teks tiruan.
 //                 Batas tiruan: daftar 5/menit, login gagal 5/menit per email, kirim ulang 3/jam.
 //
@@ -97,11 +104,15 @@ let failConsentOnce = false;
 let failAiOnce = false;
 let slowAiOnce = false;
 let closeDayOnce = false;
+let failHistoryOnce = false;
 let contactsVariant = 1; // 1 = daftar awal, 2 = daftar berubah (uji penyegaran cache)
 let messageSeq = 100;
 
 const CHAT_PER_DAY = 20;
 const CHAT_MAX_CHARS = 2000;
+const HISTORY_PER_PAGE = 15;
+const MESSAGES_PER_PAGE = 30;
+const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
 function newUser(name, email, password, verified, active) {
   return { name, email, password, verified, active, resends: [], aiGranted: false, trainingChoice: null };
@@ -116,6 +127,7 @@ function resetData() {
   failAiOnce = false;
   slowAiOnce = false;
   closeDayOnce = false;
+  failHistoryOnce = false;
   contactsVariant = 1;
   const seed = [
     ['Akun Terverifikasi', 'verified@example.test', true, true],
@@ -208,23 +220,82 @@ function consentState(user) {
 
 function chatOf(user) {
   if (!user.chat) {
-    user.chat = { id: randomUUID(), messages: [], sent: 0, hasCrisis: false };
+    user.chat = { id: randomUUID(), messages: [], sent: 0, hasCrisis: false, createdAt: new Date() };
   }
   return user.chat;
 }
 
-function chatMessage(role, content, isCrisis = false, suggestion = null) {
-  const now = new Date();
+function chatMessage(role, content, isCrisis = false, suggestion = null, at = new Date()) {
   messageSeq += 1;
   return {
     id: messageSeq,
     role,
     content,
-    time: `${String((now.getUTCHours() + 7) % 24).padStart(2, '0')}.${String(now.getUTCMinutes()).padStart(2, '0')} WIB`,
+    time: `${String((at.getUTCHours() + 7) % 24).padStart(2, '0')}.${String(at.getUTCMinutes()).padStart(2, '0')} WIB`,
     is_crisis: isCrisis,
     suggestion,
-    created_at: now.toISOString(),
+    created_at: at.toISOString(),
   };
+}
+
+// ---- Riwayat (TASK-M027)
+
+const pad2 = (n) => String(n).padStart(2, '0');
+
+/** Kunci hari percakapan: WIB dikurangi jam batas 04.00 (sama dengan DailyConversationResolver). */
+function dayKeyOf(date) {
+  return new Date(date.getTime() + 3 * 3600 * 1000).toISOString().slice(0, 10);
+}
+
+/** "6 November 2026, 14.30 WIB" (sama dengan ChatPresenter::dateLabel di web). */
+function dateLabelOf(date) {
+  const wib = new Date(date.getTime() + 7 * 3600 * 1000);
+  return `${wib.getUTCDate()} ${MONTHS[wib.getUTCMonth()]} ${wib.getUTCFullYear()}, ${pad2(wib.getUTCHours())}.${pad2(wib.getUTCMinutes())} WIB`;
+}
+
+function encodeCursor(offset) {
+  return Buffer.from(JSON.stringify({ o: offset })).toString('base64url');
+}
+
+function decodeCursor(value) {
+  if (!value) return 0;
+  try {
+    const offset = JSON.parse(Buffer.from(value, 'base64url').toString('utf8')).o;
+    return Number.isInteger(offset) && offset >= 0 ? offset : 0;
+  } catch {
+    return 0;
+  }
+}
+
+/** Percakapan yang sudah berisi pesan, terbaru dulu (hari ini ikut bila sudah berisi). */
+function historyOf(user) {
+  const all = [...(user.pastChats ?? [])];
+  if (user.chat && user.chat.messages.length > 0) {
+    all.push(user.chat);
+  }
+  return all.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+}
+
+function seedHistory(user, n) {
+  user.pastChats = [];
+  for (let i = 1; i <= n; i += 1) {
+    const start = new Date(Date.now() - i * 24 * 3600 * 1000);
+    start.setUTCHours(3, 30, 0, 0); // 10.30 WIB
+    const sessions = i % 6 === 0 ? 2 : 1;
+    for (let k = 0; k < sessions; k += 1) {
+      const at = new Date(start.getTime() + k * 8 * 3600 * 1000);
+      const turns = i % 4 === 0 ? 20 : 1 + (i % 3);
+      const crisis = i % 5 === 0 && k === 0;
+      const messages = [];
+      for (let t = 0; t < turns; t += 1) {
+        const when = new Date(at.getTime() + t * 60 * 1000);
+        messages.push(chatMessage('user', `Cerita ke-${t + 1} dari hari lampau ${i}${sessions > 1 ? ` (sesi ${k + 1})` : ''}`, false, null, when));
+        const lastOfCrisis = crisis && t === turns - 1;
+        messages.push(chatMessage('assistant', lastOfCrisis ? CRISIS_TEXT : `Aku mendengarmu (balasan ${t + 1}).`, lastOfCrisis, lastOfCrisis ? { type: 'escalate_crisis', priority: 1, dismissible: false } : null, new Date(when.getTime() + 20 * 1000)));
+      }
+      user.pastChats.push({ id: randomUUID(), messages, sent: turns, hasCrisis: crisis, createdAt: at });
+    }
+  }
 }
 
 // Sama dengan App\\Support\\CrisisResponse::TEXT di repo web (teks tetap, bukan keluaran AI).
@@ -465,14 +536,52 @@ async function authApi(req, res, path) {
     });
   }
 
+  if (method === 'GET' && path === '/api/v1/relaxmate/days') {
+    const user = chatUser(req, res);
+    if (!user) return undefined;
+    if (failHistoryOnce) {
+      failHistoryOnce = false;
+      return apiError(res, 503, 'http_error', 'Layanan sedang bermasalah. Coba lagi sebentar lagi.');
+    }
+    const offset = decodeCursor(new URL(req.url ?? '/', 'http://localhost').searchParams.get('cursor'));
+    const all = historyOf(user);
+    const page = all.slice(offset, offset + HISTORY_PER_PAGE);
+    return send(res, 200, {
+      data: {
+        days: page.map((c) => ({ id: c.id, day: dayKeyOf(c.createdAt), label: dateLabelOf(c.createdAt), total_turns: Math.floor(c.messages.length / 2), has_crisis: c.hasCrisis })),
+        next_cursor: offset + HISTORY_PER_PAGE < all.length ? encodeCursor(offset + HISTORY_PER_PAGE) : null,
+      },
+    });
+  }
+
   const sendMatch = /^\/api\/v1\/relaxmate\/conversations\/([^/]+)\/messages$/.exec(path);
+  if (method === 'GET' && sendMatch) {
+    const user = chatUser(req, res);
+    if (!user) return undefined;
+    if (failHistoryOnce) {
+      failHistoryOnce = false;
+      return apiError(res, 503, 'http_error', 'Layanan sedang bermasalah. Coba lagi sebentar lagi.');
+    }
+    const target = historyOf(user).find((c) => c.id === sendMatch[1]);
+    if (!target) {
+      return apiError(res, 404, 'not_found', 'Yang kamu cari tidak ditemukan.');
+    }
+    const offset = decodeCursor(new URL(req.url ?? '/', 'http://localhost').searchParams.get('cursor'));
+    return send(res, 200, {
+      data: {
+        conversation: { id: target.id, has_crisis: target.hasCrisis, label: dateLabelOf(target.createdAt) },
+        messages: target.messages.slice(offset, offset + MESSAGES_PER_PAGE),
+        next_cursor: offset + MESSAGES_PER_PAGE < target.messages.length ? encodeCursor(offset + MESSAGES_PER_PAGE) : null,
+      },
+    });
+  }
   if (method === 'POST' && sendMatch) {
     const user = chatUser(req, res);
     if (!user) return undefined;
     const chat = chatOf(user);
     if (closeDayOnce) {
       closeDayOnce = false;
-      user.chat = { id: randomUUID(), messages: [], sent: 0, hasCrisis: false };
+      user.chat = { id: randomUUID(), messages: [], sent: 0, hasCrisis: false, createdAt: new Date() };
       return apiError(res, 409, 'conversation_closed', 'Percakapan ini sudah berganti hari. Kita mulai yang baru, ya.');
     }
     if (sendMatch[1] !== chat.id) {
@@ -591,6 +700,23 @@ function devHelpers(req, res, url) {
     }
     chatOf(user).sent = Number(url.searchParams.get('n') ?? 0);
     sendText(res, 200, `Pesan terkirim ${email}: ${chatOf(user).sent}`);
+    return true;
+  }
+  if (url.pathname === '/__seed-history') {
+    const email = (url.searchParams.get('email') ?? '').toLowerCase();
+    const user = users.get(email);
+    if (!user) {
+      sendText(res, 404, `Tidak ada akun ${email}`);
+      return true;
+    }
+    const n = Math.min(Math.max(Number(url.searchParams.get('n') ?? 40), 0), 200);
+    seedHistory(user, n);
+    sendText(res, 200, `Riwayat ${email}: ${n} hari lampau, ${historyOf(user).length} percakapan.`);
+    return true;
+  }
+  if (url.pathname === '/__fail-history') {
+    failHistoryOnce = true;
+    sendText(res, 200, 'GET riwayat (days atau messages) berikutnya akan dijawab 503 satu kali.');
     return true;
   }
   if (url.pathname === '/__fail-consent') {

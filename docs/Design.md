@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Design System dan Spesifikasi Layar
-Version: 0.9 | Status: Draft | Last updated: 2026-11-07
+Version: 0.10 | Status: Draft | Last updated: 2026-11-07
 Depends on: PRD-Mobile v0.3, Architecture-Mobile v0.3, Design RelaxBoss (web) | Owner: Founder (solo developer)
 
 Label: `[Assumption]` bisa diubah. Kedalaman: **Lite**. Platform: Android (phone) dulu, mode terang. Tata letak layar yang tidak tertulis dibangun sederhana (fungsi dulu) memakai token dan komponen di dokumen ini (RULE-M007).
@@ -114,6 +114,8 @@ Teks layar penting (judul sambutan, krisis) tidak lebih kecil dari 16sp.
 | CMP-M17 | `OverlayBubble` | Lingkaran 64dp, avatar RelaxMate, bayangan panel, dapat digeser dan menempel ke tepi; melayang ringan |
 | CMP-M18 | `OverlayPanel` | Kartu 280dp: avatar + nama, sapaan lokal, tiga aksi (Ngobrol, Bicara, Istirahatkan), tombol tutup |
 | CMP-M19 | `Snack` | Snackbar singkat untuk sukses/galat non-kritis; galat validasi tetap di dekat kolom |
+| CMP-M21 | `HistoryEntryTile` | Satu baris riwayat (TASK-M027): kartu `card` berbingkai `border` 1dp, radius kartu, tinggi >= 48dp, jam WIB dan "N giliran" (`caption`, `textMuted`), ikon `chevronRight`; seluruh kartu dapat disentuh |
+| CMP-M22 | `HistoryLoadMore` | Kaki daftar riwayat dan detail (TASK-M027): tombol teks "Muat lebih banyak" / "Muat pesan berikutnya", indikator saat memuat, atau `ErrorAlert` dengan "Coba lagi" |
 | CMP-M20 | `ConsentChoiceTile` | Kartu pilihan tunggal setara tombol radio: tinggi >= 48dp, radius kartu, garis `inputBorder` 1dp; terpilih = latar `surfaceAlt`, garis `primary` 2dp, ikon radio terisi (tidak hanya warna). `Semantics`: `inMutuallyExclusiveGroup`, `checked`, label teks pilihan. Dibangun di TASK-M023 `[Verified: kode]` |
 
 
@@ -142,11 +144,12 @@ Teks layar penting (judul sambutan, krisis) tidak lebih kecil dari 16sp.
 | SCR-M05 Lupa kata sandi (`ForgotPasswordScreen`) | Tombol "Memproses..." | n/a | Format email di bawah kolom; galat lain lewat `ErrorAlert` | Formulir diganti catatan sukses (ikon + pesan server yang sama untuk email terdaftar atau tidak) dan tombol "Kembali ke masuk" | Sama dengan Masuk |
 | SCR-M06 Cek email (`CheckEmailScreen`) | Tombol yang sedang bekerja "Memproses...", tiga tombol lain nonaktif | n/a | `ErrorAlert` (mis. 429 "terlalu banyak email"); "Saya sudah verifikasi" saat belum terverifikasi: `Snack` "Emailmu belum terverifikasi..." | Kirim ulang: `Snack` "Email verifikasi sudah dikirim ulang...". Terverifikasi: router memindahkan ke layar utama (juga diperiksa diam-diam saat aplikasi kembali ke depan layar) | Galat jaringan lewat `ErrorAlert` |
 | SCR-M07 Consent AI dan pelatihan (`ConsentScreen`, `ConsentGate`) | `SplashView` selama status diperiksa (`GET /consent`) | n/a | Belum memilih pelatihan lalu menekan tombol utama: "Pilih salah satu dulu." di bawah pilihan (diumumkan ke TalkBack). Galat server per kolom `choice` tampil di sana; selain itu `ErrorAlert` di atas tombol. Status tidak bisa diperiksa: `ConsentErrorScreen` dengan "Coba lagi" dan "Keluar" | Layar diganti layar utama (`ChatScreen`). Bila hanya sebagian tersimpan (mis. AI tersetujui, pelatihan gagal), layar menampilkan bagian yang tersisa | `ConsentErrorScreen` dengan pesan "Koneksi terputus..."; pilihan yang sudah dipilih tidak hilang |
+| SCR-M14 Riwayat (`HistoryScreen`) dan SCR-M15 Detail hari (`ConversationScreen`) (TASK-M027 `[Verified: kode; UI belum diuji]`) | `CircularProgressIndicator` di tengah | SCR-M14: "Belum ada riwayat. Setelah kamu bercerita, hari-harimu akan muncul di sini." | Gagal dimuat: `ErrorAlert` dengan "Coba lagi". Gagal memuat halaman berikutnya: `ErrorAlert` dengan "Coba lagi" di bawah daftar, yang sudah tampil tidak hilang. Detail tidak ditemukan (404): pesan server di `ErrorAlert` | SCR-M14: penanda tanggal ("6 November 2026") di atas baris Percakapan (jam WIB dan "N giliran", tinggi >= 48dp); menyentuh baris membuka SCR-M15. SCR-M15: `ChatBubble` lama ke baru, judul AppBar tanggal dan jam, catatan "Ini riwayat percakapan. Kamu hanya bisa membacanya." di bawah, tanpa kolom isian. "Muat lebih banyak" / "Muat pesan berikutnya" bila masih ada halaman | Riwayat butuh internet (isi tidak disimpan di perangkat, ADR-M07): `ErrorAlert` dengan pesan koneksi terputus |
 | Sesi belum bisa diperiksa (`SessionErrorScreen`, tambahan di luar inventaris) | `SplashView` selama pemeriksaan ulang | n/a | `ErrorAlert` dengan "Coba lagi"; tombol "Keluar" menghapus token di perangkat saja | Kembali ke alur normal | Layar inilah yang tampil saat offline dengan token tersimpan |
 
 Pemeriksaan versi berjalan **sekali per pembukaan aplikasi** (bukan saat kembali dari latar belakang) dan membungkus seluruh router lewat `StartupGate` di `MaterialApp.builder`; selama pemeriksaan (maks. 5 detik) hanya `SplashView` yang tampil. Judul SCR-M20 diberi `Semantics(header: true)` `[Verified]`.
 
-Bantuan (TASK-M025 `[Verified: kode, belum diuji manual]`): semua layar tamu dan sesi (`AuthScaffold`, termasuk consent) memuat tautan "Butuh bantuan sekarang? Lihat kontak bantuan"; SCR-M20 memuat tautan yang sama dan membuka daftar kontak inline (layar di luar router); SCR-M08 memiliki ikon telepon di AppBar, banner krisis saat `has_crisis`, dan tombol "Lihat semua kontak bantuan" saat batas harian tercapai. SCR-M16 `CrisisContactsScreen` (`/kontak-bantuan`): AppBar "Kontak bantuan", kalimat pengantar, kartu kontak (nama, catatan, nomor, tombol "Telepon" dan "Buka situs"), catatan darurat; loading memakai indikator, galat memakai `ErrorAlert`. Kegagalan membuka `tel:` atau situs menampilkan `Snack`. Teks baru ada di `AppTexts` (`crisis*`).
+Bantuan (TASK-M025 `[Verified: uji manual founder 2026-11-07]`): semua layar tamu dan sesi (`AuthScaffold`, termasuk consent) memuat tautan "Butuh bantuan sekarang? Lihat kontak bantuan"; SCR-M20 memuat tautan yang sama dan membuka daftar kontak inline (layar di luar router); SCR-M08 memiliki ikon telepon di AppBar, banner krisis saat `has_crisis`, dan tombol "Lihat semua kontak bantuan" saat batas harian tercapai. SCR-M16 `CrisisContactsScreen` (`/kontak-bantuan`): AppBar "Kontak bantuan", kalimat pengantar, kartu kontak (nama, catatan, nomor, tombol "Telepon" dan "Buka situs"), catatan darurat; loading memakai indikator, galat memakai `ErrorAlert`. Kegagalan membuka `tel:` atau situs menampilkan `Snack`. Teks baru ada di `AppTexts` (`crisis*`).
 
 ---
 
@@ -182,12 +185,15 @@ Bantuan (TASK-M025 `[Verified: kode, belum diuji manual]`): semua layar tamu dan
 ## 6. Spesifikasi Layar Utama
 
 ### SCR-M08 RelaxMate (aliran harian)
-- **Bilah atas:** `MateAvatar` + "RelaxMate" + lencana "AI"; menu (Riwayat, Latihan, Kontak bantuan, Pengaturan).
+- **Bilah atas:** `MateAvatar` + "RelaxMate" + lencana "AI"; menu (Riwayat, Latihan, Kontak bantuan, Pengaturan). Saat ini ikon Riwayat (TASK-M027) dan ikon telepon langsung di AppBar; menu lengkap menyusul bersama Latihan dan Pengaturan.
 - **Isi:** `DaySeparator` ("Hari ini"), daftar pesan (rata kanan untuk pengguna, rata kiri untuk RelaxMate), `SuggestionChip` di bawah balasan sesuai prioritas intent; `CrisisBanner` menempel di atas setelah krisis terdeteksi.
 - **Awal sesi harian:** `MoodBlobRow` di kartu sambutan ("Hari ini, kamu yang mana?"); dapat dilewati.
 - **Input:** `ChatInputBar` dengan mikrofon (Fase 2); tombol kirim aktif bila ada teks.
 - **Perilaku:** gulir otomatis ke pesan terbaru; keyboard tidak menutup input; pesan gagal menampilkan "Coba lagi" di bawah gelembung; saat 503 saran statis dan latihan lokal ditawarkan; batas harian: input nonaktif dengan penjelasan.
 - **Aksesibilitas:** pesan baru diumumkan lewat live region (sopan); urutan fokus: bilah atas, banner, pesan, chip, input.
+
+### SCR-M14 / M15 Riwayat dan detail hari
+Dibuka dari ikon Riwayat di AppBar chat. **SCR-M14** (`/riwayat`): garis waktu per tanggal, terbaru dulu. Penanda tanggal memakai kunci hari percakapan dari server (hari berganti 04.00 WIB), jadi percakapan pukul 01.30 tampil di bawah tanggal sebelumnya; beberapa Percakapan di hari yang sama muncul di bawah satu tanggal. Penanda tanggal berperan sebagai `DaySeparator` (CMP-M16) tetapi dibangun sebagai widget privat `_DateHeader` bergaya teks kecil tebal (bukan pil, dan belum memakai "Hari ini"/"Kemarin" karena aturan hari ada di server, RULE-M033). Baris (`HistoryEntryTile`, CMP-M21): kartu `card` berbingkai `border` 1dp, radius kartu, jam WIB dan "N giliran", ikon Lucide `chevronRight`; hari krisis tidak ditandai agar tidak menyorot hari yang berat. **SCR-M15** (`/riwayat/:id`): pesan lama ke baru, hanya baca; gelembung krisis tetap memakai warna krisis (bukan satu-satunya penanda). Kaki daftar (`HistoryLoadMore`, CMP-M22): tombol teks, indikator, atau `ErrorAlert`. Aksesibilitas: baris diumumkan "Buka percakapan <tanggal>, <jam>" sebagai tombol; penanda tanggal berupa header semantik; ikon telepon (kontak bantuan) ada di AppBar kedua layar.
 
 ### SCR-M09 Cek Rasa
 Sheet dari bawah: "Hari ini, kamu yang mana?" + `MoodBlobRow` + tombol "Kirim ke RelaxMate" dan "Lewati". Jawaban dikirim sebagai pesan chat biasa (teks hasil template, mis. "Hari ini aku merasa: sedih"). Tidak membuat Mood Entry (OQ-M3).
@@ -219,6 +225,7 @@ Nada: hangat, sederhana, tidak menggurui, memakai "kamu". Teks yang sama dengan 
 | Cek Rasa | "Hari ini, kamu yang mana?"; tombol "Kirim ke RelaxMate", "Lewati" |
 | Placeholder input | "Bicara atau ketik..." (target setelah mikrofon Fase 2); sekarang "Ketik pesanmu..." |
 | Chat harian (TASK-M024) | Lencana "AI"; tombol "Kirim"; "RelaxMate sedang menulis..."; pembaca layar: "Kamu berkata: ..." dan "RelaxMate berkata: ..."; "Sisa pesan hari ini: N dari M"; "Batas pesan hari ini sudah tercapai. Kita lanjut lagi besok, ya."; pesan galat dari server |
+| Riwayat (TASK-M027) | Judul dan tooltip "Riwayat"; kosong: "Belum ada riwayat. Setelah kamu bercerita, hari-harimu akan muncul di sini."; "Muat lebih banyak"; "Muat pesan berikutnya"; "Ini riwayat percakapan. Kamu hanya bisa membacanya."; "N giliran"; pembaca layar: "Buka percakapan <tanggal>, <jam>"; nama bulan di `AppTexts.months` |
 | Mengetik | "RelaxMate sedang menulis..." |
 | AI tidak tersedia | "RelaxMate sedang tidak bisa membalas. Pesanmu tetap tersimpan. Coba lagi sebentar lagi." Tombol: "Coba lagi" |
 | Batas harian | "Kamu sudah mencapai batas percakapan hari ini. Besok kamu bisa lanjut bercerita. Kalau kamu butuh bantuan sekarang, lihat kontak bantuan." |
@@ -321,6 +328,7 @@ Ikon: satu set (`[Assumption]` Lucide untuk Flutter), ukuran 24dp, stroke 2. OQ-
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.10 | 2026-11-07 | TASK-M027: SCR-M14 dan M15 dibangun (bagian 4.1 dan 6), CMP-M21 `HistoryEntryTile` dan CMP-M22 `HistoryLoadMore`, bank teks riwayat, label uji manual M025 diperbarui. |
 | 0.9 | 2026-11-07 | TASK-M026: CMP-M05 `SuggestionChips` dibangun (label tujuan, tanpa teks saran panjang). |
 | 0.8 | 2026-11-07 | TASK-M025: CMP-M04 dan SCR-M16 diimplementasikan, tautan bantuan di layar tamu, sesi, consent, SCR-M20 dan SCR-M08, utang bantuan dihapus. |
 | 0.7 | 2026-11-07 | TASK-M024: SCR-M08 diganti `ChatScreen` aliran harian, catatan CMP-M02, M03, M06, bank teks chat, keputusan paket ikon Lucide. |

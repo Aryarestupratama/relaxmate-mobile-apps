@@ -168,4 +168,36 @@ abstract final class AppTexts {
   static const String suggestionContacts = 'Lihat kontak bantuan';
   static const String suggestionConsultation = 'Bicara dengan profesional';
   static const String suggestionDismiss = 'Tutup saran';
+
+  // Riwayat (SCR-M14) dan detail hari (SCR-M15), hanya baca (FR-M005). Label tanggal dan jam
+  // percakapan berasal dari server.
+  static const String historyTitle = 'Riwayat';
+  static const String historyTooltip = 'Riwayat';
+  static const String historyEmpty =
+      'Belum ada riwayat. Setelah kamu bercerita, hari-harimu akan muncul di '
+      'sini.';
+  static const String historyLoadMore = 'Muat lebih banyak';
+  static const String historyLoadMoreMessages = 'Muat pesan berikutnya';
+  static const String historyReadOnly =
+      'Ini riwayat percakapan. Kamu hanya bisa membacanya.';
+
+  static const List<String> months = <String>[
+    'Januari',
+    'Februari',
+    'Maret',
+    'April',
+    'Mei',
+    'Juni',
+    'Juli',
+    'Agustus',
+    'September',
+    'Oktober',
+    'November',
+    'Desember',
+  ];
+
+  static String historyTurns(int turns) => '$turns giliran';
+
+  static String historyOpenDay(String date, String time) =>
+      'Buka percakapan $date, $time';
 }

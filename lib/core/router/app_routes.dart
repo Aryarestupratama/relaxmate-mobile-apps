@@ -17,6 +17,12 @@ abstract final class AppRoutes {
   /// Kontak bantuan (SCR-M16): terbuka untuk semua keadaan sesi (FR-M011).
   static const String crisisContacts = '/kontak-bantuan';
 
+  /// Riwayat (SCR-M14) dan detail hari hanya baca (SCR-M15), keduanya di balik consent.
+  static const String history = '/riwayat';
+
+  static String historyDetail(String conversationId) =>
+      '$history/$conversationId';
+
   /// Layar yang hanya untuk tamu; pengguna yang sudah masuk dialihkan keluar.
   static const Set<String> guestOnly = <String>{
     login,

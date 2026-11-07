@@ -73,6 +73,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       appBar: AppBar(
         title: const _ChatTitle(),
         actions: <Widget>[
+          IconButton(
+            onPressed: () => context.push(AppRoutes.history),
+            tooltip: AppTexts.historyTooltip,
+            icon: const Icon(LucideIcons.history),
+          ),
           // Jalur ke bantuan nyata selalu terlihat, tidak tersembunyi di menu (Design-M
           // prinsip 4).
           IconButton(
