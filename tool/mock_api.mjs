@@ -44,6 +44,11 @@
 //                                            halaman pesan; tiap 5 hari berisi balasan krisis; tiap 6 hari ada
 //                                            dua percakapan di hari yang sama)
 //                   GET /__fail-history      GET riwayat (days atau messages) berikutnya dijawab 503 (sekali)
+//                 Cek Rasa (TASK-M028, API-M018): POST /mood-entries ({ "mood": 1..5 }) mencatat Mood Entry di memori,
+//                 maksimal 5 per akun (seperti `mood_per_day`), lewat batas -> 429 mood_limit_reached.
+//                   GET /__moods?email=...   lihat Mood Entry yang tercatat (JSON, untuk memeriksa hasil uji)
+//                   GET /__set-moods?email=...&n=5  atur jumlah Mood Entry hari ini (uji batas harian)
+//                   GET /__fail-mood         POST /mood-entries berikutnya dijawab 503 (sekali)
 //                 Halaman /ketentuan dan /privasi disajikan sebagai teks tiruan.
 //                 Batas tiruan: daftar 5/menit, login gagal 5/menit per email, kirim ulang 3/jam.
 //
@@ -105,17 +110,19 @@ let failAiOnce = false;
 let slowAiOnce = false;
 let closeDayOnce = false;
 let failHistoryOnce = false;
+let failMoodOnce = false;
 let contactsVariant = 1; // 1 = daftar awal, 2 = daftar berubah (uji penyegaran cache)
 let messageSeq = 100;
 
 const CHAT_PER_DAY = 20;
+const MOOD_PER_DAY = 5;
 const CHAT_MAX_CHARS = 2000;
 const HISTORY_PER_PAGE = 15;
 const MESSAGES_PER_PAGE = 30;
 const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
 function newUser(name, email, password, verified, active) {
-  return { name, email, password, verified, active, resends: [], aiGranted: false, trainingChoice: null };
+  return { name, email, password, verified, active, resends: [], aiGranted: false, trainingChoice: null, moods: [] };
 }
 
 function resetData() {
@@ -128,6 +135,7 @@ function resetData() {
   slowAiOnce = false;
   closeDayOnce = false;
   failHistoryOnce = false;
+  failMoodOnce = false;
   contactsVariant = 1;
   const seed = [
     ['Akun Terverifikasi', 'verified@example.test', true, true],
@@ -630,6 +638,32 @@ async function authApi(req, res, path) {
     });
   }
 
+  if (method === 'POST' && path === '/api/v1/mood-entries') {
+    const user = authedUser(req, res);
+    if (!user) return undefined;
+    if (!user.verified) {
+      return apiError(res, 403, 'unverified', 'Verifikasi emailmu dulu, ya. Cek kotak masukmu.');
+    }
+    if (failMoodOnce) {
+      failMoodOnce = false;
+      return apiError(res, 503, 'server_error', 'Layanan sedang bermasalah. Coba lagi sebentar lagi.');
+    }
+    const body = await readJson(req);
+    if (body.mood === undefined || body.mood === null || body.mood === '') {
+      return validation(res, { mood: ['Pilih perasaanmu dulu.'] });
+    }
+    if (!Number.isInteger(body.mood) || body.mood < 1 || body.mood > 5) {
+      return validation(res, { mood: ['Pilihan perasaan tidak valid. Coba lagi, ya.'] });
+    }
+    if (user.moods.length >= MOOD_PER_DAY) {
+      return apiError(res, 429, 'mood_limit_reached', `Kamu sudah mencatat ${MOOD_PER_DAY} kali hari ini. Besok kamu bisa mencatat lagi.`);
+    }
+    const labels = ['Sangat sedih', 'Sedih', 'Biasa', 'Senang', 'Luar biasa'];
+    const entry = { id: user.moods.length + 1, mood: body.mood, mood_label: labels[body.mood - 1], created_at: new Date().toISOString() };
+    user.moods.push(entry);
+    return send(res, 201, { data: { entry } });
+  }
+
   if (method === 'GET' && path === '/api/v1/crisis-contacts') {
     const user = authedUser(req, res);
     if (!user) return undefined;
@@ -700,6 +734,25 @@ function devHelpers(req, res, url) {
     }
     chatOf(user).sent = Number(url.searchParams.get('n') ?? 0);
     sendText(res, 200, `Pesan terkirim ${email}: ${chatOf(user).sent}`);
+    return true;
+  }
+  if (url.pathname === '/__moods' || url.pathname === '/__set-moods') {
+    const email = (url.searchParams.get('email') ?? '').toLowerCase();
+    const user = users.get(email);
+    if (!user) {
+      sendText(res, 404, `Tidak ada akun ${email}`);
+      return true;
+    }
+    if (url.pathname === '/__set-moods') {
+      const n = Math.min(Math.max(Number(url.searchParams.get('n') ?? 0), 0), 50);
+      user.moods = Array.from({ length: n }, (_, i) => ({ id: i + 1, mood: 3, mood_label: 'Biasa', created_at: new Date().toISOString() }));
+    }
+    sendText(res, 200, `Mood Entry ${email}: ${user.moods.length}\n${JSON.stringify(user.moods)}`);
+    return true;
+  }
+  if (url.pathname === '/__fail-mood') {
+    failMoodOnce = true;
+    sendText(res, 200, 'POST /mood-entries berikutnya akan dijawab 503 satu kali.');
     return true;
   }
   if (url.pathname === '/__seed-history') {

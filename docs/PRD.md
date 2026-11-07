@@ -1,5 +1,5 @@
 # RelaxMate Mobile - PRD
-Version: 0.4 | Status: Draft | Last updated: 2026-11-06
+Version: 0.5 | Status: Draft | Last updated: 2026-11-07
 Depends on: PRD RelaxBoss v1.8, Architecture v1.74, Rules v1.5 | Owner: Founder (solo developer)
 
 Label klaim: `[Verified]` = ada sumber yang dicek, `[Inference]` = kesimpulan dari konteks, `[Assumption]` = asumsi yang bisa diubah. Kedalaman: **Lite**.
@@ -30,7 +30,7 @@ Dokumen ini terpisah dari PRD RelaxBoss (web). Aplikasi mobile masuk daftar Won'
 - G5: Aplikasi layak dipamerkan sebagai portofolio dan lolos kebijakan toko.
 
 **Non-goals (rilis ini)**
-- Tidak ada Mood Tracker, Asesmen, dan Artikel di mobile (tetap di web).
+- Tidak ada Mood Tracker (grafik dan riwayat mood), Asesmen, dan Artikel di mobile (tetap di web). Satu-satunya titik mobile yang menulis Mood Entry adalah Cek Rasa (FR-M013).
 - Tidak ada To-Do/Pomodoro (aplikasi dan PRD terpisah).
 - Tidak ada streaming balasan, WebSocket, push notification dari server, atau antrean (RULE-034).
 - Tidak ada kata panggil yang mendengarkan terus di latar belakang (keputusan founder 2026-11-04: cari aman). Mikrofon tidak aktif di latar belakang, termasuk saat maskot mengambang tampil; pengguna menyentuh maskot dulu, baru bicara.
@@ -65,7 +65,7 @@ Dokumen ini terpisah dari PRD RelaxBoss (web). Aplikasi mobile masuk daftar Won'
 ## 4. Karakter dan Pengalaman
 
 - **Sifat:** hangat, sabar, tenang, sederhana. Menyimak dan memvalidasi dulu, menyarankan belakangan.
-- **Cek Rasa (nama sementara):** pembuka sesi berupa pertanyaan skala 1–5 “seberapa berat rasanya hari ini?”, bukan kotak teks kosong.
+- **Cek Rasa (nama sementara):** pembuka sesi berupa pertanyaan “Hari ini, kamu yang mana?” dengan lima blob mood (skala 1–5, berlabel teks), bukan kotak teks kosong.
 - **Pelukan virtual:** animasi singkat saat pengguna berat; tidak bersuara dan tidak memaksa.
 - **Penutup khas:** frasa pamit yang tetap dan hangat.
 - **Batas karakter:** tidak mengaku punya perasaan atau menggantikan manusia; tidak memakai kalimat yang menimbulkan rasa bersalah (“aku sedih kalau kamu pergi”); sesekali mengingatkan lembut bahwa ia asisten AI dan mendorong ke orang terdekat atau profesional saat percakapan berat.
@@ -135,7 +135,7 @@ Dokumen ini terpisah dari PRD RelaxBoss (web). Aplikasi mobile masuk daftar Won'
 
 | ID | Requirement | Prioritas |
 |---|---|---|
-| FR-M013 | Awal sesi harian MUST menawarkan Cek Rasa (skala 1–5). Jawaban dikirim sebagai pesan chat biasa dan dapat dilewati. Tidak membuat tabel baru (lihat OQ-M3). | Must |
+| FR-M013 | Awal sesi harian MUST menawarkan Cek Rasa (skala 1–5). Jawaban dikirim sebagai pesan chat biasa **dan juga dicatat sebagai Mood Entry (ENT-006) lewat API-M018**, sehingga tampil di Mood Tracker web (OQ-M3, diputuskan founder 2026-11-07). Dapat dilewati. Tidak membuat tabel baru. | Must |
 | FR-M014 | Aplikasi MUST menyediakan latihan napas dan grounding 5-4-3-2-1 yang berjalan **lokal**, tanpa AI dan tanpa kuota, termasuk saat offline. Fase 1 berupa panduan visual dengan getar opsional; panduan suara menyusul di Fase 2 bersama klip suara (FR-M020). | Must |
 | FR-M015 | Mode “Temani saja”: maskot hadir tanpa percakapan (animasi tenang, napas pelan), tanpa panggilan AI. | Should |
 
@@ -237,7 +237,7 @@ Dokumen ini terpisah dari PRD RelaxBoss (web). Aplikasi mobile masuk daftar Won'
 |---|---|---|
 | OQ-M1 | Ditutup: maskot mengambang masuk Fase 1 (keputusan founder, 2026-11-04). | Menetapkan roadmap |
 | OQ-M2 | Sebagian ditutup: nama karakter RelaxMate dengan panggilan “Mates”, juga dipakai sebagai kata panggil. Terbuka: cara maskot menyapa pengguna dan ejaan “RelaxMate” atau “RelaxMates”. | Fase 2 |
-| OQ-M3 | Cek Rasa hanya pesan chat, atau juga menulis Mood Entry (ENT-006) agar tampil di web? | Task Cek Rasa |
+| OQ-M3 | **Diputuskan founder 2026-11-07:** Cek Rasa mengirim pesan chat dan juga menulis Mood Entry (ENT-006) agar tampil di web. | - |
 | OQ-M4 | Ingatan lintas hari (ringkasan terenkripsi) diadakan atau tidak? Terkait TODO-LATER dan kuota | Setelah MVP |
 | OQ-M5 | Batas harian untuk obrolan suara tetap 20 atau dinaikkan (mengubah config web juga)? | Fase 2 |
 | OQ-M6 | Balasan panjang: suara perangkat saja, atau ElevenLabs API terbatas? Baca syarat resmi (output, data pelatihan) dan telaah privasi | Fase 3 |
@@ -248,6 +248,7 @@ Dokumen ini terpisah dari PRD RelaxBoss (web). Aplikasi mobile masuk daftar Won'
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.5 | 2026-11-07 | OQ-M3 diputuskan: Cek Rasa juga menulis Mood Entry (FR-M013 diperbarui; non-goal Mood Tracker dipertegas). |
 | 0.4 | 2026-11-06 | Sinkronisasi ke kode dan backend: teks consent dari server (FR-M002), versi paket terpasang dan kandidat overlay disamakan dengan Architecture-M (bagian 9), OQ-M7 sebagian ditutup. |
 | 0.3 | 2026-11-05 | Panduan suara latihan napas ditunda ke Fase 2 (keputusan founder): US-M07 dan FR-M014 diperbarui; Fase 1 hanya visual dan getar opsional. |
 | 0.2 | 2026-11-04 | Maskot mengambang masuk Fase 1 (OQ-M1 ditutup). “Mates” adalah panggilan akrab karakter RelaxMate, bukan panggilan untuk pengguna (OQ-M2 sebagian ditutup); kata panggil memakai “Mates”, hanya saat aplikasi atau mini-panel terbuka. Tidak ada pendengaran di latar belakang (keputusan founder: cari aman). |

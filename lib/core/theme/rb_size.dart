@@ -7,6 +7,9 @@ abstract final class RbSize {
   static const double avatarLarge = 72;
   static const double icon = 24;
 
+  /// Blob mood pada `MoodBlobRow` (Design-M CMP-M10).
+  static const double moodBlob = 56;
+
   /// Tebal garis tepi kartu pilihan: biasa dan terpilih (Design-M CMP-M20).
   static const double borderThin = 1;
   static const double borderSelected = 2;

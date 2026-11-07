@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Architecture
-Version: 0.12 | Status: Draft | Last updated: 2026-11-07
+Version: 0.13 | Status: Draft | Last updated: 2026-11-07
 Depends on: PRD RelaxMate Mobile v0.3, Architecture RelaxBoss (web), Schema RelaxBoss (web), Rules v1.5 | Owner: Founder (solo developer)
 
 Label: `[Verified]` ada sumber (sisi mobile: repo `relaxmate-mobile-apps` commit `8014c38`; sisi backend: repo `RELAXBOSS_WEBSITE` commit `9afd27c`), `[Inference]` kesimpulan, `[Assumption]` bisa diubah. **Dokumen ini mengikuti kode:** bila berbeda dari kode, kode yang benar. Kedalaman: **Lite**. Dokumen ini hanya mengatur sisi mobile dan tambahan di backend. Subsistem AI (rotasi key, `ChatbotService`, `CrisisDetector`), enkripsi, dan admin tetap di Architecture web dan tidak diulang di sini.
@@ -80,7 +80,7 @@ relaxmate-mobile-apps/              # nama repo; paket Dart: relaxmate
                   # ui/ (StartupGate, SplashView, UpdateRequiredScreen)
       chat/       # data/ (ChatMessage, ChatLimits, ChatDay, SendResult, ChatRepository),
                   # state/ (ChatState, ChatController, SendOutcome),
-                  # ui/ (ChatScreen, ChatBubble, ChatInputBar, TypingIndicator)
+                  # ui/ (ChatScreen, ChatBubble, ChatInputBar, TypingIndicator, ChatWelcome, SuggestionChips)
       auth/       # data/ (UserSummary, AuthSession, ResendResult, AuthRepository),
                   # state/ (AuthState, AuthController),
                   # ui/ (LoginScreen, RegisterScreen, ForgotPasswordScreen, CheckEmailScreen,
@@ -94,16 +94,20 @@ relaxmate-mobile-apps/              # nama repo; paket Dart: relaxmate
       history/    # data/ (HistoryDay, HistoryPage, ConversationPage, HistoryRepository, history_timeline),
                   # state/ (HistoryState, HistoryController, ConversationState, ConversationController),
                   # ui/ (HistoryScreen, ConversationScreen, HistoryEntryTile, HistoryLoadMore)
-      checkin/ exercises/ voice/ mascot/ overlay/ settings/   # masih .gitkeep
+      checkin/    # data/ (MoodLevel, MoodRepository),
+                  # state/ (CheckinState, CheckinController),
+                  # ui/ (CheckinCard, MoodBlobRow)
+      exercises/ voice/ mascot/ overlay/ settings/   # masih .gitkeep
     shared/
       widgets/    # MateAvatar + MateAvatarSize (CMP-M01), ErrorAlert (CMP-M13)
   assets/
     fonts/          # Plus Jakarta Sans (OFL)
-    images/mascot/  # avatar RelaxMate (dari aset web); satu-satunya folder aset yang terdaftar di pubspec
+    images/mascot/  # avatar RelaxMate (dari aset web); terdaftar di pubspec
+    images/mood/    # mood-1..5.webp: blob Cek Rasa (salinan aset web `public/images/mood`); terdaftar di pubspec
     audio/clips/    # klip rekaman + clips.json (intent -> daftar klip); masih .gitkeep
     crisis/         # crisis_contacts.json: fallback kontak bantuan (tanpa data dummy di rilis); terdaftar di pubspec
     texts/          # teks panjang (privasi, ketentuan); masih .gitkeep
-  tool/             # alat pengembangan, bukan bagian aplikasi (mock_api.mjs: mode cek versi dan mode auth, termasuk consent)
+  tool/             # alat pengembangan, bukan bagian aplikasi (mock_api.mjs: mode cek versi dan mode auth, termasuk consent, chat, riwayat, dan Mood Entry)
   android/app/
     build.gradle.kts                                  # flavor dev/prod, minSdk 26
     src/main/AndroidManifest.xml, kotlin/id/my/relaxboss/relaxmate/MainActivity.kt   # izin INTERNET di sini (sejak M022)
@@ -122,6 +126,8 @@ Aturan: satu fitur satu folder; tiap fitur berisi `data/` (repository), `state/`
 **Chat harian (TASK-M024) `[Verified: uji manual founder 2026-11-07]`.** `ChatController` (Riverpod `Notifier.autoDispose`, dibuang saat layar ditutup) memegang `ChatState`: `ChatLoading`, `ChatLoadFailed(error)`, `ChatReady` (`conversationId`, `messages`, `limits`, `unanswered`, `sending`, `error`). `load()` memanggil API-M012; `send()` dan `retry()` memanggil API-M013 (`{content}` atau `{retry: true}`). Pesan yang dikirim tampil langsung sebagai pesan tertunda (`ChatMessage.pending`, id -1) dengan penanda "sedang menulis". Penanganan galat `send`: **ditolak sebelum tersimpan** (422, 429, offline, 403 selain consent) menghapus gelembung tertunda, menampilkan alasan dari server, dan mengembalikan teks ke kolom isian (`SendOutcome.rejected`); **mungkin tersimpan** (timeout, 5xx termasuk 503 `ai_unavailable`, tidak dikenal) memuat ulang hari ini dari server (`_resync`) agar tampilan sama dengan server, lalu menampilkan galat dengan "Coba lagi" bila `unanswered` (`SendOutcome.kept`); bila sinkronisasi gagal, pesan tertunda tetap tampil dengan "Coba lagi". 409 `conversation_closed` memuat ulang hari ini (Percakapan baru) dan mengembalikan teks. 409 `nothing_to_retry` memuat ulang. 429 `daily_limit` mengosongkan sisa kuota dan menonaktifkan input dengan penjelasan. 403 `consent_required` memanggil `ref.invalidate(consentControllerProvider)` sehingga `ConsentGate` menampilkan layar consent. Tidak ada percobaan ulang otomatis (RULE-M044). Panjang input dibatasi `limits.message_max_chars` dari server; sisa kuota tampil sebagai teks. `is_crisis` dan `suggestion` belum dibaca (TASK-M025 dan M026); sampai itu selesai Crisis Response tampil sebagai gelembung biasa tanpa banner.
 
 **Saran tindakan (TASK-M026) `[Verified: uji manual founder 2026-11-07]`.** Server mengirim `suggestion` (`type`, `priority`, `dismissible`) pada balasan RelaxMate; `intent` tidak dikirim. `ChatSuggestion` membaca tiga jenis dari enum `SuggestionType` backend (`escalate_crisis`, `recommend_professional`, `recommend_support`); jenis lain diabaikan. `destinationsFor(kind)` memetakan jenis ke tujuan: `escalate_crisis` -> kontak bantuan (rute `/kontak-bantuan`) dan Konsultasi; `recommend_professional` -> Konsultasi (halaman web `/konsultasi` lewat `WebLauncher`); `recommend_support` -> latihan napas dan grounding (belum tersedia, `isAvailable` false sampai TASK-M029, jadi tanpa chip). `visibleSuggestionIds` mengikuti web (FR-029): prioritas 1 selalu tampil, saran lain hanya pada balasan RelaxMate terakhir, minus yang ditutup pengguna (disimpan di memori layar chat). Tombol tutup tidak ada pada saran krisis.
+
+**Cek Rasa (TASK-M028) `[Verified: kode, logika murni dan mock API dijalankan; UI belum diuji]`.** Fitur `features/checkin`. `MoodLevel` (enum 1..5 dengan label yang sama dengan web), `MoodRepository.record` memanggil API-M018 (hanya `mood`). `CheckinController` (Riverpod `Notifier.autoDispose`, dipegang `ChatScreen` lewat `ref.listen`) memegang `CheckinState` (`skipped`, `submitting`, `notice`). `submit(level)` **mengirim pesan chat dulu** lewat `ChatController.send` (teks template "Hari ini aku merasa: sedih"), **baru** mencatat Mood Entry bila pesan diterima atau tersimpan (`SendOutcome.accepted` atau `kept`); pesan ditolak berarti tidak ada Mood Entry dan kartu muncul lagi (belum ada pesan), sehingga tidak ada catatan ganda. Mood Entry yang gagal (jaringan, 5xx, batas harian `mood_limit_reached`) tidak diulang otomatis (RULE-M044); pesan tetap sah dan `notice` ditampilkan satu kali sebagai `SnackBar`. `ChatWelcome` (SCR-M08 kosong) menampilkan sambutan dan, bila belum ada pesan hari ini dan batas pesan belum tercapai, `CheckinCard` (SCR-M09) sampai pengguna mengirim atau menekan "Lewati" (hanya memori, tidak disimpan; kembali ditawarkan bila layar chat dibuka ulang dan belum ada pesan). Kartu tidak memblokir kolom ketik. Tidak ada GET Mood Entry di klien: Mood Tracker tetap di web. Blob memakai gambar yang sama dengan web (`assets/images/mood`).
 
 **Riwayat (TASK-M027) `[Verified: kode, logika murni dan mock API dijalankan; UI belum diuji]`.** Fitur `features/history`, hanya baca (FR-M005). `HistoryRepository` memanggil API-M015 (`days`, kursor `?cursor=`) dan API-M016 (`messages`, kursor); balasan yang bentuknya tidak sesuai kontrak (satu baris atau pesan rusak) ditolak seluruhnya menjadi galat umum. `HistoryController` (`Notifier.autoDispose`) memegang `HistoryState` (`HistoryLoading`, `HistoryLoadFailed(error)`, `HistoryReady(days, nextCursor, loadingMore, moreError)`); `ConversationController` (`Notifier.autoDispose.family`, satu instance per id Percakapan) memegang `ConversationState` dengan pola sama. Keduanya dibuang saat layar ditutup, jadi isi riwayat tidak tertinggal di memori (RULE-M031, ADR-M07) dan selalu diambil segar dari server; tanpa internet riwayat tidak tampil. Halaman berikutnya dimuat hanya atas aksi pengguna lewat tombol (tanpa percobaan ulang otomatis, RULE-M044); gagal memuat halaman berikutnya menyimpan `moreError` tanpa menghapus yang sudah tampil, dan id yang sudah ada tidak digandakan. `buildHistoryTimeline` menyisipkan penanda tanggal dari `day` server (hari percakapan 04.00 WIB; klien tidak menghitung "hari", RULE-M033) di depan baris berurutan dengan `day` sama tanpa mengubah urutan server; `formatDayKey` mengubah `2026-11-06` menjadi "6 November 2026" (bentuk lain dikembalikan apa adanya) dan `timeOfLabel` mengambil jam dari `label` server. Rute `/riwayat` (SCR-M14) dan `/riwayat/:id` (SCR-M15, rute anak) dibungkus `ConsentGate` di `app_router.dart` dan terbuka dari ikon Riwayat di AppBar chat; keduanya tidak dikecualikan dari `authRedirect` (tamu dialihkan ke Masuk). 403 `consent_required` memicu `invalidateIfConsentRequired` (`consent/state/consent_required_handler.dart`), yang memeriksa ulang gerbang consent. Percakapan hari ini ikut muncul di daftar bila sudah berisi pesan (perilaku server) dan dibuka hanya baca. Detail memakai `ChatBubble` yang sama dengan chat: tanpa chip saran, tanpa banner krisis, tanpa "Coba lagi"; ikon telepon ke `/kontak-bantuan` ada di AppBar kedua layar.
 
@@ -150,6 +156,7 @@ Semua endpoint JSON, HTTPS saja. Format sukses `{ "data": {...} }`, gagal `{ "er
 | API-M015 | `GET /relaxmate/days` | Token + `api.verified` + `ai.consent`, `api-user` | Riwayat: Percakapan yang sudah berisi pesan, terbaru dulu, `history_per_page` (15) per halaman, kursor `?cursor=` `[Verified: uji manual lolos]`. Klien memakainya sejak TASK-M027 (`HistoryRepository.days`) | n/a |
 | API-M016 | `GET /relaxmate/conversations/{id}/messages` | Token + `api.verified` + `ai.consent`, milik sendiri | Baca satu percakapan, hanya baca, urut lama ke baru, 30 per halaman, kursor `?cursor=` `[Verified: uji manual lolos]`. Klien memakainya sejak TASK-M027 (`HistoryRepository.messages`) | 404 |
 | API-M017 | `DELETE /account` | Token + `api.active`, `api-user`; tanpa `api.verified` (agar yang salah mengetik email tetap bisa menghapus data) | Badan `{ "password" }`. Memakai Action `DeleteUserAccount` yang sama dengan web (batas `delete_account_per_minute`, tolak admin terakhir); semua token pengguna dihapus di dalam transaksi. Sukses 204 tanpa isi `[Verified: uji manual lolos]` | 422 `validation_failed` dengan `errors.password` (sandi salah atau terlalu banyak percobaan) atau `errors.account` (admin terakhir); 401 |
+| API-M018 | `POST /mood-entries` | Token + `api.verified`, limiter `api-mood` (`mood_per_minute`, 10/menit) + `api-user`; **tanpa** `ai.consent` (Mood Tracker web juga tidak memintanya) | Buat Mood Entry dari Cek Rasa (FR-M013, OQ-M3). Badan `{ "mood": 1..5 }` (wajib), opsional `arousal_input` (`energized` \| `tired`) dan `note` (maks. `mood_note_max_chars`); klien mobile hanya mengirim `mood`. Memakai Action `CreateMoodEntry` yang sama dengan web (API-011), jadi batas harian `mood_per_day` (5, hari WIB) dan enkripsi `note` ikut. Sukses 201 `{ "data": { "entry": { "id", "mood", "mood_label", "created_at" (ISO UTC) } } }`; catatan tidak dikembalikan `[Verified: kode; uji manual menunggu founder]` | 422 `validation_failed` (+ `errors.mood`); 429 `mood_limit_reached` (batas harian) atau `rate_limited`; 403 `unverified`; 401 |
 
 **Bentuk nyata API-M001 sampai M005 `[Verified]` (TASK-M013).** Semua galat memakai amplop `{ "error": { "code", "message" } }` dengan `message` Bahasa Indonesia; validasi 422 menambah `errors` per kolom.
 
@@ -419,6 +426,7 @@ Alat pengembangan di luar aplikasi: Node.js untuk `tool/mock_api.mjs` (tanpa dep
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.13 | 2026-11-07 | TASK-M028: API-M018 (`POST /mood-entries`), struktur `features/checkin` dan `ChatWelcome`, aset `images/mood`, paragraf Cek Rasa, limiter `api-mood`. |
 | 0.12 | 2026-11-07 | TASK-M027: struktur `features/history` (dan `features/crisis` yang sebelumnya belum tertulis di pohon), paragraf Riwayat, API-M015 dan M016 dipakai klien, ADR-M14 diperbarui, label uji manual M024 sampai M026 diperbarui. |
 | 0.11 | 2026-11-07 | TASK-M026: paragraf Saran tindakan, `shared_preferences: ^2.5.0` tertulis di pubspec. |
 | 0.10 | 2026-11-07 | TASK-M025: struktur `features/crisis`, aset fallback terdaftar, `shared_preferences` dipakai, rute `/kontak-bantuan`, paragraf Crisis Response, OQ-MA9 sementara `tel:119,8`. |

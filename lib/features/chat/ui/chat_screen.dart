@@ -13,8 +13,10 @@ import 'package:relaxmate/features/chat/state/chat_state.dart';
 import 'package:relaxmate/features/chat/state/send_outcome.dart';
 import 'package:relaxmate/features/chat/ui/chat_bubble.dart';
 import 'package:relaxmate/features/chat/ui/chat_input_bar.dart';
+import 'package:relaxmate/features/chat/ui/chat_welcome.dart';
 import 'package:relaxmate/features/chat/ui/suggestion_chips.dart';
 import 'package:relaxmate/features/chat/ui/typing_indicator.dart';
+import 'package:relaxmate/features/checkin/state/checkin_controller.dart';
 import 'package:relaxmate/features/crisis/ui/crisis_banner.dart';
 import 'package:relaxmate/shared/widgets/error_alert.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar.dart';
@@ -68,6 +70,20 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final chat = ref.watch(chatControllerProvider);
     final controller = ref.read(chatControllerProvider.notifier);
     final space = context.rbSpace;
+
+    // Pesan Cek Rasa terkirim tetapi Mood Entry belum tercatat: beri tahu sekali (FR-M013).
+    ref.listen<String?>(
+      checkinControllerProvider.select((state) => state.notice),
+      (previous, next) {
+        if (next == null) {
+          return;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(next)),
+        );
+        ref.read(checkinControllerProvider.notifier).clearNotice();
+      },
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -180,16 +196,7 @@ class _ChatBody extends StatelessWidget {
         if (ready.hasCrisis) const CrisisBanner(),
         Expanded(
           child: newestFirst.isEmpty
-              ? Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(space.lg),
-                    child: Text(
-                      AppTexts.welcome,
-                      textAlign: TextAlign.center,
-                      style: text.body.copyWith(color: colors.textSecondary),
-                    ),
-                  ),
-                )
+              ? ChatWelcome(canCheckin: !ready.limitReached)
               : ListView.builder(
                   reverse: true,
                   padding: EdgeInsets.all(space.md),

@@ -138,6 +138,22 @@ abstract final class AppTexts {
   static String chatRemaining(int remaining, int perDay) =>
       'Sisa pesan hari ini: $remaining dari $perDay';
 
+  // Cek Rasa (SCR-M09, FR-M013). Label skala mengikuti web (enum `MoodLevel` server).
+  static const String checkinTitle = 'Hari ini, kamu yang mana?';
+  static const String checkinSend = 'Kirim ke RelaxMate';
+  static const String checkinSkip = 'Lewati';
+  static const String checkinNotSaved =
+      'Perasaanmu sudah terkirim ke RelaxMate, tetapi belum tercatat di Mood '
+      'Tracker. Kamu bisa mencatatnya lewat web.';
+  static const String moodVerySad = 'Sangat sedih';
+  static const String moodSad = 'Sedih';
+  static const String moodNeutral = 'Biasa';
+  static const String moodHappy = 'Senang';
+  static const String moodGreat = 'Luar biasa';
+
+  static String checkinMessage(String label) =>
+      'Hari ini aku merasa: ${label.toLowerCase()}';
+
   // Kontak bantuan dan Crisis Response (SCR-M16, CMP-M04). Teks tetap di klien, bukan
   // keluaran AI (FR-M011). Daftar kontak sendiri dari server atau aset, bukan dari sini.
   static const String crisisContactsTitle = 'Kontak bantuan';
