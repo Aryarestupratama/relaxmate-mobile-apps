@@ -10,9 +10,6 @@ abstract final class AppTexts {
 
   static const String mascotLabel = 'Maskot RelaxMate';
 
-  /// Hanya tampil di flavor `dev`.
-  static const String devBadge = 'Mode pengembangan';
-
   static const String configError =
       'Konfigurasi aplikasi belum lengkap. Hubungi pengembang.';
 
@@ -128,6 +125,16 @@ abstract final class AppTexts {
       'Sebelum bercerita, kami perlu memastikan persetujuanmu. Pastikan '
       'internetmu aktif, lalu coba lagi.';
 
-  // Layar sambutan sementara (TASK-M024 menggantinya).
-  static String signedInAs(String email) => 'Masuk sebagai $email';
+  // Chat harian (SCR-M08). Pesan galat dan batas berasal dari server.
+  static const String aiBadge = 'AI';
+  static const String chatInputHint = 'Ketik pesanmu...';
+  static const String chatSend = 'Kirim';
+  static const String chatTyping = 'RelaxMate sedang menulis...';
+  static const String chatYouSaid = 'Kamu berkata';
+  static const String chatMateSaid = 'RelaxMate berkata';
+  static const String chatDailyLimit =
+      'Batas pesan hari ini sudah tercapai. Kita lanjut lagi besok, ya.';
+
+  static String chatRemaining(int remaining, int perDay) =>
+      'Sisa pesan hari ini: $remaining dari $perDay';
 }

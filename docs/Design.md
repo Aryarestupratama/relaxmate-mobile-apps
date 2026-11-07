@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Design System dan Spesifikasi Layar
-Version: 0.6 | Status: Draft | Last updated: 2026-11-06
+Version: 0.7 | Status: Draft | Last updated: 2026-11-06
 Depends on: PRD-Mobile v0.3, Architecture-Mobile v0.3, Design RelaxBoss (web) | Owner: Founder (solo developer)
 
 Label: `[Assumption]` bisa diubah. Kedalaman: **Lite**. Platform: Android (phone) dulu, mode terang. Tata letak layar yang tidak tertulis dibangun sederhana (fungsi dulu) memakai token dan komponen di dokumen ini (RULE-M007).
@@ -96,11 +96,11 @@ Teks layar penting (judul sambutan, krisis) tidak lebih kecil dari 16sp.
 | ID | Komponen | Spesifikasi |
 |---|---|---|
 | CMP-M01 | `MateAvatar` | Lingkaran 40/56/72dp berisi avatar RelaxMate (aset web) di atas `softLavender`. Dibangun di TASK-M020 (`MateAvatar`, ukuran `small`/`medium`/`large`) |
-| CMP-M02 | `ChatBubble` | Pengguna: rata kanan, `softLavender`; RelaxMate: rata kiri, `surfaceAlt` + `MateAvatar` kecil; radius 20 (sudut dekat pengirim 6); teks isi; lebar maks. 80% layar; teks biasa; `Semantics` "RelaxMate berkata: ..." |
-| CMP-M03 | `TypingIndicator` | Tiga titik navy bergantian di gelembung RelaxMate; teks tersembunyi "RelaxMate sedang menulis" untuk TalkBack; maks. 20 detik |
+| CMP-M02 | `ChatBubble` (dibangun di TASK-M024; lebar maks. 80% = `RbSize.bubbleMaxWidthFactor`, waktu WIB kecil di bawah isi, tanpa `MateAvatar` kecil) | Pengguna: rata kanan, `softLavender`; RelaxMate: rata kiri, `surfaceAlt` + `MateAvatar` kecil; radius 20 (sudut dekat pengirim 6); teks isi; lebar maks. 80% layar; teks biasa; `Semantics` "RelaxMate berkata: ..." |
+| CMP-M03 | `TypingIndicator` (TASK-M024: versi teks "RelaxMate sedang menulis..."; titik beranimasi menyusul di M030) | Tiga titik navy bergantian di gelembung RelaxMate; teks tersembunyi "RelaxMate sedang menulis" untuk TalkBack; maks. 20 detik |
 | CMP-M04 | `CrisisBanner` | Latar `crisisBg`, teks `crisisText`, ikon, tombol "Hubungi bantuan" (`tel:`); menempel di atas daftar pesan, **tidak dapat ditutup** setelah krisis terdeteksi |
 | CMP-M05 | `SuggestionChip` | Pil putih berbingkai navy 2dp, label + ikon; di bawah balasan; chip `escalate_crisis` tidak dapat ditutup |
-| CMP-M06 | `ChatInputBar` | Kolom teks 1-4 baris (`inputBorder`), placeholder, tombol mikrofon (kiri tombol kirim), tombol kirim navy; dinonaktifkan dengan penjelasan saat batas harian tercapai |
+| CMP-M06 | `ChatInputBar` (TASK-M024: tanpa mikrofon, tombol kirim `IconButton.filled` berikon Lucide `send`; kolom tetap bisa diketik saat pesan diproses) | Kolom teks 1-4 baris (`inputBorder`), placeholder, tombol mikrofon (kiri tombol kirim), tombol kirim navy; dinonaktifkan dengan penjelasan saat batas harian tercapai |
 | CMP-M07 | `VoiceButton` | Lingkaran 56dp navy dengan ikon mikrofon; keadaan idle, mendengarkan (cincin berdenyut), nonaktif; selalu ada label teks |
 | CMP-M08 | `Waveform` | 18 batang navy yang bergerak mengikuti level suara; tidak membawa makna selain "sedang mendengar" (ada label teks) |
 | CMP-M09 | `SendCountdown` | Bilah tipis yang menyusut 1,5 dtk + teks "Mengirim dalam 1,5 detik" + tombol "Batal"; setelah kirim: "Terkirim otomatis" |
@@ -136,7 +136,7 @@ Teks layar penting (judul sambutan, krisis) tidak lebih kecil dari 16sp.
 |---|---|---|---|---|---|
 | SCR-M01 Pembuka dan cek versi (`SplashView`, `StartupGate`) | Maskot besar dan indikator putar berlabel "Memuat..." (pengecualian dari skeleton karena belum ada konten untuk dibentuk) | n/a | Konfigurasi build tidak valid: `ConfigErrorApp` dengan teks "Konfigurasi aplikasi belum lengkap. Hubungi pengembang." Galat pemeriksaan versi tidak ditampilkan (gagal-terbuka) | Lanjut ke aplikasi | Lanjut ke aplikasi; kontak bantuan dan latihan tetap bisa dibuka |
 | SCR-M20 Perbarui aplikasi (`UpdateRequiredScreen`) | n/a | n/a | `Snack` "Toko aplikasi belum bisa dibuka. Coba lagi nanti." bila toko gagal dibuka | Tombol membuka halaman aplikasi di toko | Layar tetap tampil; tombol toko dapat gagal dan menampilkan `Snack` yang sama |
-| SCR-M08 RelaxMate (`ChatScreen`, sementara) | n/a | Sambutan statis: avatar besar, judul "RelaxMate", teks sambutan, dan "Mode pengembangan" hanya di flavor `dev` | n/a | n/a | n/a (diganti di TASK-M024) |
+| SCR-M08 RelaxMate (`ChatScreen`) | `CircularProgressIndicator` di tengah | Kalimat sambutan di tengah layar (belum ada pesan hari ini) | Gagal dimuat: `ErrorAlert` dengan "Coba lagi". Gagal kirim: gelembung tertunda dihapus, alasan dari server di `ErrorAlert`, teks dikembalikan ke kolom isian. Balasan gagal (503, timeout): pesan tetap tampil, `ErrorAlert` dengan "Coba lagi" | Gelembung pengguna dan RelaxMate, waktu WIB di bawah isi, "Sisa pesan hari ini: N dari M" di bawah input | Offline: `ErrorAlert` dengan pesan koneksi terputus; teks tidak hilang. Batas harian: input diganti penjelasan "Batas pesan hari ini sudah tercapai...". Tampilan sengaja sederhana sampai desain final; banner krisis, chip saran, kartu Cek Rasa, dan menu menyusul (M025, M026, M028, M031) |
 | SCR-M04 Masuk (`LoginScreen`) | Tombol "Memproses..." dan dinonaktifkan; kolom hanya-baca | n/a | Kolom wajib/format: pesan di bawah kolom dan fokus ke kolom pertama yang salah. Galat server per kolom (422) tampil di kolomnya; selain itu (401 salah sandi, 403 nonaktif, 429, offline, timeout) `ErrorAlert` di atas tombol | Router memindahkan ke Cek email (belum verifikasi) atau layar utama | Pesan "Koneksi terputus..." lewat `ErrorAlert`; isian tidak hilang |
 | SCR-M03 Daftar (`RegisterScreen`) | Sama dengan Masuk | n/a | Sama dengan Masuk; centang Ketentuan wajib (pesan di bawah centang); tautan "Baca Ketentuan" dan "Baca Kebijakan Privasi" membuka halaman web, gagal buka: `Snack` | Pengguna langsung masuk; router memindahkan ke Cek email | Sama dengan Masuk |
 | SCR-M05 Lupa kata sandi (`ForgotPasswordScreen`) | Tombol "Memproses..." | n/a | Format email di bawah kolom; galat lain lewat `ErrorAlert` | Formulir diganti catatan sukses (ikon + pesan server yang sama untuk email terdaftar atau tidak) dan tombol "Kembali ke masuk" | Sama dengan Masuk |
@@ -217,7 +217,8 @@ Nada: hangat, sederhana, tidak menggurui, memakai "kamu". Teks yang sama dengan 
 |---|---|
 | Sambutan | "Halo, aku RelaxMate. Teman ceritamu. Aku bukan psikolog atau layanan medis, tapi aku siap mendengarkan." |
 | Cek Rasa | "Hari ini, kamu yang mana?"; tombol "Kirim ke RelaxMate", "Lewati" |
-| Placeholder input | "Bicara atau ketik..." |
+| Placeholder input | "Bicara atau ketik..." (target setelah mikrofon Fase 2); sekarang "Ketik pesanmu..." |
+| Chat harian (TASK-M024) | Lencana "AI"; tombol "Kirim"; "RelaxMate sedang menulis..."; pembaca layar: "Kamu berkata: ..." dan "RelaxMate berkata: ..."; "Sisa pesan hari ini: N dari M"; "Batas pesan hari ini sudah tercapai. Kita lanjut lagi besok, ya."; pesan galat dari server |
 | Mengetik | "RelaxMate sedang menulis..." |
 | AI tidak tersedia | "RelaxMate sedang tidak bisa membalas. Pesanmu tetap tersimpan. Coba lagi sebentar lagi." Tombol: "Coba lagi" |
 | Batas harian | "Kamu sudah mencapai batas percakapan hari ini. Besok kamu bisa lanjut bercerita. Kalau kamu butuh bantuan sekarang, lihat kontak bantuan." |
@@ -294,7 +295,7 @@ Kontak bantuan tidak ditulis di bank teks; selalu dari API-M011 atau aset fallba
 
 Aset sumber: `relaxmate-avatar.webp`, `relaxmate-half.webp`, dan sprite `idle`/`speaking`/`thinking`/`walk` dari repo web/reel. Konversi ke format animasi (Rive atau Lottie) diputuskan di TASK-M030. Gaya gambar tidak dicampur dalam satu layar (sprite pixel vs ilustrasi mulus) tanpa alasan; pilih satu keluarga per layar. Karakter orisinal RelaxMate: tidak meniru karakter, bentuk, atau suara pihak lain.
 
-Ikon: satu set (`[Assumption]` Lucide untuk Flutter), ukuran 24dp, stroke 2. Sementara (TASK-M022) layar auth memakai `Icons` bawaan Material karena paket ikon belum diputuskan (OQ-MA10).
+Ikon: satu set (`[Assumption]` Lucide untuk Flutter), ukuran 24dp, stroke 2. OQ-MA10 diputuskan 2026-11-07: Lucide (`lucide_icons_flutter`), dipakai pertama kali di `ChatInputBar` (TASK-M024). Layar auth, consent, dan `ErrorAlert` masih memakai `Icons` bawaan Material dan dipindahkan saat UI disentuh lagi.
 
 ---
 
@@ -320,6 +321,7 @@ Ikon: satu set (`[Assumption]` Lucide untuk Flutter), ukuran 24dp, stroke 2. Sem
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.7 | 2026-11-07 | TASK-M024: SCR-M08 diganti `ChatScreen` aliran harian, catatan CMP-M02, M03, M06, bank teks chat, keputusan paket ikon Lucide. |
 | 0.6 | 2026-11-06 | TASK-M023: SCR-M07 di bagian 4.1, CMP-M14 diterapkan sebagai `ConsentScreen` layar penuh, CMP-M20 `ConsentChoiceTile`, token tebal garis, bank teks consent, OQ-D3 ditutup. |
 | 0.5 | 2026-11-06 | TASK-M022: status layar SCR-M03 sampai M06 dan layar sesi di bagian 4.1; bank teks auth; `ErrorAlert` diterapkan; A-D6, A-D7; ikon sementara; OQ-D3 digeser ke M023. |
 | 0.4 | 2026-11-06 | Sinkronisasi ke kode (commit `8014c38`): bagian Tema komponen Material, nilai bayangan, pemetaan `TextTheme`, tanpa `fontFamilyFallback` eksplisit, isi `ChatScreen` sementara, cek versi sekali per pembukaan, teks `mascotLabel` dan `devBadge` di bank teks. |

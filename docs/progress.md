@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Progress
-Version: 0.12 | Status: Living document | Last updated: 2026-11-07
+Version: 0.13 | Status: Living document | Last updated: 2026-11-07
 Owner: Founder (solo developer)
 
 Dokumen ini dibaca pertama setiap mulai bekerja di proyek mobile. Perbarui di akhir setiap task atau sesi. Dokumen proyek disimpan **di luar repo kode** (RULE-M014). Task di sisi backend (repo web RelaxBoss) mengikuti `Rules.md` web dan juga dicatat di sini, dengan awalan `TASK-M`, agar satu sumber kebenaran untuk fitur mobile. Perubahan di repo web tetap mengikuti Doc Sync web (`progress.md` web diperbarui bila menyentuh perilaku web).
@@ -10,12 +10,12 @@ Dokumen ini dibaca pertama setiap mulai bekerja di proyek mobile. Perbarui di ak
 
 | Hal | Status terbaru |
 |---|---|
-| Tahap | Implementasi berjalan. Selesai (uji manual lolos): **TASK-M010 sampai M017** (seluruh backend MM1, repo web), **M020, M021, M022, M023** (Flutter; M023 lolos 2026-11-07). **MM1 (Backend API) selesai** kecuali prasyarat rilis web. Berikutnya mulai MM2 sisi layar chat (TASK-M024). Dokumen mobile: PRD v0.4, Architecture v0.8, Schema v0.1 (**perlu pembaruan**, lihat Utang dokumen), Design v0.6, Rules v0.7, progress v0.12. Sejak 2026-11-06 **dokumen mengikuti kode**. |
-| Berikutnya | Mobile **TASK-M024** (layar chat harian; juga menangani 403 `consent_required` di tengah sesi lewat `ref.invalidate(consentControllerProvider)`). Sebelumnya putuskan OQ-MA10 (paket ikon) dan OQ-MA11 (kirim ke percakapan lama). TASK-M001 (menutup dokumen) tersisa sebagian. |
+| Tahap | Implementasi berjalan. Selesai (uji manual lolos): **TASK-M010 sampai M017** (seluruh backend MM1, repo web), **M020, M021, M022, M023** (Flutter; M023 lolos 2026-11-07). **MM1 (Backend API) selesai** kecuali prasyarat rilis web. **TASK-M024** (layar chat harian, mobile) kodenya selesai dan **menunggu uji manual founder**. Dokumen mobile: PRD v0.4, Architecture v0.9, Schema v0.1 (**perlu pembaruan**, lihat Utang dokumen), Design v0.7, Rules v0.8, progress v0.13. Sejak 2026-11-06 **dokumen mengikuti kode**. |
+| Berikutnya | Uji manual **TASK-M024** (butuh `flutter pub add lucide_icons_flutter`, lihat panduan uji), lalu mobile **M025** (Crisis Response: banner permanen dan kontak bantuan). **Peringatan:** sampai M025 selesai, layar chat belum punya banner krisis; aplikasi hanya untuk pengembangan. TASK-M001 (menutup dokumen) tersisa sebagian. |
 | Pemblokir | Prasyarat web untuk **rilis**: TASK-031 (go-live), OQ-3 (kontak krisis terverifikasi), OQ-5 (telaah hukum data AI dan pelatihan, termasuk layanan suara pihak ketiga). Tanpa itu, tidak ada rilis mobile. **Keputusan founder (sesi 2026-11-05/06, dicatat di sini sebagai keputusan tertulis):** task kode dibuka tanpa menunggu TASK-M002. TASK-M002 tetap `Blocked` dan wajib selesai sebelum TASK-M045. |
 | Alur kerja | Kerja di `main`, commit lalu push, pesan commit bahasa Inggris. Dokumen di luar repo. Uji manual wajib; tanpa CI. |
 | Data | Sebelum TASK-M044, hanya data dummy bertanda jelas (akun `example.test`, kontak krisis `dummy`). Build `prod` tidak boleh memuat dummy (RULE-M048). |
-| Versi dokumen | PRD-Mobile 0.4, Architecture-Mobile 0.8, Schema-Mobile 0.1 (**perlu pembaruan**, lihat Utang dokumen), Design-Mobile 0.6, Rules-Mobile 0.7, progress 0.12. |
+| Versi dokumen | PRD-Mobile 0.4, Architecture-Mobile 0.9, Schema-Mobile 0.1 (**perlu pembaruan**, lihat Utang dokumen), Design-Mobile 0.7, Rules-Mobile 0.8, progress 0.13. |
 
 > Status task yang perlu uji manual atau konfirmasi founder tidak dianggap terverifikasi hanya karena catatan Doc Sync sudah ditulis.
 
@@ -81,7 +81,7 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 
 | ID | Task | Repo | Rujukan | Status |
 |---|---|---|---|---|
-| TASK-M024 | Layar chat harian: aliran per hari, kirim, indikator mengetik, galat, "Coba lagi" (retry), sisa kuota, input nonaktif saat batas harian | M | FR-M004, M006, M007, SCR-M08 | **Next** |
+| TASK-M024 | Layar chat harian: aliran per hari, kirim, indikator mengetik, galat, "Coba lagi" (retry), sisa kuota, input nonaktif saat batas harian | M | FR-M004, M006, M007, SCR-M08 | **Doing** (kode selesai 2026-11-07; menunggu uji manual) |
 | TASK-M025 | Crisis Response: banner permanen, kontak bantuan (cache + fallback aset, bukan dummy di `prod`), tombol `tel:`, uji manual kasus krisis dari `cases.json` lewat aplikasi | M | FR-M010, M011, SCR-M16 | Todo |
 | TASK-M026 | Saran tindakan: chip dan peta intent/`suggestion.type` ke tujuan (napas, grounding, kontak, Konsultasi web) | M | FR-M008 | Todo |
 | TASK-M027 | Riwayat: garis waktu per tanggal (hanya baca) | M | FR-M005, SCR-M14, M15 | Todo |
@@ -132,6 +132,8 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 | TASK-M061 | Evaluasi suara premium terbatas (OQ-M6): baca syarat resmi, telaah privasi, putuskan | D | OQ-M6 | Todo |
 
 ### Catatan hasil task selesai
+
+**TASK-M024 (mobile; kode selesai 2026-11-07, uji manual belum dilakukan).** Fitur `chat/`: `data/` (`ChatMessage`, `ChatLimits`, `ChatDay`, `SendResult`, `ChatRepository` untuk API-M012 dan M013), `state/` (`ChatState` bertingkat: `ChatLoading`, `ChatLoadFailed`, `ChatReady`; `ChatController` autoDispose; `SendOutcome`), `ui/` (`ChatScreen` menggantikan layar sambutan, `ChatBubble`, `ChatInputBar`, `TypingIndicator`). Layar tetap dibungkus `ConsentGate`. Pesan tampil langsung sebagai pesan tertunda; galat dipilah: ditolak sebelum tersimpan (teks dikembalikan ke kolom isian), mungkin tersimpan (timeout, 5xx, 503 `ai_unavailable`: hari ini dimuat ulang dari server lalu "Coba lagi" bila `unanswered`), `conversation_closed` dan `nothing_to_retry` (muat ulang), `daily_limit` (input diganti penjelasan), `consent_required` (gerbang consent memeriksa ulang). Sisa kuota tampil sebagai teks; panjang input dibatasi dari server. Paket ikon diputuskan **Lucide**: `lucide_icons_flutter` dipasang lewat `flutter pub add` (versi tidak saya tebak), hanya `LucideIcons.send` dipakai. `is_crisis` dan `suggestion` belum dibaca (M025, M026). Teks `signedInAs` dan `devBadge` dihapus karena tidak terpakai. Tampilan sengaja sederhana (desain final belum ada). `tool/mock_api.mjs` mendapat `GET /relaxmate/today`, `POST .../messages` (balasan gema, 20 pesan/hari, `retry`), dan pembantu `/__fail-ai`, `/__slow-ai`, `/__close-day`, `/__set-sent`; semua skenario galat diuji dengan curl di sandbox. **Diperiksa di sandbox:** `dart format` gaya Dart 3.5 bersih dan `node --check`. **Belum dijalankan (sandbox tanpa Flutter): `flutter pub get`, `flutter analyze`, build, dan uji emulator.** Risiko yang saya tahu: nama ikon `LucideIcons.send` belum dapat saya verifikasi terhadap versi paket yang akan terpasang.
 
 **TASK-M017 (web; uji manual lolos 2026-11-07).** Bukti yang diberikan: potongan `storage/logs/laravel.log` (2026-11-07 00:42 sampai 01:05). Yang terbaca dari log: (a) dua akun uji `a-mw5ohdku@example.test` dan `b-mw5ohdku@example.test` (id 7 dan 8) masing-masing dikirimi email verifikasi, jadi pasangan A dan B untuk skenario isolasi sudah ada; akun A juga memicu kirim ulang verifikasi (00:42:01, 00:44:19, 00:44:34, 00:46:49) dan satu email reset sandi (00:42:07); (b) 11 panggilan chat AI berhasil (`ai.completion`: satu pada 00:48, lima pada 00:50, lima pada 00:55) dengan `key_no` bergilir 1 sampai 5; (c) pada 01:05:59 tercatat `ai.unavailable` dengan alasan `no_keys`, tampaknya skenario 503 saat kunci AI tidak tersedia. **RULE-040:** entri `ai.*` hanya memuat `feature`, `version`, `model`, `key_no`, jumlah token, dan `duration_ms`; pada potongan ini tidak ada isi pesan maupun token Sanctum. **Temuan:** mailer `log` (lokal) menulis tautan verifikasi bertanda tangan dan tautan reset sandi beserta tokennya ke `laravel.log`; wajar di lokal, tetapi menjadi kebocoran token bila `MAIL_MAILER=log` terbawa ke produksi (lihat Utang web). **Tidak bisa disimpulkan dari log:** isolasi A vs B (dibuktikan oleh respons, bukan log), batas/429 (respons 429 tidak ditulis ke log aplikasi), dan bentuk respons 503; ketiganya dikonfirmasi lolos oleh founder 2026-11-07, sehingga M017 `Done`.
 
@@ -189,12 +191,12 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 | OQ-MA4 | `SendChatMessage` diekstrak sekarang atau bungkus dulu. Temuan 2026-11-06: logika ada di satu metode `ChatMessageController::store()` dan retry sudah ada (`retry=true`), jadi ekstraksi terbatas dan jelas batasnya | **Selesai 2026-11-06**: diekstrak sekarang | TASK-M010 |
 | OQ-MA5 | Android minimum, aturan closed testing Play, Data Safety | TASK-M043 |
 | OQ-MA6 | Bentuk respons dan kode galat API chat (API-M013, M014): ikuti presenter web (`user_message`, `assistant_message`, `has_crisis`, `remaining_today`, kode `invalid_message`, `busy`, `daily_limit`, `rate_limited`, `ai_unavailable`, `nothing_to_retry`) dan tambahkan `created_at` ISO UTC (RULE-M033), atau bentuk di Architecture-M bagian 5. Usulan: ikuti web dan hapus endpoint retry terpisah | **Diputuskan 2026-11-06**: ikuti presenter web, tambah `created_at` ISO UTC, tanpa endpoint retry terpisah | TASK-M015 |
-| OQ-MA11 | POST pesan ke Percakapan yang bukan hari ini (setelah pergantian 04.00 WIB) ditolak 409 `conversation_closed` agar riwayat hanya baca (FR-M005). Setuju, atau izinkan menulis ke Percakapan lama? | **Diusulkan 2026-11-06 (di kode)**, perlu konfirmasi | TASK-M024 |
+| OQ-MA11 | POST pesan ke Percakapan yang bukan hari ini (setelah pergantian 04.00 WIB) ditolak 409 `conversation_closed` agar riwayat hanya baca (FR-M005). Setuju, atau izinkan menulis ke Percakapan lama? | **Diputuskan founder 2026-11-07:** setuju (riwayat hanya baca) | TASK-M024 |
 | OQ-MA12 | Bila pengguna menolak consent AI: aplikasi kini hanya menawarkan "Keluar" (tidak ada dashboard seperti di web, dan latihan serta kontak bantuan belum ada). Setelah TASK-M025 dan M029, apakah penolakan membawa pengguna ke layar yang hanya berisi latihan napas, grounding, dan kontak bantuan (tanpa AI)? Usulan: ya | TASK-M029 |
 | OQ-MA7 | Batas hari kuota (`ChatQuota` mulai 00.00 WIB) berbeda dari hari percakapan (`DailyConversationResolver`, 04.00 WIB). Antara 00.00 dan 04.00 keduanya tidak sejajar | **Diputuskan 2026-11-06 (opsi A)**: kuota tetap 00.00 WIB, hari percakapan 04.00 WIB; ketidaksejajaran 00.00-04.00 hanya didokumentasikan, web tidak diubah | TASK-M011 |
 | OQ-MA8 | **Ditutup 2026-11-06 (TASK-M014):** teks consent ada di `config/relaxboss.php` bagian `consent`; naikkan `ai_consent_version` atau `ai_training_consent_version` bila teks berubah. | - |
 | OQ-MA9 | Kontak krisis web memuat `119 ext 8`; format `tel:` untuk ekstensi perlu diputuskan dan diuji di perangkat | TASK-M025 |
-| OQ-MA10 | Paket ikon: Lucide (`lucide_icons_flutter`, sesuai RULE-M051) atau `Icons` bawaan Material. M022 memakai `Icons` bawaan agar tidak menambah dependensi yang belum bisa diverifikasi di sandbox. Putuskan sebelum layar chat yang padat ikon | TASK-M024 |
+| OQ-MA10 | Paket ikon: Lucide (`lucide_icons_flutter`, sesuai RULE-M051) atau `Icons` bawaan Material. **Diputuskan founder 2026-11-07: Lucide.** Layar lama (auth, consent, `ErrorAlert`) masih `Icons` bawaan dan dipindahkan saat disentuh lagi | TASK-M024 |
 | OQ-3, OQ-5 (web) | Kontak krisis terverifikasi; telaah hukum data AI, pelatihan, dan layanan suara | TASK-M045 |
 
 ---
@@ -226,6 +228,8 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 | Gerbang consent berupa widget `ConsentGate` dengan `ConsentController` sendiri, bukan cabang `authRedirect`; latihan dan kontak bantuan kelak tidak dibungkus gerbang ini | TASK-M023, ADR-M14 |
 | SCR-M07 dibangun sebagai layar penuh (bukan bottom sheet seperti CMP-M14 lama): gerbang ini memblokir fitur AI jadi tidak boleh ditutup | TASK-M023, Design-M CMP-M14 (dokumen mengikuti kode) |
 | Consent: hanya bagian yang kurang yang tampil; tombol utama menyimpan berurutan consent AI lalu pilihan pelatihan; "Keluar" sebagai satu-satunya alternatif sementara (OQ-MA12) | TASK-M023, FR-M002 |
+| Paket ikon: Lucide, dipasang lewat `flutter pub add` (versi tidak ditebak) | TASK-M024, OQ-MA10 |
+| Chat: pesan tertunda tampil langsung; galat dipilah "ditolak" (teks dikembalikan) vs "mungkin tersimpan" (muat ulang dari server lalu "Coba lagi"); `ChatController` autoDispose; 403 `consent_required` memicu pemeriksaan ulang gerbang consent | TASK-M024, FR-M007 |
 | **Dokumen mengikuti kode:** bila dokumen dan kode berbeda, kode yang dianggap benar dan dokumen diperbarui | Keputusan founder 2026-11-06 |
 | Paket Dart `relaxmate`; flavor `dev` ber-suffix `.dev`; teks UI di `core/texts/app_texts.dart` | Architecture-M 4, 10 |
 | Sesi dimodelkan sebagai `AuthState` bertingkat (memulihkan, tamu, masuk, sesi belum bisa diperiksa); router memilih layar dari keadaan itu lewat `authRedirect` | TASK-M022, Architecture-M 4 |
@@ -263,7 +267,10 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 | Utang mobile | UI untuk mengubah pilihan persetujuan pelatihan kapan saja (FR-M002, "dapat diubah di Pengaturan") belum ada karena layar Pengaturan baru dibuat di TASK-M031. `ConsentRepository.setTraining` (API-M010) sudah ada; M031 menambah layar dan membaca pilihan saat ini (`training.choice` belum diurai `ConsentState`) | M031 |
 | Utang mobile | 403 `consent_required` di tengah sesi (versi consent dinaikkan saat aplikasi terbuka) belum ditangani; `ConsentGate` memeriksa saat layar dibuka | M024: `ref.invalidate(consentControllerProvider)` saat menerima kode itu |
 | Utang mobile | Layar consent memakai `AuthScaffold`, jadi ikut belum punya tautan Kontak bantuan (Design-M prinsip 4) | `TODO(TASK-M025)` yang sama di `AuthScaffold` |
-| Utang mobile | `ChatScreen` sementara memuat info email dan tombol Keluar | `TODO(TASK-M031)`; M024 mengganti layarnya |
+| Utang mobile | `ChatScreen` memuat tombol Keluar sementara di AppBar | `TODO(TASK-M031)`: pindah ke Pengaturan |
+| Utang mobile | Banner krisis dan chip saran belum ada; `is_crisis` dan `suggestion` belum dibaca, jadi Crisis Response tampil sebagai gelembung biasa | TASK-M025 dan M026 (aplikasi belum boleh dipakai di luar pengembangan sebelum M025) |
+| Utang mobile | Pergantian hari saat aplikasi terbuka hanya ditangani lewat 409 `conversation_closed` saat mengirim; belum ada muat ulang saat aplikasi kembali ke depan layar | Pertimbangkan di M027 atau M030 |
+| Utang mobile | `ErrorAlert`, layar auth, dan consent masih memakai `Icons` bawaan (RULE-M051 sekarang Lucide) | Pindahkan saat UI disentuh lagi atau saat desain final |
 | Utang mobile | Panjang minimum sandi baru diketahui pengguna setelah kirim (tidak digandakan di klien) | Pertimbangkan `password_min_length` di `GET /config` (backend) sebagai petunjuk di layar Daftar |
 | Utang mobile | Keluar tanpa internet hanya menghapus token di perangkat; token di server tetap berlaku sampai kedaluwarsa (60 hari) | Putuskan di M031 (antrean pencabutan atau terima risikonya) |
 | Utang mobile | Kode M022 belum melewati `flutter analyze`, `dart format`, dan build debug (sandbox tanpa Flutter) | Jalankan sebelum commit (panduan uji M022) |
@@ -287,12 +294,13 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 | 2026-11-06 (sesi M023) | Repo web (`905f455`) dan mobile (`696e6e3`) dibaca ulang; M016 tetap `Doing` (belum ada laporan uji). TASK-M023 dikodekan: `features/consent`, `ConsentGate` di router, token garis dan teks consent, mock API diperluas. Dokumen disinkronkan (Architecture 0.7, Design 0.6, Rules 0.6, progress 0.10); status Tahap yang usang (M022) dibetulkan. OQ-MA12 dibuka. Menunggu uji manual M016 dan M023. |
 | 2026-11-07 (sesi M017) | Founder menjalankan M017 dan memberikan potongan `laravel.log`. Log diperiksa terhadap RULE-040 (bersih untuk `ai.*`), temuan mailer `log` dicatat sebagai utang web. M017 `Doing` sampai founder mengonfirmasi hasil skenario isolasi A vs B, batas, dan 503. `progress.md` digabung dengan versi M023 (v0.10, sudah di `main`) menjadi v0.11. |
 | 2026-11-07 (konfirmasi) | Founder mengonfirmasi uji manual M016, M017, dan M023 lolos: ketiganya `Done`; MM1 (backend) selesai. Utang web `active` varian API dan utang uji M023 dihapus. TASK-M024 menjadi `Next`. Architecture 0.8, Rules 0.7, progress 0.12. |
+| 2026-11-07 (sesi M024) | Founder menyetujui OQ-MA10 (Lucide) dan OQ-MA11 (409), dan meminta UI sederhana. TASK-M024 dikodekan: `features/chat`, token dan teks chat, mock API chat; teks tak terpakai dihapus. Dokumen disinkronkan (Architecture 0.9, Design 0.7, Rules 0.8, progress 0.13). Menunggu uji manual M024. |
 
 ---
 
 ## 9. Catatan Serah Terima
 
-1. Mulai dari task berstatus `Next`: TASK-M024 (layar chat); putuskan OQ-MA10 dan OQ-MA11 lebih dulu. Task kode sudah dibuka lebih awal lewat keputusan founder 2026-11-05/06; prasyarat web (TASK-M002) tetap wajib sebelum rilis (TASK-M045).
+1. Mulai dari uji manual TASK-M024 (jalankan `flutter pub add lucide_icons_flutter` lebih dulu), lalu TASK-M025 (Crisis Response). Task kode sudah dibuka lebih awal lewat keputusan founder 2026-11-05/06; prasyarat web (TASK-M002) tetap wajib sebelum rilis (TASK-M045).
 2. Urutan kerja: MM1 (backend) dan MM2 (Flutter) boleh berselang-seling. Yang sudah ditempuh: M010 sampai M017, M020, M021, M022, M023 (uji lolos). Yang disarankan berikutnya: M024, dan seterusnya sampai MM6. Fase 2 dan 3 dirilis sesudahnya.
 3. Spike TASK-M003 sebaiknya dikerjakan lebih awal karena overlay adalah bagian paling berisiko; bila hasilnya buruk, putuskan apakah overlay keluar dari Fase 1 (ubah PRD-M).
 4. Setiap perubahan perilaku, route, skema, atau keputusan memperbarui dokumen terkait dan progress ini di akhir task yang sama (RULE-M005).
@@ -303,6 +311,7 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.13 | 2026-11-07 | TASK-M024 `Doing` (kode selesai, menunggu uji manual): catatan hasil, OQ-MA10 dan OQ-MA11 diputuskan, keputusan chat dan ikon, utang baru, log sesi. |
 | 0.12 | 2026-11-07 | M016, M017, M023 `Done` (uji manual lolos); MM1 selesai; M024 `Next`; catatan hasil dan Tahap/Berikutnya disegarkan; utang yang selesai dihapus. |
 | 0.11 | 2026-11-07 | TASK-M017 `Doing` (dijalankan, log diperiksa, menunggu konfirmasi): catatan hasil dan temuan mailer `log`, utang web baru, log sesi; Status Proyek dan Serah Terima disegarkan. Digabung di atas v0.10 (M023). |
 | 0.10 | 2026-11-06 | TASK-M023 `Doing` (kode selesai, menunggu uji manual): catatan hasil, OQ-MA12, keputusan gerbang consent, utang baru, log sesi; Status Proyek dan Serah Terima disegarkan (M022 sudah `Done`). |

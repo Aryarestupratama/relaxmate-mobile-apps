@@ -10,4 +10,7 @@ abstract final class RbSize {
   /// Tebal garis tepi kartu pilihan: biasa dan terpilih (Design-M CMP-M20).
   static const double borderThin = 1;
   static const double borderSelected = 2;
+
+  /// Lebar maksimum gelembung chat sebagai bagian dari lebar layar (Design-M CMP-M02).
+  static const double bubbleMaxWidthFactor = 0.8;
 }

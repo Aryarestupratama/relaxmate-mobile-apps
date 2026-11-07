@@ -25,10 +25,16 @@
 //                   GET /__fail-consent      GET /consent berikutnya dijawab 503 sekali
 //                 Consent (API-M008 sampai M010): akun baru dan akun contoh belum menyetujui apa pun.
 //                 Teks consent disalin dari config/relaxboss.php di repo web (hanya untuk uji).
+//                 Chat (API-M012, M013): satu percakapan per akun, balasan tiruan berupa gema, 20 pesan/hari.
+//                   GET /__fail-ai           POST pesan berikutnya: pesan tersimpan, lalu 503 ai_unavailable (sekali)
+//                   GET /__slow-ai           POST pesan berikutnya dijawab setelah 25 detik (meniru timeout klien, sekali)
+//                   GET /__close-day         POST pesan berikutnya: 409 conversation_closed, percakapan baru (sekali)
+//                   GET /__set-sent?email=...&n=19  atur jumlah pesan terkirim hari ini (uji batas harian)
 //                 Halaman /ketentuan dan /privasi disajikan sebagai teks tiruan.
 //                 Batas tiruan: daftar 5/menit, login gagal 5/menit per email, kirim ulang 3/jam.
 //
 // Log hanya memuat metode, path, status, dan versi aplikasi (tidak ada token, email, atau isi pesan).
+import { randomUUID } from 'node:crypto';
 import http from 'node:http';
 
 const mode = process.argv[2] ?? 'ok';
@@ -81,6 +87,13 @@ let tokenSeq = 0;
 let hits = new Map(); // kunci -> [timestamp]
 let failTrainingOnce = false;
 let failConsentOnce = false;
+let failAiOnce = false;
+let slowAiOnce = false;
+let closeDayOnce = false;
+let messageSeq = 100;
+
+const CHAT_PER_DAY = 20;
+const CHAT_MAX_CHARS = 2000;
 
 function newUser(name, email, password, verified, active) {
   return { name, email, password, verified, active, resends: [], aiGranted: false, trainingChoice: null };
@@ -92,6 +105,9 @@ function resetData() {
   hits = new Map();
   failTrainingOnce = false;
   failConsentOnce = false;
+  failAiOnce = false;
+  slowAiOnce = false;
+  closeDayOnce = false;
   const seed = [
     ['Akun Terverifikasi', 'verified@example.test', true, true],
     ['Akun Belum Verifikasi', 'unverified@example.test', false, true],
@@ -179,6 +195,50 @@ function consentState(user) {
     },
     complete: user.aiGranted && answered,
   };
+}
+
+function chatOf(user) {
+  if (!user.chat) {
+    user.chat = { id: randomUUID(), messages: [], sent: 0 };
+  }
+  return user.chat;
+}
+
+function chatMessage(role, content) {
+  const now = new Date();
+  messageSeq += 1;
+  return {
+    id: messageSeq,
+    role,
+    content,
+    time: `${String((now.getUTCHours() + 7) % 24).padStart(2, '0')}.${String(now.getUTCMinutes()).padStart(2, '0')} WIB`,
+    is_crisis: false,
+    suggestion: null,
+    created_at: now.toISOString(),
+  };
+}
+
+function chatLimits(chat) {
+  return {
+    message_max_chars: CHAT_MAX_CHARS,
+    per_day: CHAT_PER_DAY,
+    remaining_today: Math.max(0, CHAT_PER_DAY - chat.sent),
+  };
+}
+
+// Pengguna harus terverifikasi dan consent lengkap, seperti middleware api.verified dan ai.consent.
+function chatUser(req, res) {
+  const user = authedUser(req, res);
+  if (!user) return undefined;
+  if (!user.verified) {
+    apiError(res, 403, 'unverified', 'Verifikasi emailmu dulu, ya. Cek kotak masukmu.');
+    return undefined;
+  }
+  if (!consentState(user).complete) {
+    apiError(res, 403, 'consent_required', 'Setujui dulu persetujuan terbaru untuk lanjut bercerita.');
+    return undefined;
+  }
+  return user;
 }
 
 function issueToken(user) {
@@ -354,6 +414,71 @@ async function authApi(req, res, path) {
     return send(res, 200, { data: { consent: consentState(user) } });
   }
 
+  if (method === 'GET' && path === '/api/v1/relaxmate/today') {
+    const user = chatUser(req, res);
+    if (!user) return undefined;
+    const chat = chatOf(user);
+    const last = chat.messages[chat.messages.length - 1];
+    return send(res, 200, {
+      data: {
+        conversation: { id: chat.id, has_crisis: false, day: new Date().toISOString().slice(0, 10), created_at: new Date().toISOString() },
+        messages: chat.messages,
+        unanswered: last !== undefined && last.role === 'user',
+        limits: chatLimits(chat),
+      },
+    });
+  }
+
+  const sendMatch = /^\/api\/v1\/relaxmate\/conversations\/([^/]+)\/messages$/.exec(path);
+  if (method === 'POST' && sendMatch) {
+    const user = chatUser(req, res);
+    if (!user) return undefined;
+    const chat = chatOf(user);
+    if (closeDayOnce) {
+      closeDayOnce = false;
+      user.chat = { id: randomUUID(), messages: [], sent: 0 };
+      return apiError(res, 409, 'conversation_closed', 'Percakapan ini sudah berganti hari. Kita mulai yang baru, ya.');
+    }
+    if (sendMatch[1] !== chat.id) {
+      return apiError(res, 404, 'not_found', 'Yang kamu cari tidak ditemukan.');
+    }
+    const body = await readJson(req);
+    let target;
+
+    if (body.retry === true) {
+      const last = chat.messages[chat.messages.length - 1];
+      if (!last || last.role !== 'user') {
+        return apiError(res, 409, 'nothing_to_retry', 'Tidak ada pesan yang perlu dijawab ulang.');
+      }
+      target = last;
+    } else {
+      const content = typeof body.content === 'string' ? body.content.trim() : '';
+      if (content === '' || content.length > CHAT_MAX_CHARS) {
+        return apiError(res, 422, 'invalid_message', `Pesan tidak boleh kosong atau lebih dari ${CHAT_MAX_CHARS} karakter.`);
+      }
+      if (chat.sent >= CHAT_PER_DAY) {
+        return apiError(res, 429, 'daily_limit', 'Batas pesan hari ini sudah tercapai. Kita lanjut lagi besok, ya.');
+      }
+      chat.sent += 1;
+      target = chatMessage('user', content);
+      chat.messages.push(target);
+    }
+
+    if (failAiOnce) {
+      failAiOnce = false;
+      return apiError(res, 503, 'ai_unavailable', 'RelaxMate sedang tidak bisa menjawab. Pesanmu aman, coba lagi sebentar lagi.');
+    }
+    if (slowAiOnce) {
+      slowAiOnce = false;
+      await new Promise((resolve) => setTimeout(resolve, 25000));
+    }
+    const reply = chatMessage('assistant', `Aku mendengarmu. Kamu bilang: "${target.content}"`);
+    chat.messages.push(reply);
+    return send(res, 200, {
+      data: { user_message: target, assistant_message: reply, has_crisis: false, remaining_today: chatLimits(chat).remaining_today },
+    });
+  }
+
   if (method === 'GET' && path === '/api/v1/me') {
     const user = authedUser(req, res);
     if (!user) return undefined;
@@ -400,6 +525,24 @@ function devHelpers(req, res, url) {
       user.trainingChoice = null;
     }
     sendText(res, 200, `Consent ${email} diperbarui: ${JSON.stringify(consentState(user))}`);
+    return true;
+  }
+  if (url.pathname === '/__fail-ai' || url.pathname === '/__slow-ai' || url.pathname === '/__close-day') {
+    if (url.pathname === '/__fail-ai') failAiOnce = true;
+    if (url.pathname === '/__slow-ai') slowAiOnce = true;
+    if (url.pathname === '/__close-day') closeDayOnce = true;
+    sendText(res, 200, `${url.pathname} aktif untuk permintaan POST pesan berikutnya (sekali).`);
+    return true;
+  }
+  if (url.pathname === '/__set-sent') {
+    const email = (url.searchParams.get('email') ?? '').toLowerCase();
+    const user = users.get(email);
+    if (!user) {
+      sendText(res, 404, `Tidak ada akun ${email}`);
+      return true;
+    }
+    chatOf(user).sent = Number(url.searchParams.get('n') ?? 0);
+    sendText(res, 200, `Pesan terkirim ${email}: ${chatOf(user).sent}`);
     return true;
   }
   if (url.pathname === '/__fail-consent') {

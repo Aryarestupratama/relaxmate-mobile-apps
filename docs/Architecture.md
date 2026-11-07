@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Architecture
-Version: 0.8 | Status: Draft | Last updated: 2026-11-06
+Version: 0.9 | Status: Draft | Last updated: 2026-11-06
 Depends on: PRD RelaxMate Mobile v0.3, Architecture RelaxBoss (web), Schema RelaxBoss (web), Rules v1.5 | Owner: Founder (solo developer)
 
 Label: `[Verified]` ada sumber (sisi mobile: repo `relaxmate-mobile-apps` commit `8014c38`; sisi backend: repo `RELAXBOSS_WEBSITE` commit `9afd27c`), `[Inference]` kesimpulan, `[Assumption]` bisa diubah. **Dokumen ini mengikuti kode:** bila berbeda dari kode, kode yang benar. Kedalaman: **Lite**. Dokumen ini hanya mengatur sisi mobile dan tambahan di backend. Subsistem AI (rotasi key, `ChatbotService`, `CrisisDetector`), enkripsi, dan admin tetap di Architecture web dan tidak diulang di sini.
@@ -78,7 +78,9 @@ relaxmate-mobile-apps/              # nama repo; paket Dart: relaxmate
       startup/    # data/ (ServerConfig, ServerConfigRepository, StoreLauncher),
                   # state/ (versionGateProvider, VersionGateStatus),
                   # ui/ (StartupGate, SplashView, UpdateRequiredScreen)
-      chat/       # ui/chat_screen.dart (sementara, TASK-M024); data/ dan state/ masih .gitkeep
+      chat/       # data/ (ChatMessage, ChatLimits, ChatDay, SendResult, ChatRepository),
+                  # state/ (ChatState, ChatController, SendOutcome),
+                  # ui/ (ChatScreen, ChatBubble, ChatInputBar, TypingIndicator)
       auth/       # data/ (UserSummary, AuthSession, ResendResult, AuthRepository),
                   # state/ (AuthState, AuthController),
                   # ui/ (LoginScreen, RegisterScreen, ForgotPasswordScreen, CheckEmailScreen,
@@ -108,6 +110,8 @@ Aturan: satu fitur satu folder; tiap fitur berisi `data/` (repository), `state/`
 **Sesi dan pengalihan layar (TASK-M022) `[Verified]` terhadap kode.** `AuthController` (Riverpod `Notifier`) memegang `AuthState`: `AuthRestoring` (membaca token tersimpan dan memeriksanya lewat `GET /me`), `AuthUnauthenticated`, `AuthAuthenticated(user)`, dan `AuthSessionCheckFailed` (token ada tetapi pemeriksaan gagal bukan 401: offline, timeout, galat server; token tidak dihapus). Router memanggil `authRedirect(state, lokasi)` setiap keadaan berubah: pemeriksaan sesi hanya `/memuat`; sesi belum bisa diperiksa hanya `/sesi`; tamu hanya `/masuk`, `/daftar`, `/lupa-sandi`; sudah masuk tetapi email belum terverifikasi hanya `/cek-email`; terverifikasi tidak boleh di layar tamu atau peralihan (dialihkan ke `/`). Saat server menolak token (401), `ApiClient` menghapus token lalu `SessionExpiredSignal.fire()`; `AuthController` mendengarkan dan menjadi `AuthUnauthenticated`. Dengan sinyal itu `core/` tidak mengimpor `features/`. Keluar memanggil API-M003 lalu menghapus token; bila panggilan gagal (mis. offline) token di perangkat tetap dihapus.
 
 **Gerbang consent (TASK-M023) `[Verified: uji manual founder 2026-11-07]`.** `ConsentController` (Riverpod `Notifier`) memegang `ConsentGateState`: `ConsentChecking`, `ConsentRequired(prompt)`, `ConsentComplete`, `ConsentCheckFailed(error)`. Ia memeriksa `GET /consent` (API-M008, teks dan status dalam satu panggilan) begitu ada pengguna **terverifikasi**, dan memeriksa ulang hanya bila email pengguna berganti (`select` pada `AuthController`), jadi consent akun lain tidak terbawa. Widget `ConsentGate` membungkus layar yang memakai fitur AI (sekarang `ChatScreen` di `app_router.dart`): memuat = `SplashView`, kurang = `ConsentScreen`, gagal = `ConsentErrorScreen`, lengkap = layar aslinya. Gerbang ini tidak memakai `authRedirect` karena consent bukan keadaan sesi dan latihan serta kontak bantuan harus tetap bisa dibuka tanpa consent (RULE-M034). `submit` menyimpan hanya yang kurang, berurutan: API-M009 (consent AI) lalu API-M010 (pilihan pelatihan); kemajuan sebagian dicatat walau langkah berikutnya gagal. Teks consent tidak pernah disalin di klien; teks kosong dari server dianggap balasan rusak (persetujuan tanpa teks tidak diminta).
+
+**Chat harian (TASK-M024) `[Verified: kode, belum diuji manual]`.** `ChatController` (Riverpod `Notifier.autoDispose`, dibuang saat layar ditutup) memegang `ChatState`: `ChatLoading`, `ChatLoadFailed(error)`, `ChatReady` (`conversationId`, `messages`, `limits`, `unanswered`, `sending`, `error`). `load()` memanggil API-M012; `send()` dan `retry()` memanggil API-M013 (`{content}` atau `{retry: true}`). Pesan yang dikirim tampil langsung sebagai pesan tertunda (`ChatMessage.pending`, id -1) dengan penanda "sedang menulis". Penanganan galat `send`: **ditolak sebelum tersimpan** (422, 429, offline, 403 selain consent) menghapus gelembung tertunda, menampilkan alasan dari server, dan mengembalikan teks ke kolom isian (`SendOutcome.rejected`); **mungkin tersimpan** (timeout, 5xx termasuk 503 `ai_unavailable`, tidak dikenal) memuat ulang hari ini dari server (`_resync`) agar tampilan sama dengan server, lalu menampilkan galat dengan "Coba lagi" bila `unanswered` (`SendOutcome.kept`); bila sinkronisasi gagal, pesan tertunda tetap tampil dengan "Coba lagi". 409 `conversation_closed` memuat ulang hari ini (Percakapan baru) dan mengembalikan teks. 409 `nothing_to_retry` memuat ulang. 429 `daily_limit` mengosongkan sisa kuota dan menonaktifkan input dengan penjelasan. 403 `consent_required` memanggil `ref.invalidate(consentControllerProvider)` sehingga `ConsentGate` menampilkan layar consent. Tidak ada percobaan ulang otomatis (RULE-M044). Panjang input dibatasi `limits.message_max_chars` dari server; sisa kuota tampil sebagai teks. `is_crisis` dan `suggestion` belum dibaca (TASK-M025 dan M026); sampai itu selesai Crisis Response tampil sebagai gelembung biasa tanpa banner.
 
 ---
 
@@ -170,7 +174,7 @@ Objek `message` (sama untuk keempat endpoint):
 - `GET /relaxmate/days`: `{ "days": [ { "id": "<uuid>", "day": "2026-11-06", "label": "6 November 2026, 14.30 WIB", "total_turns": 8, "has_crisis": false } ], "next_cursor": "..." | null }`. Satu baris per Percakapan; beberapa Percakapan dari web di hari yang sama muncul sebagai beberapa baris dengan `day` sama. `day` memakai jam batas hari percakapan (04.00 WIB).
 - `GET /relaxmate/conversations/{id}/messages`: `{ "conversation": { "id", "has_crisis", "label" }, "messages": [message...], "next_cursor": "..." | null }`, urut lama ke baru. Kursor diteruskan apa adanya sebagai `?cursor=`.
 
-Keputusan TASK-M015 (perlu dikonfirmasi founder, OQ-MA11): POST ke Percakapan yang **bukan hari ini** (jendela 04.00 WIB) ditolak 409 `conversation_closed`, supaya riwayat tetap hanya baca (FR-M005) dan klien yang lupa berganti hari tidak menulis ke hari kemarin. Percakapan dari web di jendela hari yang sama tetap boleh menerima pesan.
+Keputusan TASK-M015 (dikonfirmasi founder 2026-11-07, OQ-MA11): POST ke Percakapan yang **bukan hari ini** (jendela 04.00 WIB) ditolak 409 `conversation_closed`, supaya riwayat tetap hanya baca (FR-M005) dan klien yang lupa berganti hari tidak menulis ke hari kemarin. Percakapan dari web di jendela hari yang sama tetap boleh menerima pesan.
 
 **Temuan 2026-11-06 (OQ-MA6):** presenter web hari ini mengembalikan `user_message`, `assistant_message`, `has_crisis`, dan `remaining_today`; pesan berisi `id`, `role`, `content`, `time` (teks "14.30 WIB"), `is_crisis`, dan `suggestion` (`type`, `priority`, `dismissible`); `intent` tidak dikirim ke klien. Kode galat web: `invalid_message`, `busy`, `daily_limit`, `rate_limited`, `ai_unavailable`, `nothing_to_retry`, `consent_required`, `account_inactive`. Bentuk final diputuskan di TASK-M015 (di atas): mengikuti presenter web dan menambah `created_at` ISO UTC (RULE-M033).
 
@@ -314,7 +318,7 @@ Refaktor `SendChatMessage` menyentuh jalur produksi web, jadi dikerjakan sebagai
 | 403 `consent_required` | Tampilkan consent versi terbaru. `ConsentGate` memeriksa saat layar AI dibuka (M023); 403 di tengah sesi (versi dinaikkan saat aplikasi terbuka) ditangani di layar chat, TASK-M024 |
 | 429 `daily_limit` / `busy` | Pesan ramah dengan sisa kuota atau tunggu sebentar |
 | 503 `ai_unavailable` | Pesan pengguna tetap tampil, tombol “Coba lagi” (API-M013 dengan `retry`); saran statis dan latihan lokal ditawarkan |
-| Timeout 20 dtk | `AppConstants.requestTimeout` berlaku **per fase** (connect, send, receive), bukan total. Saat ini `error_mapper` memetakannya ke `ApiErrorKind.timeout` dengan pesan `errorTimeout`, bukan ke `ai_unavailable` `[Verified]`; perlakuan setara `ai_unavailable` (pesan pengguna tetap tampil + "Coba lagi") ditetapkan di layar chat, TASK-M024 |
+| Timeout 20 dtk | `AppConstants.requestTimeout` berlaku **per fase** (connect, send, receive), bukan total. Saat ini `error_mapper` memetakannya ke `ApiErrorKind.timeout` dengan pesan `errorTimeout`, bukan ke `ai_unavailable` `[Verified]`; timeout diperlakukan setara `ai_unavailable` di `ChatController` (pesan pengguna tetap tampil + "Coba lagi"; TASK-M024) |
 | Galat login | 401 `invalid_credentials` (pesan umum), 403 `account_inactive`, 429 `rate_limited` dengan `Retry-After`; ditampilkan dengan pesan dari server |
 | Pemetaan galat klien | `error_mapper` mengubah galat `dio` menjadi `ApiException` (jenis: `offline`, `timeout`, `unauthorized`, `forbidden`, `notFound`, `conflict`, `validation`, `rateLimited`, `server`, `unknown`) dengan pesan dari amplop server atau teks bawaan `AppTexts`; `toString()` tanpa pesan agar aman di log. `ApiException` juga membawa `code`, `statusCode`, `retryAfterSeconds` (header `Retry-After`), dan `fieldErrors` (pesan pertama per kolom, dari `errors`); 409 dipetakan ke `conflict`, 5xx ke `server`, 4xx lain ke `unknown` |
 | Konfigurasi tidak valid | `API_BASE_URL` kosong, tidak valid, atau `http` pada flavor `prod` menampilkan `ConfigErrorApp` tanpa detail teknis |
@@ -337,6 +341,7 @@ Setiap layar punya status memuat, kosong, galat, dan sukses (RULE-053).
 | `package_info_plus` | Header `X-App-Version` | Terpasang (M021), `^10.2.2` |
 | `url_launcher` | `tel:` untuk kontak bantuan dan buka halaman web atau toko | Terpasang (M021, untuk tombol toko), `^6.3.3` |
 | `flutter_lints` (dev) | Aturan lint dasar untuk `flutter analyze` (RULE-M020) | Terpasang (M020), `^6.0.0` |
+| `lucide_icons_flutter` | Satu set ikon (RULE-M051; OQ-MA10 diputuskan 2026-11-07) | Terpasang (M024) lewat `flutter pub add lucide_icons_flutter`; hanya `LucideIcons.send` dipakai sejauh ini |
 | `shared_preferences` | Pengaturan tidak sensitif | Belum |
 | `speech_to_text` | Input suara lewat pengenal perangkat | Belum |
 | `just_audio` | Memutar klip rekaman | Belum |
@@ -402,6 +407,7 @@ Alat pengembangan di luar aplikasi: Node.js untuk `tool/mock_api.mjs` (tanpa dep
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.9 | 2026-11-07 | TASK-M024: struktur `features/chat`, paragraf Chat harian, timeout setara `ai_unavailable`, OQ-MA11 dikonfirmasi, dependency `lucide_icons_flutter`. |
 | 0.8 | 2026-11-07 | Penanda `[Verified]` API-M012 sampai M017 dan gerbang consent diperbarui: uji manual M015, M016, M017, M023 lolos. |
 | 0.7 | 2026-11-06 | TASK-M023: struktur `features/consent`, paragraf Gerbang consent, status klien API-M008 sampai M010, penanganan `consent_required`, ADR-M14. |
 | 0.6 | 2026-11-06 | TASK-M016: API-M017 bentuk nyata (422 per kolom, 204), middleware `api.active`, token dihapus saat akun dihapus. |
