@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Rules (Aturan Proyek)
-Version: 0.6 | Status: Draft | Last updated: 2026-11-06
+Version: 0.7 | Status: Draft | Last updated: 2026-11-06
 Depends on: PRD-Mobile v0.4, Architecture-Mobile v0.3, Schema-Mobile v0.1, Design-Mobile v0.4, Rules RelaxBoss (web) v1.5 | Owner: Founder (solo developer)
 
 Dokumen ini adalah panduan kerja founder sebagai pengembang tunggal untuk **repo mobile (Flutter)**; bantuan AI boleh dipakai dengan tetap mengikuti seluruh aturan, melakukan verifikasi manual, dan tidak menganggap keluaran otomatis sebagai bukti kebenaran. Untuk pekerjaan di **repo web** (task backend `TASK-M01x`), `Rules.md` web tetap berlaku penuh; aturan di sini hanya menambah. Kata MUST, MUST NOT, SHOULD dipakai secara tegas. Kedalaman: **Lite**. Prinsip: sederhana, fungsi dulu, aman dulu.
@@ -134,13 +134,14 @@ Jangan: menambah fitur di luar PRD, memanggil Groq atau layanan suara langsung d
 - A-R4: Folder `tool/` di repo mobile boleh memuat alat bantu pengembangan (mis. `mock_api.mjs`) yang tidak ikut aplikasi, tanpa dependensi, dan tanpa data pengguna atau rahasia.
 
 - A-R6: Pemeriksaan kode TASK-M022 terhadap aturan (2026-11-06, pencarian teks): lihat catatan hasil M022 di `progress.md`; `flutter analyze` dan `dart format` belum dijalankan (A-R2).
-- A-R7: Pemeriksaan kode TASK-M023 terhadap aturan (2026-11-06, pencarian teks): tanpa `print`, `// ignore:`, `Colors.*`/`Color(0x...)`, `dynamic`, atau null-bang di `lib/features/consent`; ukuran dan jarak hanya dari token; `dart format` gaya Dart 3.5 bersih; `flutter analyze` belum dijalankan (A-R2).
+- A-R7: Pemeriksaan kode TASK-M023 terhadap aturan (2026-11-06, pencarian teks): tanpa `print`, `// ignore:`, `Colors.*`/`Color(0x...)`, `dynamic`, atau null-bang di `lib/features/consent`; ukuran dan jarak hanya dari token; `dart format` gaya Dart 3.5 bersih; uji manual M023 lolos 2026-11-07; hasil `flutter analyze` tidak dilaporkan terpisah (A-R2).
 - A-R5: Pemeriksaan kode terhadap aturan (commit `8014c38`, 2026-11-06, pencarian teks): tidak ada `print`, `// ignore:`, `Colors.*`/`Color(0x...)` di luar `rb_colors.dart`, atau null-bang di `lib/`; `dynamic` hanya pada tiga argumen tipe di RULE-M021. Pengecualian sementara: dua `TODO` templat tanpa ID di `android/app/build.gradle.kts` dan penandatanganan rilis dengan kunci debug dibereskan di TASK-M043.
 
 ## Change Log
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.7 | 2026-11-07 | A-R7 diperbarui setelah uji manual M023 lolos. |
 | 0.6 | 2026-11-06 | A-R7 (pemeriksaan kode TASK-M023); token `RbSize.borderThin` dan `RbSize.borderSelected` menggantikan angka tebal garis di widget (RULE-M050). |
 | 0.5 | 2026-11-06 | RULE-M051: ikon Material bawaan sementara (OQ-MA10); A-R6 (pemeriksaan kode M022). |
 | 0.4 | 2026-11-06 | Sinkronisasi ke kode (commit `8014c38`): lint tambahan di RULE-M020, batas `dynamic` di RULE-M021, `shared/widgets/` di RULE-M024, bentuk `TODO(TASK-Mxxx)` di RULE-M027, akses token lewat `RbThemeContext` di RULE-M050, batas `^` di RULE-M060, isi `.gitignore` di RULE-M013; A-R5. |
