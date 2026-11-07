@@ -11,6 +11,7 @@ import 'package:relaxmate/features/auth/ui/login_screen.dart';
 import 'package:relaxmate/features/auth/ui/register_screen.dart';
 import 'package:relaxmate/features/auth/ui/session_error_screen.dart';
 import 'package:relaxmate/features/chat/ui/chat_screen.dart';
+import 'package:relaxmate/features/consent/ui/consent_gate.dart';
 import 'package:relaxmate/features/startup/ui/splash_view.dart';
 
 /// Memberi tahu router bahwa keadaan sesi berubah, agar `redirect` dijalankan ulang.
@@ -61,7 +62,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.chat,
-        builder: (context, state) => const ChatScreen(),
+        builder: (context, state) => const ConsentGate(child: ChatScreen()),
       ),
     ],
   );

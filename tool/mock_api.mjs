@@ -10,7 +10,7 @@
 //   error         503 dengan amplop galat -> aplikasi lanjut
 //   unauthorized  401 tanpa amplop -> aplikasi lanjut
 //
-// Mode auth (melayani /config, /auth/*, dan /me dengan data di memori; hilang saat berhenti):
+// Mode auth (melayani /config, /auth/*, /me, dan /consent dengan data di memori; hilang saat berhenti):
 //   auth          akun contoh (semua sandi: Password123):
 //                   verified@example.test    sudah terverifikasi
 //                   unverified@example.test  belum terverifikasi
@@ -19,6 +19,12 @@
 //                   GET /__verify?email=...  tandai email terverifikasi (pengganti klik tautan email)
 //                   GET /__expire            cabut semua token (uji 401 "sesi berakhir")
 //                   GET /__reset             kembalikan data awal
+//                   GET /__bump-ai?email=... consent AI wajib disetujui lagi (meniru kenaikan versi)
+//                   GET /__bump-training?email=...  pilihan pelatihan wajib dijawab lagi
+//                   GET /__fail-training     POST persetujuan pelatihan berikutnya dijawab 503 sekali
+//                   GET /__fail-consent      GET /consent berikutnya dijawab 503 sekali
+//                 Consent (API-M008 sampai M010): akun baru dan akun contoh belum menyetujui apa pun.
+//                 Teks consent disalin dari config/relaxboss.php di repo web (hanya untuk uji).
 //                 Halaman /ketentuan dan /privasi disajikan sebagai teks tiruan.
 //                 Batas tiruan: daftar 5/menit, login gagal 5/menit per email, kirim ulang 3/jam.
 //
@@ -73,18 +79,26 @@ let users = new Map(); // email -> { name, email, password, verified, active, re
 let tokens = new Map(); // token -> email
 let tokenSeq = 0;
 let hits = new Map(); // kunci -> [timestamp]
+let failTrainingOnce = false;
+let failConsentOnce = false;
+
+function newUser(name, email, password, verified, active) {
+  return { name, email, password, verified, active, resends: [], aiGranted: false, trainingChoice: null };
+}
 
 function resetData() {
   users = new Map();
   tokens = new Map();
   hits = new Map();
+  failTrainingOnce = false;
+  failConsentOnce = false;
   const seed = [
     ['Akun Terverifikasi', 'verified@example.test', true, true],
     ['Akun Belum Verifikasi', 'unverified@example.test', false, true],
     ['Akun Nonaktif', 'inactive@example.test', true, false],
   ];
   for (const [name, email, verified, active] of seed) {
-    users.set(email, { name, email, password: EXAMPLE_PASSWORD, verified, active, resends: [] });
+    users.set(email, newUser(name, email, EXAMPLE_PASSWORD, verified, active));
   }
 }
 resetData();
@@ -136,6 +150,35 @@ function validation(res, errors) {
 
 function userSummary(user) {
   return { name: user.name, email: user.email, email_verified: user.verified };
+}
+
+const CONSENT_TEXTS = {
+  ai: {
+    title: 'Sebelum bercerita ke RelaxMate',
+    text:
+      'RelaxMate adalah teman bicara berbasis AI, bukan psikolog atau layanan medis. Pesanmu dan jurusanmu (bila kamu isi) dikirim ke penyedia AI pihak ketiga untuk dibalas, tanpa nama, email, atau kampusmu. Pengelola RelaxBoss dapat meninjau isi percakapan tanpa identitasmu untuk menjaga kualitas dan keselamatan. Jangan bagikan data yang sangat pribadi seperti alamat atau nomor identitas. Dengan melanjutkan, kamu menyetujui hal ini.',
+    version: 1,
+  },
+  training: {
+    question: 'Bolehkah percakapan dan hasil asesmenmu dipakai untuk melatih model AI di masa depan?',
+    text:
+      'Datanya diekspor tanpa nama, email, jurusan, dan kampus, dan termasuk percakapan yang menyentuh topik sensitif seperti menyakiti diri. Pilihanmu tidak memengaruhi akses ke fitur apa pun dan bisa kamu ubah kapan saja di pengaturan akun. Data yang sudah diekspor tidak bisa ditarik kembali.',
+    version: 1,
+  },
+};
+
+function consentState(user) {
+  const answered = user.trainingChoice === 'granted' || user.trainingChoice === 'denied';
+  return {
+    ai: { granted: user.aiGranted, accepted_version: user.aiGranted ? 1 : null, required_version: 1 },
+    training: {
+      choice: user.trainingChoice,
+      answered,
+      accepted_version: answered ? 1 : null,
+      required_version: 1,
+    },
+    complete: user.aiGranted && answered,
+  };
 }
 
 function issueToken(user) {
@@ -198,7 +241,7 @@ async function authApi(req, res, path) {
     if (Object.keys(errors).length > 0) {
       return validation(res, errors);
     }
-    const user = { name, email, password, verified: false, active: true, resends: [] };
+    const user = newUser(name, email, password, false, true);
     users.set(email, user);
     return send(res, 201, { data: { ...issueToken(user), email_sent: true } });
   }
@@ -270,13 +313,54 @@ async function authApi(req, res, path) {
     return send(res, 200, { data: { email_verified: false, email_sent: true } });
   }
 
+  if (method === 'GET' && path === '/api/v1/consent') {
+    const user = authedUser(req, res);
+    if (!user) return undefined;
+    if (failConsentOnce) {
+      failConsentOnce = false;
+      return apiError(res, 503, 'server_error', 'Layanan sedang bermasalah. Coba lagi sebentar lagi.');
+    }
+    return send(res, 200, { data: { ...CONSENT_TEXTS, state: consentState(user) } });
+  }
+
+  if (method === 'POST' && path === '/api/v1/relaxmate/consent') {
+    const user = authedUser(req, res);
+    if (!user) return undefined;
+    if (!user.verified) {
+      return apiError(res, 403, 'unverified', 'Verifikasi emailmu dulu, ya. Cek kotak masukmu.');
+    }
+    user.aiGranted = true;
+    return send(res, 200, { data: { consent: consentState(user) } });
+  }
+
+  if (method === 'POST' && path === '/api/v1/account/training-consent') {
+    const user = authedUser(req, res);
+    if (!user) return undefined;
+    if (!user.verified) {
+      return apiError(res, 403, 'unverified', 'Verifikasi emailmu dulu, ya. Cek kotak masukmu.');
+    }
+    if (failTrainingOnce) {
+      failTrainingOnce = false;
+      return apiError(res, 503, 'server_error', 'Layanan sedang bermasalah. Coba lagi sebentar lagi.');
+    }
+    const body = await readJson(req);
+    if (body.choice === undefined || body.choice === null || body.choice === '') {
+      return validation(res, { choice: ['Pilih salah satu dulu.'] });
+    }
+    if (body.choice !== 'granted' && body.choice !== 'denied') {
+      return validation(res, { choice: ['Pilihan tidak valid. Coba lagi, ya.'] });
+    }
+    user.trainingChoice = body.choice;
+    return send(res, 200, { data: { consent: consentState(user) } });
+  }
+
   if (method === 'GET' && path === '/api/v1/me') {
     const user = authedUser(req, res);
     if (!user) return undefined;
     return send(res, 200, {
       data: {
         user: userSummary(user),
-        consent: { complete: false },
+        consent: consentState(user),
         limits: { message_max_chars: 1000, chat_per_day: 20, chat_per_minute: 5 },
         crisis_contacts_version: 'mock00000000',
       },
@@ -301,6 +385,31 @@ function devHelpers(req, res, url) {
   if (url.pathname === '/__expire') {
     tokens = new Map();
     sendText(res, 200, 'Semua token dicabut. Permintaan berikutnya dari aplikasi akan 401.');
+    return true;
+  }
+  if (url.pathname === '/__bump-ai' || url.pathname === '/__bump-training') {
+    const email = (url.searchParams.get('email') ?? '').toLowerCase();
+    const user = users.get(email);
+    if (!user) {
+      sendText(res, 404, `Tidak ada akun ${email}`);
+      return true;
+    }
+    if (url.pathname === '/__bump-ai') {
+      user.aiGranted = false;
+    } else {
+      user.trainingChoice = null;
+    }
+    sendText(res, 200, `Consent ${email} diperbarui: ${JSON.stringify(consentState(user))}`);
+    return true;
+  }
+  if (url.pathname === '/__fail-consent') {
+    failConsentOnce = true;
+    sendText(res, 200, 'GET /consent berikutnya akan dijawab 503 satu kali.');
+    return true;
+  }
+  if (url.pathname === '/__fail-training') {
+    failTrainingOnce = true;
+    sendText(res, 200, 'POST persetujuan pelatihan berikutnya akan dijawab 503 satu kali.');
     return true;
   }
   if (url.pathname === '/__reset') {

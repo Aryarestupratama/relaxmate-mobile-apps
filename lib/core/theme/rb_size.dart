@@ -6,4 +6,8 @@ abstract final class RbSize {
   static const double avatarMedium = 56;
   static const double avatarLarge = 72;
   static const double icon = 24;
+
+  /// Tebal garis tepi kartu pilihan: biasa dan terpilih (Design-M CMP-M20).
+  static const double borderThin = 1;
+  static const double borderSelected = 2;
 }

@@ -115,6 +115,19 @@ abstract final class AppTexts {
       'Kamu masih masuk di perangkat ini. Pastikan internetmu aktif, lalu coba '
       'lagi.';
 
+  // Consent AI dan persetujuan pelatihan (SCR-M07). Judul dan isi consent berasal dari
+  // server (API-M008), bukan dari sini.
+  static const String consentAgree = 'Setuju dan lanjutkan';
+  static const String consentSaveChoice = 'Simpan pilihan';
+  static const String consentTrainingTitle = 'Satu pilihan untukmu';
+  static const String consentTrainingYes = 'Boleh';
+  static const String consentTrainingNo = 'Tidak boleh';
+  static const String consentChoiceRequired = 'Pilih salah satu dulu.';
+  static const String consentCheckTitle = 'Belum bisa memuat persetujuan';
+  static const String consentCheckBody =
+      'Sebelum bercerita, kami perlu memastikan persetujuanmu. Pastikan '
+      'internetmu aktif, lalu coba lagi.';
+
   // Layar sambutan sementara (TASK-M024 menggantinya).
   static String signedInAs(String email) => 'Masuk sebagai $email';
 }

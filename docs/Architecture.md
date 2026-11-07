@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Architecture
-Version: 0.6 | Status: Draft | Last updated: 2026-11-06
+Version: 0.7 | Status: Draft | Last updated: 2026-11-06
 Depends on: PRD RelaxMate Mobile v0.3, Architecture RelaxBoss (web), Schema RelaxBoss (web), Rules v1.5 | Owner: Founder (solo developer)
 
 Label: `[Verified]` ada sumber (sisi mobile: repo `relaxmate-mobile-apps` commit `8014c38`; sisi backend: repo `RELAXBOSS_WEBSITE` commit `9afd27c`), `[Inference]` kesimpulan, `[Assumption]` bisa diubah. **Dokumen ini mengikuti kode:** bila berbeda dari kode, kode yang benar. Kedalaman: **Lite**. Dokumen ini hanya mengatur sisi mobile dan tambahan di backend. Subsistem AI (rotasi key, `ChatbotService`, `CrisisDetector`), enkripsi, dan admin tetap di Architecture web dan tidak diulang di sini.
@@ -83,7 +83,10 @@ relaxmate-mobile-apps/              # nama repo; paket Dart: relaxmate
                   # state/ (AuthState, AuthController),
                   # ui/ (LoginScreen, RegisterScreen, ForgotPasswordScreen, CheckEmailScreen,
                   #      SessionErrorScreen, AuthScaffold, PasswordField, AuthValidators)
-      consent/ checkin/ exercises/ voice/ mascot/ overlay/ settings/   # masih .gitkeep
+      consent/    # data/ (ConsentState, ConsentPrompt, TrainingChoice, ConsentRepository),
+                  # state/ (ConsentGateState, ConsentController),
+                  # ui/ (ConsentGate, ConsentScreen, ConsentChoiceTile, ConsentErrorScreen)
+      checkin/ exercises/ voice/ mascot/ overlay/ settings/   # masih .gitkeep
     shared/
       widgets/    # MateAvatar + MateAvatarSize (CMP-M01), ErrorAlert (CMP-M13)
   assets/
@@ -92,7 +95,7 @@ relaxmate-mobile-apps/              # nama repo; paket Dart: relaxmate
     audio/clips/    # klip rekaman + clips.json (intent -> daftar klip); masih .gitkeep
     crisis/         # fallback kontak bantuan (tanpa data dummy di rilis); masih .gitkeep
     texts/          # teks panjang (privasi, ketentuan); masih .gitkeep
-  tool/             # alat pengembangan, bukan bagian aplikasi (mock_api.mjs: mode cek versi dan mode auth)
+  tool/             # alat pengembangan, bukan bagian aplikasi (mock_api.mjs: mode cek versi dan mode auth, termasuk consent)
   android/app/
     build.gradle.kts                                  # flavor dev/prod, minSdk 26
     src/main/AndroidManifest.xml, kotlin/id/my/relaxboss/relaxmate/MainActivity.kt   # izin INTERNET di sini (sejak M022)
@@ -103,6 +106,8 @@ relaxmate-mobile-apps/              # nama repo; paket Dart: relaxmate
 Aturan: satu fitur satu folder; tiap fitur berisi `data/` (repository), `state/` (provider), `ui/`. Widget tidak memanggil `dio` langsung, hanya lewat repository dan `ApiClient`. Folder fitur yang belum dikerjakan berisi `.gitkeep`. Folder aset audio, crisis, dan texts baru didaftarkan di `pubspec.yaml` pada task yang mengisinya.
 
 **Sesi dan pengalihan layar (TASK-M022) `[Verified]` terhadap kode.** `AuthController` (Riverpod `Notifier`) memegang `AuthState`: `AuthRestoring` (membaca token tersimpan dan memeriksanya lewat `GET /me`), `AuthUnauthenticated`, `AuthAuthenticated(user)`, dan `AuthSessionCheckFailed` (token ada tetapi pemeriksaan gagal bukan 401: offline, timeout, galat server; token tidak dihapus). Router memanggil `authRedirect(state, lokasi)` setiap keadaan berubah: pemeriksaan sesi hanya `/memuat`; sesi belum bisa diperiksa hanya `/sesi`; tamu hanya `/masuk`, `/daftar`, `/lupa-sandi`; sudah masuk tetapi email belum terverifikasi hanya `/cek-email`; terverifikasi tidak boleh di layar tamu atau peralihan (dialihkan ke `/`). Saat server menolak token (401), `ApiClient` menghapus token lalu `SessionExpiredSignal.fire()`; `AuthController` mendengarkan dan menjadi `AuthUnauthenticated`. Dengan sinyal itu `core/` tidak mengimpor `features/`. Keluar memanggil API-M003 lalu menghapus token; bila panggilan gagal (mis. offline) token di perangkat tetap dihapus.
+
+**Gerbang consent (TASK-M023) `[Verified: kode, belum dijalankan]`.** `ConsentController` (Riverpod `Notifier`) memegang `ConsentGateState`: `ConsentChecking`, `ConsentRequired(prompt)`, `ConsentComplete`, `ConsentCheckFailed(error)`. Ia memeriksa `GET /consent` (API-M008, teks dan status dalam satu panggilan) begitu ada pengguna **terverifikasi**, dan memeriksa ulang hanya bila email pengguna berganti (`select` pada `AuthController`), jadi consent akun lain tidak terbawa. Widget `ConsentGate` membungkus layar yang memakai fitur AI (sekarang `ChatScreen` di `app_router.dart`): memuat = `SplashView`, kurang = `ConsentScreen`, gagal = `ConsentErrorScreen`, lengkap = layar aslinya. Gerbang ini tidak memakai `authRedirect` karena consent bukan keadaan sesi dan latihan serta kontak bantuan harus tetap bisa dibuka tanpa consent (RULE-M034). `submit` menyimpan hanya yang kurang, berurutan: API-M009 (consent AI) lalu API-M010 (pilihan pelatihan); kemajuan sebagian dicatat walau langkah berikutnya gagal. Teks consent tidak pernah disalin di klien; teks kosong dari server dianggap balasan rusak (persetujuan tanpa teks tidak diminta).
 
 ---
 
@@ -145,7 +150,7 @@ Semua endpoint JSON, HTTPS saja. Format sukses `{ "data": {...} }`, gagal `{ "er
   `{ "ai": { "granted", "accepted_version", "required_version" }, "training": { "choice", "answered", "accepted_version", "required_version" }, "complete" }`. `accepted_version` dan `choice` bernilai `null` bila belum dijawab; `complete` benar bila consent AI dan pilihan pelatihan sudah lengkap pada versi terbaru.
 - `GET /consent`: `{ "data": { "ai": { "title", "text", "version" }, "training": { "question", "text", "version" }, "state": <state> } }`. `version` berupa bilangan bulat dari `ai_consent_version` dan `ai_training_consent_version`; naikkan bila teks berubah.
 - Galat memakai amplop seragam (ADR-M11); limiter melebihi batas membalas 429 `rate_limited`.
-- Sisi klien `[Verified]`: aplikasi baru memanggil `GET /config` dan membaca `min_app_version` saja (`ServerConfig`); bentuk `/config` asli cocok dengan parser klien. `/me`, `/consent`, dan `/crisis-contacts` belum dipakai (TASK-M022, M023, M025).
+- Sisi klien `[Verified]`: aplikasi baru memanggil `GET /config` dan membaca `min_app_version` saja (`ServerConfig`); bentuk `/config` asli cocok dengan parser klien. `GET /me` dipakai sejak TASK-M022; `GET /consent`, `POST /relaxmate/consent`, dan `POST /account/training-consent` dipakai sejak TASK-M023 (`ConsentRepository`; kode selesai, belum diuji manual); `/crisis-contacts` belum dipakai (TASK-M025).
 
 **Bentuk nyata API-M012, M013, M015, M016 (TASK-M015; kode di repo web, belum diuji manual).** Format sukses `{ "data": {...} }`. Semua waktu `created_at` berformat ISO-8601 UTC (`2026-11-06T09:30:00Z`, RULE-M033); `time` adalah teks WIB siap tampil dari presenter web.
 
@@ -306,7 +311,7 @@ Refaktor `SendChatMessage` menyentuh jalur produksi web, jadi dikerjakan sebagai
 |---|---|
 | Tanpa internet | Kontak bantuan, latihan napas/grounding, dan klip tetap jalan; chat menampilkan status offline ramah, pesan tidak dikirim |
 | 401 | `ApiClient` menghapus token hanya bila permintaan membawa token (login yang salah tidak dianggap sesi berakhir); mengarahkan ke Masuk menunggu TASK-M022; tidak menampilkan isi galat teknis |
-| 403 `consent_required` | Tampilkan consent versi terbaru |
+| 403 `consent_required` | Tampilkan consent versi terbaru. `ConsentGate` memeriksa saat layar AI dibuka (M023); 403 di tengah sesi (versi dinaikkan saat aplikasi terbuka) ditangani di layar chat, TASK-M024 |
 | 429 `daily_limit` / `busy` | Pesan ramah dengan sisa kuota atau tunggu sebentar |
 | 503 `ai_unavailable` | Pesan pengguna tetap tampil, tombol “Coba lagi” (API-M013 dengan `retry`); saran statis dan latihan lokal ditawarkan |
 | Timeout 20 dtk | `AppConstants.requestTimeout` berlaku **per fase** (connect, send, receive), bukan total. Saat ini `error_mapper` memetakannya ke `ApiErrorKind.timeout` dengan pesan `errorTimeout`, bukan ke `ai_unavailable` `[Verified]`; perlakuan setara `ai_unavailable` (pesan pengguna tetap tampil + "Coba lagi") ditetapkan di layar chat, TASK-M024 |
@@ -364,6 +369,7 @@ Alat pengembangan di luar aplikasi: Node.js untuk `tool/mock_api.mjs` (tanpa dep
 | ADR-M11 | Galat seragam `{ "error": { "code", "message" } }` di seluruh `/api/*` lewat `ApiExceptionRenderer`; 500 memakai penanganan bawaan | Klien memetakan galat di satu tempat; pesan aman ditampilkan | Rute web tidak tersentuh; kode final: `invalid_credentials`, `account_inactive`, `rate_limited`, `validation_failed`, `unauthenticated` |
 | ADR-M12 | CORS dimatikan untuk API | Klien hanya aplikasi native; mengurangi paparan ke peramban pihak lain | Bila suatu hari ada klien peramban, CORS harus dibuka dengan daftar origin eksplisit |
 | ADR-M13 | Pemeriksaan versi aplikasi (`min_app_version`) gagal-terbuka dengan batas 5 detik | Kontak bantuan dan latihan harus tetap bisa dipakai offline (RULE-M034) | Aplikasi lama tidak diblokir bila server tidak terjangkau |
+| ADR-M14 | Gerbang consent berupa widget pembungkus (`ConsentGate`) dengan `ConsentController` sendiri, bukan cabang `authRedirect` | Consent bukan keadaan sesi; latihan dan kontak bantuan tidak boleh ikut tertahan; `authRedirect` tetap fungsi murni dan kecil | Setiap layar AI baru (riwayat, Cek Rasa) harus dibungkus `ConsentGate` (atau satu `ShellRoute` bila sudah banyak) |
 
 ---
 
@@ -396,6 +402,7 @@ Alat pengembangan di luar aplikasi: Node.js untuk `tool/mock_api.mjs` (tanpa dep
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.7 | 2026-11-06 | TASK-M023: struktur `features/consent`, paragraf Gerbang consent, status klien API-M008 sampai M010, penanganan `consent_required`, ADR-M14. |
 | 0.6 | 2026-11-06 | TASK-M016: API-M017 bentuk nyata (422 per kolom, 204), middleware `api.active`, token dihapus saat akun dihapus. |
 | 0.5 | 2026-11-06 | TASK-M015: bentuk nyata API-M012, M013, M015, M016; API-M014 tidak dibuat (retry lewat M013); kode galat chat termasuk `conversation_closed`; A-MA4 terjawab. |
 | 0.4 | 2026-11-06 | TASK-M022: struktur folder `features/auth`, `core/launch`, `session_expired_signal`, `auth_redirect`, `ErrorAlert`; paragraf Sesi dan pengalihan layar; izin `INTERNET` pindah ke manifest utama; `tool/mock_api.mjs` punya mode `auth`. |

@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Design System dan Spesifikasi Layar
-Version: 0.5 | Status: Draft | Last updated: 2026-11-06
+Version: 0.6 | Status: Draft | Last updated: 2026-11-06
 Depends on: PRD-Mobile v0.3, Architecture-Mobile v0.3, Design RelaxBoss (web) | Owner: Founder (solo developer)
 
 Label: `[Assumption]` bisa diubah. Kedalaman: **Lite**. Platform: Android (phone) dulu, mode terang. Tata letak layar yang tidak tertulis dibangun sederhana (fungsi dulu) memakai token dan komponen di dokumen ini (RULE-M007).
@@ -85,6 +85,7 @@ Teks layar penting (judul sambutan, krisis) tidak lebih kecil dari 16sp.
 - Radius: 8 (input kecil), 12 (kartu), 20 (gelembung chat), 24 (panel/sheet), pil penuh (chip, tombol utama besar).
 - Bayangan: diturunkan dari `primary` (6% kartu, 12% panel/overlay), bukan angka terpisah. Kartu: blur 12, offset (0, 4); panel/overlay: blur 24, offset (0, 8) (`RbShadow.card` dan `RbShadow.panel`) `[Verified]`.
 - Gerak: 150 ms ease-out untuk umpan balik; transisi layar 250 ms; maskot bergerak pelan (napas 3-4 dtk). Hormati `MediaQuery.disableAnimations` (matikan gerak non-esensial; maskot menjadi gambar diam).
+- Garis tepi kartu pilihan: 1dp, terpilih 2dp (`RbSize.borderThin`, `RbSize.borderSelected`) `[Verified: kode]`.
 - Target sentuh minimal **48 x 48 dp**; jarak antar target >= 8dp.
 - Hanya portrait pada rilis pertama `[Assumption]`.
 
@@ -107,12 +108,13 @@ Teks layar penting (judul sambutan, krisis) tidak lebih kecil dari 16sp.
 | CMP-M11 | `BreathingGuide` | Lingkaran yang membesar/mengecil mengikuti ritme, instruksi teks besar ("Tarik napas", "Tahan", "Embuskan"), hitung putaran, tombol "Selesai" |
 | CMP-M12 | `EmptyState` | Maskot kecil + satu kalimat hangat + satu aksi |
 | CMP-M13 | `ErrorAlert` | Kartu `surfaceAlt` dengan ikon `danger`, pesan ramah, tombol "Coba lagi"; tanpa detail teknis; tidak memakai warna krisis agar merah krisis hanya untuk keselamatan |
-| CMP-M14 | `ConsentSheet` | Bottom sheet penuh: judul, teks dari API-M008 (dapat digulir), dua tombol; persetujuan pelatihan sebagai pilihan terpisah tanpa nilai awal |
+| CMP-M14 | `ConsentScreen` (sebelumnya `ConsentSheet`) | Layar penuh yang dapat digulir (`AuthScaffold`): judul dan teks dari API-M008, pilihan pelatihan sebagai dua `ConsentChoiceTile` tanpa nilai awal, tombol utama dan "Keluar". Hanya bagian yang masih kurang yang tampil (consent AI dan pelatihan berversi terpisah). Diterapkan sebagai layar penuh lewat `ConsentGate`, bukan bottom sheet: gerbang ini memblokir fitur AI sehingga tidak boleh ditutup `[Verified: kode, TASK-M023]` |
 | CMP-M15 | `SettingToggleRow` | Judul, keterangan satu baris, `Switch`; tinggi >= 56dp |
 | CMP-M16 | `DaySeparator` | Pil kecil "Hari ini", "Kemarin", atau tanggal WIB |
 | CMP-M17 | `OverlayBubble` | Lingkaran 64dp, avatar RelaxMate, bayangan panel, dapat digeser dan menempel ke tepi; melayang ringan |
 | CMP-M18 | `OverlayPanel` | Kartu 280dp: avatar + nama, sapaan lokal, tiga aksi (Ngobrol, Bicara, Istirahatkan), tombol tutup |
 | CMP-M19 | `Snack` | Snackbar singkat untuk sukses/galat non-kritis; galat validasi tetap di dekat kolom |
+| CMP-M20 | `ConsentChoiceTile` | Kartu pilihan tunggal setara tombol radio: tinggi >= 48dp, radius kartu, garis `inputBorder` 1dp; terpilih = latar `surfaceAlt`, garis `primary` 2dp, ikon radio terisi (tidak hanya warna). `Semantics`: `inMutuallyExclusiveGroup`, `checked`, label teks pilihan. Dibangun di TASK-M023 `[Verified: kode]` |
 
 
 ---
@@ -139,6 +141,7 @@ Teks layar penting (judul sambutan, krisis) tidak lebih kecil dari 16sp.
 | SCR-M03 Daftar (`RegisterScreen`) | Sama dengan Masuk | n/a | Sama dengan Masuk; centang Ketentuan wajib (pesan di bawah centang); tautan "Baca Ketentuan" dan "Baca Kebijakan Privasi" membuka halaman web, gagal buka: `Snack` | Pengguna langsung masuk; router memindahkan ke Cek email | Sama dengan Masuk |
 | SCR-M05 Lupa kata sandi (`ForgotPasswordScreen`) | Tombol "Memproses..." | n/a | Format email di bawah kolom; galat lain lewat `ErrorAlert` | Formulir diganti catatan sukses (ikon + pesan server yang sama untuk email terdaftar atau tidak) dan tombol "Kembali ke masuk" | Sama dengan Masuk |
 | SCR-M06 Cek email (`CheckEmailScreen`) | Tombol yang sedang bekerja "Memproses...", tiga tombol lain nonaktif | n/a | `ErrorAlert` (mis. 429 "terlalu banyak email"); "Saya sudah verifikasi" saat belum terverifikasi: `Snack` "Emailmu belum terverifikasi..." | Kirim ulang: `Snack` "Email verifikasi sudah dikirim ulang...". Terverifikasi: router memindahkan ke layar utama (juga diperiksa diam-diam saat aplikasi kembali ke depan layar) | Galat jaringan lewat `ErrorAlert` |
+| SCR-M07 Consent AI dan pelatihan (`ConsentScreen`, `ConsentGate`) | `SplashView` selama status diperiksa (`GET /consent`) | n/a | Belum memilih pelatihan lalu menekan tombol utama: "Pilih salah satu dulu." di bawah pilihan (diumumkan ke TalkBack). Galat server per kolom `choice` tampil di sana; selain itu `ErrorAlert` di atas tombol. Status tidak bisa diperiksa: `ConsentErrorScreen` dengan "Coba lagi" dan "Keluar" | Layar diganti layar utama (`ChatScreen`). Bila hanya sebagian tersimpan (mis. AI tersetujui, pelatihan gagal), layar menampilkan bagian yang tersisa | `ConsentErrorScreen` dengan pesan "Koneksi terputus..."; pilihan yang sudah dipilih tidak hilang |
 | Sesi belum bisa diperiksa (`SessionErrorScreen`, tambahan di luar inventaris) | `SplashView` selama pemeriksaan ulang | n/a | `ErrorAlert` dengan "Coba lagi"; tombol "Keluar" menghapus token di perangkat saja | Kembali ke alur normal | Layar inilah yang tampil saat offline dengan token tersimpan |
 
 Pemeriksaan versi berjalan **sekali per pembukaan aplikasi** (bukan saat kembali dari latar belakang) dan membungkus seluruh router lewat `StartupGate` di `MaterialApp.builder`; selama pemeriksaan (maks. 5 detik) hanya `SplashView` yang tampil. Judul SCR-M20 diberi `Semantics(header: true)` `[Verified]`.
@@ -256,6 +259,8 @@ Nada: hangat, sederhana, tidak menggurui, memakai "kamu". Teks yang sama dengan 
 | Lupa kata sandi | Judul "Lupa kata sandi"; keterangan "Masukkan emailmu. Kami kirim tautan untuk mengatur ulang kata sandi."; tombol "Kirim tautan"; "Kembali ke masuk"; pesan sukses dari server (cadangan: "Jika email itu terdaftar, tautan untuk mengatur ulang kata sandi sudah dikirim. Cek kotak masukmu, ya.") |
 | Cek email | Judul "Cek emailmu"; "Kami mengirim tautan verifikasi ke {email}. Buka tautannya, lalu kembali ke sini."; tombol "Saya sudah verifikasi", "Kirim ulang email", "Keluar"; "Emailmu belum terverifikasi. Cek kotak masuk atau folder spam, ya."; "Email verifikasi sudah dikirim ulang. Cek kotak masukmu, ya." |
 | Validasi kolom | "Nama wajib diisi.", "Email wajib diisi.", "Format email belum benar.", "Kata sandi wajib diisi.", "Centang dulu bahwa kamu sudah membaca ketentuan." (sama dengan pesan server) |
+| Consent (SCR-M07) | Judul dan isi consent AI, serta pertanyaan dan keterangan pelatihan: **dari server** (API-M008), tidak disalin. Teks klien: tombol "Setuju dan lanjutkan" (consent AI belum disetujui) atau "Simpan pilihan" (hanya pelatihan yang kurang); judul bila hanya pelatihan yang kurang "Satu pilihan untukmu"; pilihan "Boleh" dan "Tidak boleh"; validasi "Pilih salah satu dulu." (sama dengan pesan server); tombol "Keluar" |
+| Consent: status tidak bisa diperiksa | Judul "Belum bisa memuat persetujuan"; "Sebelum bercerita, kami perlu memastikan persetujuanmu. Pastikan internetmu aktif, lalu coba lagi."; "Coba lagi", "Keluar" |
 | Sesi belum bisa diperiksa | Judul "Belum bisa memeriksa sesimu"; "Kamu masih masuk di perangkat ini. Pastikan internetmu aktif, lalu coba lagi." |
 | Umum (tombol) | "Memproses...", "Coba lagi", "Keluar"; label ikon sandi "Tampilkan kata sandi" / "Sembunyikan kata sandi"; "Halaman belum bisa dibuka. Coba lagi nanti." |
 | Email terverifikasi (halaman Masuk web) | "Emailmu sudah terverifikasi. Kembali ke aplikasi RelaxMate, atau masuk di sini." |
@@ -308,13 +313,14 @@ Ikon: satu set (`[Assumption]` Lucide untuk Flutter), ukuran 24dp, stroke 2. Sem
 |---|---|---|
 | OQ-D1 | **Ditutup 2026-11-05:** mobile mengikuti kode website (`app.css`); alias `soft-sky/mint/peach` = lavender. | - |
 | OQ-D2 | Format animasi maskot: Rive atau Lottie; sumber sprite untuk keadaan menyimak dan pelukan | TASK-M030 |
-| OQ-D3 | Apakah onboarding perlu lebih dari satu layar? M022 tidak menambahnya (tamu langsung ke Masuk atau Daftar) | TASK-M023 |
+| OQ-D3 | **Ditutup 2026-11-06:** M022 dan M023 tidak menambah onboarding; setelah verifikasi email pengguna langsung ke layar consent bila belum lengkap. | - |
 | OQ-D4 | Nama dan ejaan final maskot (OQ-M2) memengaruhi seluruh bank teks | TASK-M030 |
 
 ## Change Log
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.6 | 2026-11-06 | TASK-M023: SCR-M07 di bagian 4.1, CMP-M14 diterapkan sebagai `ConsentScreen` layar penuh, CMP-M20 `ConsentChoiceTile`, token tebal garis, bank teks consent, OQ-D3 ditutup. |
 | 0.5 | 2026-11-06 | TASK-M022: status layar SCR-M03 sampai M06 dan layar sesi di bagian 4.1; bank teks auth; `ErrorAlert` diterapkan; A-D6, A-D7; ikon sementara; OQ-D3 digeser ke M023. |
 | 0.4 | 2026-11-06 | Sinkronisasi ke kode (commit `8014c38`): bagian Tema komponen Material, nilai bayangan, pemetaan `TextTheme`, tanpa `fontFamilyFallback` eksplisit, isi `ChatScreen` sementara, cek versi sekali per pembukaan, teks `mascotLabel` dan `devBadge` di bank teks. |
 | 0.3 | 2026-11-06 | Sinkronisasi setelah TASK-M020 dan M021: token diwujudkan di kode (`Rb*`), font dibundel, `MateAvatar`, bagian 4.1 (status layar yang sudah dibangun), bank teks galat jaringan dan perbarui aplikasi, A-D5. |
