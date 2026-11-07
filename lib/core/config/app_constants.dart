@@ -35,4 +35,15 @@ abstract final class AppConstants {
 
   /// Halaman Konsultasi Profesional di website (tujuan chip saran, FR-M008).
   static const String consultationPath = '/konsultasi';
+
+  /// Ritme latihan napas dalam detik: tarik, tahan, embuskan (FR-M014). `[Assumption]` 4-4-6:
+  /// embusan lebih panjang dari tarikan agar terasa menenangkan; ubah angka di sini bila
+  /// founder ingin ritme lain (satu putaran = jumlah ketiganya).
+  static const int breathingInhaleSeconds = 4;
+  static const int breathingHoldSeconds = 4;
+  static const int breathingExhaleSeconds = 6;
+
+  /// Pilihan durasi latihan napas dalam menit (Design-M SCR-M11) dan pilihan awalnya.
+  static const List<int> breathingMinuteChoices = <int>[1, 3, 5];
+  static const int breathingDefaultMinutes = 3;
 }

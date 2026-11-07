@@ -185,6 +185,74 @@ abstract final class AppTexts {
   static const String suggestionConsultation = 'Bicara dengan profesional';
   static const String suggestionDismiss = 'Tutup saran';
 
+  // Menu di bilah atas chat (SCR-M08).
+  static const String chatMenuTooltip = 'Menu';
+
+  // Latihan lokal (SCR-M11, SCR-M12, FR-M014). Berjalan di perangkat: tanpa AI, tanpa kuota,
+  // tanpa internet. Disclaimer dan jalur ke bantuan mengikuti RULE-M046.
+  static const String exercisesTitle = 'Latihan';
+  static const String exercisesIntro =
+      'Beberapa menit untuk menenangkan diri. Semuanya berjalan di HP-mu, '
+      'tanpa AI, dan bisa dipakai tanpa internet.';
+  static const String exercisesDisclaimer =
+      'Latihan ini membantu menenangkan diri. Ini bukan layanan medis dan '
+      'tidak menggantikan profesional. Kalau terasa berat, kamu tidak harus '
+      'menghadapinya sendirian.';
+  static const String exerciseDone = 'Selesai';
+  static const String exerciseAgain = 'Ulangi';
+  static const String exerciseClosing =
+      'Aku di sini kapan pun kamu butuh. Jaga dirimu, ya.';
+
+  static String exerciseTileLabel(String title, String subtitle) =>
+      '$title. $subtitle';
+
+  // Latihan napas (SCR-M11).
+  static const String breathingTitle = 'Latihan napas';
+  static const String breathingSubtitle =
+      'Tarik, tahan, embuskan. Pilih 1, 3, atau 5 menit.';
+  static const String breathingIntro =
+      'Duduk dengan nyaman. Ikuti lingkaran: membesar saat kamu menarik napas, '
+      'mengecil saat kamu mengembuskan.';
+  static const String breathingDurationLabel = 'Berapa lama?';
+  static const String breathingHaptics = 'Getar halus';
+  static const String breathingHapticsHint =
+      'Terasa setiap pergantian napas. Bergantung pada pengaturan getar '
+      'perangkatmu.';
+  static const String breathingStart = 'Mulai';
+  static const String breathingInhale = 'Tarik napas...';
+  static const String breathingHold = 'Tahan...';
+  static const String breathingExhale = 'Embuskan pelan-pelan...';
+  static const String breathingDoneTitle = 'Latihan selesai';
+
+  static String breathingMinutes(int minutes) => '$minutes menit';
+
+  static String breathingCycle(int cycle, int total) =>
+      'Putaran $cycle dari $total';
+
+  static String breathingDoneBody(int cycles) =>
+      'Kamu sudah menyelesaikan $cycles putaran napas. Perhatikan sebentar '
+      'bagaimana rasanya sekarang.';
+
+  // Grounding 5-4-3-2-1 (SCR-M12). Satu indra per langkah, dari 5 sampai 1.
+  static const String groundingTitle = 'Grounding 5-4-3-2-1';
+  static const String groundingSubtitle =
+      'Kenali sekitarmu lewat lima indra, satu per satu.';
+  static const String groundingHint =
+      'Ambil waktumu. Tidak perlu terburu-buru.';
+  static const String groundingNext = 'Lanjut';
+  static const String groundingSee = 'Sebutkan 5 hal yang kamu lihat.';
+  static const String groundingTouch = 'Sebutkan 4 hal yang bisa kamu sentuh.';
+  static const String groundingHear = 'Sebutkan 3 hal yang kamu dengar.';
+  static const String groundingSmell = 'Sebutkan 2 hal yang kamu cium.';
+  static const String groundingTaste = 'Sebutkan 1 hal yang bisa kamu cicipi.';
+  static const String groundingDoneTitle = 'Kamu sudah sampai di sini';
+  static const String groundingDoneBody =
+      'Kamu sudah mengenali sekitarmu satu per satu. Perhatikan sebentar '
+      'bagaimana rasanya sekarang.';
+
+  static String groundingProgress(int step, int total) =>
+      'Langkah $step dari $total';
+
   // Riwayat (SCR-M14) dan detail hari (SCR-M15), hanya baca (FR-M005). Label tanggal dan jam
   // percakapan berasal dari server.
   static const String historyTitle = 'Riwayat';

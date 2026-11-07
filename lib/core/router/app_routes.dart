@@ -23,6 +23,12 @@ abstract final class AppRoutes {
   static String historyDetail(String conversationId) =>
       '$history/$conversationId';
 
+  /// Latihan lokal: daftar, latihan napas (SCR-M11), grounding 5-4-3-2-1 (SCR-M12). Hanya
+  /// perlu masuk; di luar `ConsentGate` karena tanpa AI (FR-M014).
+  static const String exercises = '/latihan';
+  static const String breathing = '/latihan/napas';
+  static const String grounding = '/latihan/grounding';
+
   /// Layar yang hanya untuk tamu; pengguna yang sudah masuk dialihkan keluar.
   static const Set<String> guestOnly = <String>{
     login,

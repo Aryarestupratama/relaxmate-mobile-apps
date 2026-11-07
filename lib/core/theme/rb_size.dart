@@ -21,4 +21,16 @@ abstract final class RbSize {
   /// di atas itu isinya digulir supaya daftar pesan dan kolom ketik tetap terlihat pada
   /// teks 200% (RULE-M055).
   static const double crisisBannerMaxHeightFactor = 0.4;
+
+  /// Garis tengah cincin panduan napas (Design-M CMP-M11). Lingkaran di dalamnya membesar dan
+  /// mengecil antara [breathingMinScale] dan 1 kali ukuran ini.
+  static const double breathingGuide = 240;
+
+  /// Skala terkecil lingkaran napas (saat napas habis), sebagai bagian dari [breathingGuide].
+  static const double breathingMinScale = 0.5;
+
+  /// Lingkaran angka pada langkah grounding (SCR-M12) dan ukuran angka di dalamnya. Angka
+  /// diperkecil otomatis (`FittedBox`) bila teks sistem sangat besar.
+  static const double groundingBadge = 112;
+  static const double groundingNumber = 56;
 }

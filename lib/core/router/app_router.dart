@@ -13,6 +13,9 @@ import 'package:relaxmate/features/auth/ui/session_error_screen.dart';
 import 'package:relaxmate/features/chat/ui/chat_screen.dart';
 import 'package:relaxmate/features/consent/ui/consent_gate.dart';
 import 'package:relaxmate/features/crisis/ui/crisis_contacts_screen.dart';
+import 'package:relaxmate/features/exercises/ui/breathing_screen.dart';
+import 'package:relaxmate/features/exercises/ui/exercises_screen.dart';
+import 'package:relaxmate/features/exercises/ui/grounding_screen.dart';
 import 'package:relaxmate/features/history/ui/conversation_screen.dart';
 import 'package:relaxmate/features/history/ui/history_screen.dart';
 import 'package:relaxmate/features/startup/ui/splash_view.dart';
@@ -70,6 +73,19 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.chat,
         builder: (context, state) => const ConsentGate(child: ChatScreen()),
+      ),
+      // Latihan lokal: perlu masuk, tanpa ConsentGate (tanpa AI, FR-M014).
+      GoRoute(
+        path: AppRoutes.exercises,
+        builder: (context, state) => const ExercisesScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.breathing,
+        builder: (context, state) => const BreathingScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.grounding,
+        builder: (context, state) => const GroundingScreen(),
       ),
       GoRoute(
         path: AppRoutes.history,

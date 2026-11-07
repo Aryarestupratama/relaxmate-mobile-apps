@@ -22,6 +22,9 @@ import 'package:relaxmate/shared/widgets/error_alert.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar_size.dart';
 
+/// Pilihan di menu bilah atas chat. Ikon telepon (kontak bantuan) sengaja di luar menu.
+enum _ChatMenuAction { history, exercises }
+
 /// SCR-M08: aliran chat harian (FR-M004, M006, M007). Dibungkus `ConsentGate` di router.
 /// Tampilan sengaja sederhana sampai desain final tersedia.
 /// TODO(TASK-M031): pindahkan tombol Keluar ke Pengaturan.
@@ -89,17 +92,33 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       appBar: AppBar(
         title: const _ChatTitle(),
         actions: <Widget>[
-          IconButton(
-            onPressed: () => context.push(AppRoutes.history),
-            tooltip: AppTexts.historyTooltip,
-            icon: const Icon(LucideIcons.history),
-          ),
           // Jalur ke bantuan nyata selalu terlihat, tidak tersembunyi di menu (Design-M
           // prinsip 4).
           IconButton(
             onPressed: () => context.push(AppRoutes.crisisContacts),
             tooltip: AppTexts.crisisMenuTooltip,
             icon: const Icon(LucideIcons.phone),
+          ),
+          PopupMenuButton<_ChatMenuAction>(
+            tooltip: AppTexts.chatMenuTooltip,
+            onSelected: (action) {
+              switch (action) {
+                case _ChatMenuAction.history:
+                  context.push<void>(AppRoutes.history);
+                case _ChatMenuAction.exercises:
+                  context.push<void>(AppRoutes.exercises);
+              }
+            },
+            itemBuilder: (context) => const <PopupMenuEntry<_ChatMenuAction>>[
+              PopupMenuItem<_ChatMenuAction>(
+                value: _ChatMenuAction.history,
+                child: Text(AppTexts.historyTooltip),
+              ),
+              PopupMenuItem<_ChatMenuAction>(
+                value: _ChatMenuAction.exercises,
+                child: Text(AppTexts.exercisesTitle),
+              ),
+            ],
           ),
           TextButton(
             onPressed: ref.read(authControllerProvider.notifier).logout,

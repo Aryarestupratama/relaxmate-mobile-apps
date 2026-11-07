@@ -13,7 +13,8 @@ import 'package:relaxmate/features/chat/data/suggestion_destination.dart';
 
 /// CMP-M05: chip saran tindakan di bawah balasan RelaxMate (FR-M008). Satu chip per tujuan
 /// (`destinationsFor`); gayanya mengikuti `OutlinedButton` tema (pil putih berbingkai navy).
-/// Saran krisis tidak punya tombol tutup (FR-M010). Dipakai hanya bila ada tujuan tersedia.
+/// Saran krisis tidak punya tombol tutup (FR-M010). Latihan napas dan grounding langsung
+/// terbuka ke layar latihannya (tanpa lewat daftar latihan).
 class SuggestionChips extends ConsumerWidget {
   const SuggestionChips({
     required this.suggestion,
@@ -59,10 +60,8 @@ class SuggestionChips extends ConsumerWidget {
     return switch (destination) {
       SuggestionDestination.crisisContacts => LucideIcons.phone,
       SuggestionDestination.consultation => LucideIcons.heartHandshake,
-      // TODO(TASK-M029): ikon latihan napas dan grounding.
-      SuggestionDestination.breathing ||
-      SuggestionDestination.grounding =>
-        LucideIcons.heartHandshake,
+      SuggestionDestination.breathing => LucideIcons.wind,
+      SuggestionDestination.grounding => LucideIcons.eye,
     };
   }
 
@@ -70,10 +69,8 @@ class SuggestionChips extends ConsumerWidget {
     return switch (destination) {
       SuggestionDestination.crisisContacts => AppTexts.suggestionContacts,
       SuggestionDestination.consultation => AppTexts.suggestionConsultation,
-      // TODO(TASK-M029): label latihan napas dan grounding.
-      SuggestionDestination.breathing ||
-      SuggestionDestination.grounding =>
-        AppTexts.suggestionConsultation,
+      SuggestionDestination.breathing => AppTexts.breathingTitle,
+      SuggestionDestination.grounding => AppTexts.groundingTitle,
     };
   }
 
@@ -95,9 +92,9 @@ class SuggestionChips extends ConsumerWidget {
           );
         }
       case SuggestionDestination.breathing:
+        await context.push<void>(AppRoutes.breathing);
       case SuggestionDestination.grounding:
-        // TODO(TASK-M029): buka layar latihan napas dan grounding.
-        break;
+        await context.push<void>(AppRoutes.grounding);
     }
   }
 }

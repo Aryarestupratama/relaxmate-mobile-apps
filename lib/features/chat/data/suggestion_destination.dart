@@ -12,19 +12,12 @@ enum SuggestionDestination {
   breathing,
 
   /// Grounding 5-4-3-2-1 lokal (SCR-M12).
-  grounding;
-
-  /// Tujuan yang belum dibangun tidak dijadikan chip.
-  bool get isAvailable => switch (this) {
-        crisisContacts || consultation => true,
-        // TODO(TASK-M029): ubah menjadi true bersama layar latihan napas dan grounding.
-        breathing || grounding => false,
-      };
+  grounding,
 }
 
-/// Peta `suggestion.type` ke tujuan, urut sesuai tampilan. Hanya tujuan yang sudah tersedia.
+/// Peta `suggestion.type` ke tujuan, urut sesuai tampilan.
 List<SuggestionDestination> destinationsFor(SuggestionKind kind) {
-  final all = switch (kind) {
+  return switch (kind) {
     SuggestionKind.escalateCrisis => const <SuggestionDestination>[
         SuggestionDestination.crisisContacts,
         SuggestionDestination.consultation,
@@ -37,5 +30,4 @@ List<SuggestionDestination> destinationsFor(SuggestionKind kind) {
         SuggestionDestination.grounding,
       ],
   };
-  return all.where((destination) => destination.isAvailable).toList();
 }
