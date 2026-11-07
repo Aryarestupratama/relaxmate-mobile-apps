@@ -32,4 +32,7 @@ abstract final class AppConstants {
   /// lihat `AppConfig.webUri`). Teks Ketentuan dan Privasi tetap milik web.
   static const String termsPath = '/ketentuan';
   static const String privacyPath = '/privasi';
+
+  /// Halaman Konsultasi Profesional di website (tujuan chip saran, FR-M008).
+  static const String consultationPath = '/konsultasi';
 }

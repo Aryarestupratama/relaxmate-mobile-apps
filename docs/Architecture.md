@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Architecture
-Version: 0.10 | Status: Draft | Last updated: 2026-11-07
+Version: 0.11 | Status: Draft | Last updated: 2026-11-07
 Depends on: PRD RelaxMate Mobile v0.3, Architecture RelaxBoss (web), Schema RelaxBoss (web), Rules v1.5 | Owner: Founder (solo developer)
 
 Label: `[Verified]` ada sumber (sisi mobile: repo `relaxmate-mobile-apps` commit `8014c38`; sisi backend: repo `RELAXBOSS_WEBSITE` commit `9afd27c`), `[Inference]` kesimpulan, `[Assumption]` bisa diubah. **Dokumen ini mengikuti kode:** bila berbeda dari kode, kode yang benar. Kedalaman: **Lite**. Dokumen ini hanya mengatur sisi mobile dan tambahan di backend. Subsistem AI (rotasi key, `ChatbotService`, `CrisisDetector`), enkripsi, dan admin tetap di Architecture web dan tidak diulang di sini.
@@ -114,6 +114,8 @@ Aturan: satu fitur satu folder; tiap fitur berisi `data/` (repository), `state/`
 **Crisis Response (TASK-M025) `[Verified: kode, belum diuji manual]`.** Fitur `features/crisis`: `data/` (`CrisisContact` dengan `telUri`, `CrisisContactSet`, `CrisisContactsRepository`), `state/` (`CrisisContactsController`, `AsyncNotifier` yang memuat dari cache atau aset lebih dulu, lalu menyegarkan lewat API-M011 hanya bila sudah masuk dan terverifikasi; galat API diabaikan tanpa percobaan ulang, RULE-M044; kontak `dummy` disaring di flavor `prod`, RULE-M048), `ui/` (`CrisisBanner`, `CrisisCallButton`, `CrisisContactCard`, `CrisisContactsList`, `CrisisContactsScreen`). Rute `/kontak-bantuan` dikecualikan dari `authRedirect` di semua status dan berada di luar `ConsentGate`. Layar "Perbarui aplikasi" berada di luar router, jadi memuat `CrisisContactsList` inline. Chat membaca `has_crisis` (per Percakapan) dan `is_crisis` (per pesan); banner tampil selama `hasCrisis` dan tidak dapat ditutup. Teks krisis di gelembung berasal dari server (statis), bukan keluaran AI.
 
 **Chat harian (TASK-M024) `[Verified: kode, belum diuji manual]`.** `ChatController` (Riverpod `Notifier.autoDispose`, dibuang saat layar ditutup) memegang `ChatState`: `ChatLoading`, `ChatLoadFailed(error)`, `ChatReady` (`conversationId`, `messages`, `limits`, `unanswered`, `sending`, `error`). `load()` memanggil API-M012; `send()` dan `retry()` memanggil API-M013 (`{content}` atau `{retry: true}`). Pesan yang dikirim tampil langsung sebagai pesan tertunda (`ChatMessage.pending`, id -1) dengan penanda "sedang menulis". Penanganan galat `send`: **ditolak sebelum tersimpan** (422, 429, offline, 403 selain consent) menghapus gelembung tertunda, menampilkan alasan dari server, dan mengembalikan teks ke kolom isian (`SendOutcome.rejected`); **mungkin tersimpan** (timeout, 5xx termasuk 503 `ai_unavailable`, tidak dikenal) memuat ulang hari ini dari server (`_resync`) agar tampilan sama dengan server, lalu menampilkan galat dengan "Coba lagi" bila `unanswered` (`SendOutcome.kept`); bila sinkronisasi gagal, pesan tertunda tetap tampil dengan "Coba lagi". 409 `conversation_closed` memuat ulang hari ini (Percakapan baru) dan mengembalikan teks. 409 `nothing_to_retry` memuat ulang. 429 `daily_limit` mengosongkan sisa kuota dan menonaktifkan input dengan penjelasan. 403 `consent_required` memanggil `ref.invalidate(consentControllerProvider)` sehingga `ConsentGate` menampilkan layar consent. Tidak ada percobaan ulang otomatis (RULE-M044). Panjang input dibatasi `limits.message_max_chars` dari server; sisa kuota tampil sebagai teks. `is_crisis` dan `suggestion` belum dibaca (TASK-M025 dan M026); sampai itu selesai Crisis Response tampil sebagai gelembung biasa tanpa banner.
+
+**Saran tindakan (TASK-M026) `[Verified: logika murni dijalankan; UI belum diuji]`.** Server mengirim `suggestion` (`type`, `priority`, `dismissible`) pada balasan RelaxMate; `intent` tidak dikirim. `ChatSuggestion` membaca tiga jenis dari enum `SuggestionType` backend (`escalate_crisis`, `recommend_professional`, `recommend_support`); jenis lain diabaikan. `destinationsFor(kind)` memetakan jenis ke tujuan: `escalate_crisis` -> kontak bantuan (rute `/kontak-bantuan`) dan Konsultasi; `recommend_professional` -> Konsultasi (halaman web `/konsultasi` lewat `WebLauncher`); `recommend_support` -> latihan napas dan grounding (belum tersedia, `isAvailable` false sampai TASK-M029, jadi tanpa chip). `visibleSuggestionIds` mengikuti web (FR-029): prioritas 1 selalu tampil, saran lain hanya pada balasan RelaxMate terakhir, minus yang ditutup pengguna (disimpan di memori layar chat). Tombol tutup tidak ada pada saran krisis.
 
 ---
 
@@ -344,7 +346,7 @@ Setiap layar punya status memuat, kosong, galat, dan sukses (RULE-053).
 | `url_launcher` | `tel:` untuk kontak bantuan dan buka halaman web atau toko | Terpasang (M021, untuk tombol toko), `^6.3.3` |
 | `flutter_lints` (dev) | Aturan lint dasar untuk `flutter analyze` (RULE-M020) | Terpasang (M020), `^6.0.0` |
 | `lucide_icons_flutter` | Satu set ikon (RULE-M051; OQ-MA10 diputuskan 2026-11-07) | Terpasang (M024) lewat `flutter pub add lucide_icons_flutter`; hanya `LucideIcons.send` dipakai sejauh ini |
-| `shared_preferences` | Cache kontak bantuan dan pengaturan tidak sensitif | Dipakai (M025) lewat `flutter pub add shared_preferences` |
+| `shared_preferences` | Cache kontak bantuan dan pengaturan tidak sensitif | Terpasang (M025, ditambahkan ke `pubspec.yaml` di sesi M026), `^2.5.0` |
 | `speech_to_text` | Input suara lewat pengenal perangkat | Belum |
 | `just_audio` | Memutar klip rekaman | Belum |
 | `flutter_tts` | Suara balasan percobaan | Belum |
@@ -409,6 +411,7 @@ Alat pengembangan di luar aplikasi: Node.js untuk `tool/mock_api.mjs` (tanpa dep
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.11 | 2026-11-07 | TASK-M026: paragraf Saran tindakan, `shared_preferences: ^2.5.0` tertulis di pubspec. |
 | 0.10 | 2026-11-07 | TASK-M025: struktur `features/crisis`, aset fallback terdaftar, `shared_preferences` dipakai, rute `/kontak-bantuan`, paragraf Crisis Response, OQ-MA9 sementara `tel:119,8`. |
 | 0.9 | 2026-11-07 | TASK-M024: struktur `features/chat`, paragraf Chat harian, timeout setara `ai_unavailable`, OQ-MA11 dikonfirmasi, dependency `lucide_icons_flutter`. |
 | 0.8 | 2026-11-07 | Penanda `[Verified]` API-M012 sampai M017 dan gerbang consent diperbarui: uji manual M015, M016, M017, M023 lolos. |

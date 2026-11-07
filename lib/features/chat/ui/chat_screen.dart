@@ -7,11 +7,13 @@ import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_radius.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/features/auth/state/auth_controller.dart';
+import 'package:relaxmate/features/chat/data/suggestion_visibility.dart';
 import 'package:relaxmate/features/chat/state/chat_controller.dart';
 import 'package:relaxmate/features/chat/state/chat_state.dart';
 import 'package:relaxmate/features/chat/state/send_outcome.dart';
 import 'package:relaxmate/features/chat/ui/chat_bubble.dart';
 import 'package:relaxmate/features/chat/ui/chat_input_bar.dart';
+import 'package:relaxmate/features/chat/ui/suggestion_chips.dart';
 import 'package:relaxmate/features/chat/ui/typing_indicator.dart';
 import 'package:relaxmate/features/crisis/ui/crisis_banner.dart';
 import 'package:relaxmate/shared/widgets/error_alert.dart';
@@ -30,6 +32,10 @@ class ChatScreen extends ConsumerStatefulWidget {
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final TextEditingController _input = TextEditingController();
+
+  /// Pesan yang saran tindakannya sudah ditutup pengguna. Hanya di memori; kembali tampil
+  /// bila layar dibuka ulang (sama dengan web).
+  final Set<int> _dismissedSuggestions = <int>{};
 
   @override
   void dispose() {
@@ -51,6 +57,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         selection: TextSelection.collapsed(offset: text.length),
       );
     }
+  }
+
+  void _dismissSuggestion(int messageId) {
+    setState(() => _dismissedSuggestions.add(messageId));
   }
 
   @override
@@ -93,6 +103,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               input: _input,
               onSend: _send,
               onRetry: controller.retry,
+              dismissedSuggestions: _dismissedSuggestions,
+              onDismissSuggestion: _dismissSuggestion,
             ),
         },
       ),
@@ -134,12 +146,16 @@ class _ChatBody extends StatelessWidget {
     required this.input,
     required this.onSend,
     required this.onRetry,
+    required this.dismissedSuggestions,
+    required this.onDismissSuggestion,
   });
 
   final ChatReady ready;
   final TextEditingController input;
   final VoidCallback onSend;
   final VoidCallback onRetry;
+  final Set<int> dismissedSuggestions;
+  final ValueChanged<int> onDismissSuggestion;
 
   @override
   Widget build(BuildContext context) {
@@ -149,6 +165,10 @@ class _ChatBody extends StatelessWidget {
     final error = ready.error;
     final newestFirst = ready.messages.reversed.toList();
     final typing = ready.sending ? 1 : 0;
+    final suggestionIds = visibleSuggestionIds(
+      ready.messages,
+      dismissedSuggestions,
+    );
 
     return Column(
       children: <Widget>[
@@ -174,9 +194,25 @@ class _ChatBody extends StatelessWidget {
                       return const TypingIndicator();
                     }
                     final position = index - typing;
-                    return ChatBubble(
-                      message: newestFirst[position],
+                    final message = newestFirst[position];
+                    final bubble = ChatBubble(
+                      message: message,
                       announce: position == 0,
+                    );
+                    final suggestion = message.suggestion;
+                    if (suggestion == null ||
+                        !suggestionIds.contains(message.id)) {
+                      return bubble;
+                    }
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        bubble,
+                        SuggestionChips(
+                          suggestion: suggestion,
+                          onDismiss: () => onDismissSuggestion(message.id),
+                        ),
+                      ],
                     );
                   },
                 ),

@@ -162,4 +162,10 @@ abstract final class AppTexts {
       'Panggilan belum bisa dimulai. Hubungi $phone lewat aplikasi telepon.';
 
   static String crisisCallContact(String name) => 'Hubungi $name';
+
+  // Saran tindakan di bawah balasan (CMP-M05, FR-M008). Teks panjang saran tidak disalin dari
+  // web (RULE-049): chip hanya berlabel tujuan.
+  static const String suggestionContacts = 'Lihat kontak bantuan';
+  static const String suggestionConsultation = 'Bicara dengan profesional';
+  static const String suggestionDismiss = 'Tutup saran';
 }

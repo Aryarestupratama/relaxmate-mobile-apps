@@ -1,13 +1,15 @@
 # Panduan Uji TASK-M025 (Crisis Response)
 
 ## 1. Persiapan
+`shared_preferences` sudah tertulis di `pubspec.yaml` (`^2.5.0`). Jalankan:
 ```bash
-flutter pub add shared_preferences
 flutter pub get
 dart format .
 flutter analyze
 ```
-Perbaiki temuan `analyze` bila ada (sandbox tidak punya Flutter, jadi kode belum pernah dianalisis).
+- `flutter analyze` harus **bersih** (sebelumnya 4 temuan karena paket ini belum ada). Bila ada temuan lain, kirim persis seperti keluarannya.
+- `pubspec.lock` akan berubah; **ikut di-commit**.
+- `shared_preferences` adalah plugin native: **hentikan aplikasi lalu jalankan ulang penuh** (bukan hot reload/hot restart), kalau tidak muncul `MissingPluginException`. Kalau tetap muncul: `flutter clean`, `flutter pub get`, jalankan ulang.
 
 ## 2. Jalankan mock dan aplikasi
 ```bash

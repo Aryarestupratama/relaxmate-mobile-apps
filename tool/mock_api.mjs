@@ -30,6 +30,8 @@
 //                   GET /__slow-ai           POST pesan berikutnya dijawab setelah 25 detik (meniru timeout klien, sekali)
 //                   GET /__close-day         POST pesan berikutnya: 409 conversation_closed, percakapan baru (sekali)
 //                   GET /__set-sent?email=...&n=19  atur jumlah pesan terkirim hari ini (uji batas harian)
+//                 Saran (TASK-M026): pesan berisi "saran profesional", "saran dukungan", atau "saran baru" dibalas
+//                 dengan saran tindakan (recommend_professional, recommend_support, jenis tak dikenal).
 //                 Krisis (TASK-M025): pesan berisi "uji krisis" dibalas Crisis Response tetap (is_crisis true)
 //                 dan percakapan bertanda has_crisis. GET /crisis-contacts (API-M011) memuat satu kontak asli
 //                 dan satu kontak bertanda dummy (tidak boleh tampil di build prod).
@@ -211,7 +213,7 @@ function chatOf(user) {
   return user.chat;
 }
 
-function chatMessage(role, content, isCrisis = false) {
+function chatMessage(role, content, isCrisis = false, suggestion = null) {
   const now = new Date();
   messageSeq += 1;
   return {
@@ -220,13 +222,25 @@ function chatMessage(role, content, isCrisis = false) {
     content,
     time: `${String((now.getUTCHours() + 7) % 24).padStart(2, '0')}.${String(now.getUTCMinutes()).padStart(2, '0')} WIB`,
     is_crisis: isCrisis,
-    suggestion: null,
+    suggestion,
     created_at: now.toISOString(),
   };
 }
 
 // Sama dengan App\\Support\\CrisisResponse::TEXT di repo web (teks tetap, bukan keluaran AI).
 const CRISIS_TEXT = 'Aku mendengarmu, dan aku senang kamu mau bercerita. Kamu tidak harus menghadapi ini sendirian. Kalau kamu berpikir untuk menyakiti dirimu sendiri, tolong hubungi bantuan sekarang atau minta seseorang yang kamu percaya menemanimu.';
+
+// Saran tindakan tiruan (TASK-M026): kata pemicu di pesan pengguna.
+//   "saran profesional" -> recommend_professional (prioritas 2, bisa ditutup)
+//   "saran dukungan"    -> recommend_support (prioritas 3, bisa ditutup)
+//   "saran baru"        -> jenis tak dikenal (harus diabaikan klien)
+function suggestionFor(content) {
+  const text = content.toLowerCase();
+  if (text.includes('saran profesional')) return { type: 'recommend_professional', priority: 2, dismissible: true };
+  if (text.includes('saran dukungan')) return { type: 'recommend_support', priority: 3, dismissible: true };
+  if (text.includes('saran baru')) return { type: 'jenis_baru_dari_server', priority: 2, dismissible: true };
+  return null;
+}
 
 function crisisContacts() {
   const contacts = [
@@ -499,8 +513,8 @@ async function authApi(req, res, path) {
       chat.hasCrisis = true;
     }
     const reply = crisis
-      ? chatMessage('assistant', CRISIS_TEXT, true)
-      : chatMessage('assistant', `Aku mendengarmu. Kamu bilang: "${target.content}"`);
+      ? chatMessage('assistant', CRISIS_TEXT, true, { type: 'escalate_crisis', priority: 1, dismissible: false })
+      : chatMessage('assistant', `Aku mendengarmu. Kamu bilang: "${target.content}"`, false, suggestionFor(target.content));
     chat.messages.push(reply);
     return send(res, 200, {
       data: { user_message: target, assistant_message: reply, has_crisis: chat.hasCrisis, remaining_today: chatLimits(chat).remaining_today },
@@ -597,6 +611,10 @@ function devHelpers(req, res, url) {
   if (url.pathname === '/__reset') {
     resetData();
     sendText(res, 200, 'Data dikembalikan ke awal.');
+    return true;
+  }
+  if (url.pathname === '/konsultasi') {
+    sendHtml(res, '<h1>Konsultasi Profesional (halaman tiruan)</h1><p>Halaman asli ada di website RelaxBoss.</p>');
     return true;
   }
   if (url.pathname === '/ketentuan') {

@@ -79,8 +79,7 @@ class CrisisBanner extends ConsumerWidget {
                 ],
               ),
               TextButton(
-                style:
-                    TextButton.styleFrom(foregroundColor: colors.crisisText),
+                style: TextButton.styleFrom(foregroundColor: colors.crisisText),
                 onPressed: () => context.push(AppRoutes.crisisContacts),
                 child: const Text(AppTexts.crisisSeeAll),
               ),
