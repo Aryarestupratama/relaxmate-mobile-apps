@@ -25,6 +25,7 @@ class ChatReady extends ChatState {
     required this.messages,
     required this.limits,
     required this.unanswered,
+    this.hasCrisis = false,
     this.sending = false,
     this.error,
   });
@@ -35,6 +36,7 @@ class ChatReady extends ChatState {
       messages: day.messages,
       limits: day.limits,
       unanswered: day.unanswered,
+      hasCrisis: day.hasCrisis,
       error: error,
     );
   }
@@ -48,6 +50,10 @@ class ChatReady extends ChatState {
   /// Pesan terakhir pengguna belum dijawab: galat disertai "Coba lagi".
   final bool unanswered;
 
+  /// Krisis terdeteksi di Percakapan hari ini: `CrisisBanner` menempel di atas daftar dan
+  /// tidak dapat ditutup (FR-M010).
+  final bool hasCrisis;
+
   /// Permintaan kirim atau ulang sedang berjalan (indikator "sedang menulis").
   final bool sending;
 
@@ -60,6 +66,7 @@ class ChatReady extends ChatState {
     List<ChatMessage>? messages,
     ChatLimits? limits,
     bool? unanswered,
+    bool? hasCrisis,
     bool? sending,
     String? error,
     bool clearError = false,
@@ -69,6 +76,7 @@ class ChatReady extends ChatState {
       messages: messages ?? this.messages,
       limits: limits ?? this.limits,
       unanswered: unanswered ?? this.unanswered,
+      hasCrisis: hasCrisis ?? this.hasCrisis,
       sending: sending ?? this.sending,
       error: clearError ? null : (error ?? this.error),
     );

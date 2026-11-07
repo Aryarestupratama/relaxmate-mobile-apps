@@ -6,8 +6,9 @@ import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/features/chat/data/chat_message.dart';
 
 /// CMP-M02: gelembung pesan. Pengguna rata kanan (`softLavender`), RelaxMate rata kiri
-/// (`surfaceAlt`). Isi ditampilkan sebagai teks biasa. [announce] membuat pembaca layar
-/// mengumumkan pesan baru dengan sopan.
+/// (`surfaceAlt`). Balasan Crisis Response memakai warna krisis (`crisisBg`/`crisisText`)
+/// dan tidak mengandalkan warna saja: banner dan teks tetap menyertainya. Isi ditampilkan
+/// sebagai teks biasa. [announce] membuat pembaca layar mengumumkan pesan baru dengan sopan.
 class ChatBubble extends StatelessWidget {
   const ChatBubble({required this.message, this.announce = false, super.key});
 
@@ -25,6 +26,11 @@ class ChatBubble extends StatelessWidget {
     final maxWidth =
         MediaQuery.sizeOf(context).width * RbSize.bubbleMaxWidthFactor;
     final speaker = isUser ? AppTexts.chatYouSaid : AppTexts.chatMateSaid;
+    final crisis = message.isCrisis && !isUser;
+    final background = isUser
+        ? colors.softLavender
+        : (crisis ? colors.crisisBg : colors.surfaceAlt);
+    final foreground = crisis ? colors.crisisText : colors.text;
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: space.xxs),
@@ -43,7 +49,7 @@ class ChatBubble extends StatelessWidget {
                 vertical: space.sm,
               ),
               decoration: BoxDecoration(
-                color: isUser ? colors.softLavender : colors.surfaceAlt,
+                color: background,
                 borderRadius: BorderRadius.only(
                   topLeft: radius,
                   topRight: radius,
@@ -55,7 +61,10 @@ class ChatBubble extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Text(message.content, style: text.body),
+                  Text(
+                    message.content,
+                    style: text.body.copyWith(color: foreground),
+                  ),
                   if (message.time.isNotEmpty) ...<Widget>[
                     SizedBox(height: space.xxs),
                     Text(

@@ -27,9 +27,10 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # Folder aset lain (audio/clips, crisis, texts) didaftarkan pada task yang mengisinya.
+  # Folder aset lain (audio/clips, texts) didaftarkan pada task yang mengisinya.
   assets:
     - assets/images/mascot/
+    - assets/crisis/
 
   fonts:
     - family: PlusJakartaSans

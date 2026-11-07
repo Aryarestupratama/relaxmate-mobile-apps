@@ -2,18 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
+import 'package:relaxmate/features/crisis/ui/crisis_contacts_list.dart';
 import 'package:relaxmate/features/startup/data/store_launcher.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar_size.dart';
 
 /// SCR-M20: layar "Perbarui aplikasi" saat versi terpasang terlalu lama.
-/// TODO(TASK-M025): tambahkan tautan Kontak bantuan di layar ini
-/// (bantuan nyata tidak boleh tersembunyi, Design-M prinsip 4).
-class UpdateRequiredScreen extends ConsumerWidget {
+///
+/// Layar ini berada di luar router (dipasang `StartupGate`), jadi kontak bantuan
+/// ditampilkan di tempat, bukan lewat rute (Design-M prinsip 4, TASK-M025).
+class UpdateRequiredScreen extends ConsumerStatefulWidget {
   const UpdateRequiredScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<UpdateRequiredScreen> createState() =>
+      _UpdateRequiredScreenState();
+}
+
+class _UpdateRequiredScreenState extends ConsumerState<UpdateRequiredScreen> {
+  bool _showHelp = false;
+
+  @override
+  Widget build(BuildContext context) {
     final colors = context.rbColors;
     final text = context.rbText;
     final space = context.rbSpace;
@@ -44,9 +54,17 @@ class UpdateRequiredScreen extends ConsumerWidget {
                 ),
                 SizedBox(height: space.lg),
                 FilledButton(
-                  onPressed: () => _openStore(context, ref),
+                  onPressed: _openStore,
                   child: const Text(AppTexts.updateAction),
                 ),
+                SizedBox(height: space.md),
+                if (_showHelp)
+                  const CrisisContactsList()
+                else
+                  TextButton(
+                    onPressed: () => setState(() => _showHelp = true),
+                    child: const Text(AppTexts.crisisNeedHelp),
+                  ),
               ],
             ),
           ),
@@ -55,9 +73,9 @@ class UpdateRequiredScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _openStore(BuildContext context, WidgetRef ref) async {
+  Future<void> _openStore() async {
     final opened = await ref.read(storeLauncherProvider).openStore();
-    if (!opened && context.mounted) {
+    if (!opened && mounted) {
       ScaffoldMessenger.maybeOf(context)?.showSnackBar(
         const SnackBar(content: Text(AppTexts.storeOpenFailed)),
       );

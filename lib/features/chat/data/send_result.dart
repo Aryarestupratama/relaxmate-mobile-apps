@@ -7,11 +7,15 @@ class SendResult {
     required this.userMessage,
     required this.assistantMessage,
     required this.remainingToday,
+    required this.hasCrisis,
   });
 
   final ChatMessage userMessage;
   final ChatMessage assistantMessage;
   final int remainingToday;
+
+  /// Krisis terdeteksi di Percakapan ini (termasuk pesan sebelumnya hari ini).
+  final bool hasCrisis;
 
   /// `null` bila bentuknya tidak sesuai kontrak.
   static SendResult? tryParse(JsonMap json) {
@@ -25,6 +29,7 @@ class SendResult {
       userMessage: user,
       assistantMessage: assistant,
       remainingToday: remaining,
+      hasCrisis: json['has_crisis'] == true,
     );
   }
 }

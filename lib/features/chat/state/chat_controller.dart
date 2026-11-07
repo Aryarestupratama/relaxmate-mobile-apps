@@ -122,6 +122,8 @@ class ChatController extends Notifier<ChatState> {
       ],
       limits: now.limits.withRemaining(result.remainingToday),
       unanswered: false,
+      // Sekali krisis terdeteksi, banner bertahan sepanjang Percakapan hari itu.
+      hasCrisis: now.hasCrisis || result.hasCrisis,
       sending: false,
       clearError: true,
     );

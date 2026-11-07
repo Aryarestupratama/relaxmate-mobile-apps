@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:relaxmate/core/router/app_routes.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_radius.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
@@ -10,6 +13,7 @@ import 'package:relaxmate/features/chat/state/send_outcome.dart';
 import 'package:relaxmate/features/chat/ui/chat_bubble.dart';
 import 'package:relaxmate/features/chat/ui/chat_input_bar.dart';
 import 'package:relaxmate/features/chat/ui/typing_indicator.dart';
+import 'package:relaxmate/features/crisis/ui/crisis_banner.dart';
 import 'package:relaxmate/shared/widgets/error_alert.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar_size.dart';
@@ -59,6 +63,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       appBar: AppBar(
         title: const _ChatTitle(),
         actions: <Widget>[
+          // Jalur ke bantuan nyata selalu terlihat, tidak tersembunyi di menu (Design-M
+          // prinsip 4).
+          IconButton(
+            onPressed: () => context.push(AppRoutes.crisisContacts),
+            tooltip: AppTexts.crisisMenuTooltip,
+            icon: const Icon(LucideIcons.phone),
+          ),
           TextButton(
             onPressed: ref.read(authControllerProvider.notifier).logout,
             child: const Text(AppTexts.logout),
@@ -141,6 +152,7 @@ class _ChatBody extends StatelessWidget {
 
     return Column(
       children: <Widget>[
+        if (ready.hasCrisis) const CrisisBanner(),
         Expanded(
           child: newestFirst.isEmpty
               ? Center(
@@ -180,13 +192,22 @@ class _ChatBody extends StatelessWidget {
         if (ready.limitReached)
           Padding(
             padding: EdgeInsets.all(space.md),
-            child: Semantics(
-              liveRegion: true,
-              child: Text(
-                AppTexts.chatDailyLimit,
-                textAlign: TextAlign.center,
-                style: text.small.copyWith(color: colors.textSecondary),
-              ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Semantics(
+                  liveRegion: true,
+                  child: Text(
+                    AppTexts.chatDailyLimit,
+                    textAlign: TextAlign.center,
+                    style: text.small.copyWith(color: colors.textSecondary),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => context.push(AppRoutes.crisisContacts),
+                  child: const Text(AppTexts.crisisSeeAll),
+                ),
+              ],
             ),
           )
         else ...<Widget>[

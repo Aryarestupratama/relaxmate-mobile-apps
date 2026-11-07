@@ -1,0 +1,12 @@
+{
+  "version": "bundled",
+  "contacts": [
+    {
+      "name": "Healing119.id (Kementerian Kesehatan)",
+      "phone": "119 ext 8",
+      "url": "https://www.healing119.id",
+      "note": "Layanan konseling gratis, 24 jam.",
+      "dummy": false
+    }
+  ]
+}

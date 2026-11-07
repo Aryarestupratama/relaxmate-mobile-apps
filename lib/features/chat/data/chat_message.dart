@@ -3,13 +3,14 @@ import 'package:relaxmate/core/api/json_map.dart';
 enum ChatRole { user, assistant }
 
 /// Satu pesan dalam aliran harian (objek `message` API-M012, M013, M016). Hanya kolom yang
-/// dipakai layar chat yang dibaca; `is_crisis` dan `suggestion` menyusul di TASK-M025 dan M026.
+/// dipakai layar chat yang dibaca; `suggestion` menyusul di TASK-M026.
 class ChatMessage {
   const ChatMessage({
     required this.id,
     required this.role,
     required this.content,
     required this.time,
+    this.isCrisis = false,
   });
 
   /// Pesan pengguna yang baru dikirim dan belum dikonfirmasi server.
@@ -24,6 +25,9 @@ class ChatMessage {
 
   /// Teks waktu WIB siap tampil dari server (mis. "14.30 WIB"); kosong untuk pesan tertunda.
   final String time;
+
+  /// Balasan Crisis Response (`is_crisis`): gelembung memakai warna krisis (CMP-M02).
+  final bool isCrisis;
 
   bool get isPending => id == pendingId;
 
@@ -48,6 +52,7 @@ class ChatMessage {
       role: role,
       content: content,
       time: time is String ? time : '',
+      isCrisis: value['is_crisis'] == true,
     );
   }
 }

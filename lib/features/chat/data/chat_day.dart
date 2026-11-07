@@ -9,6 +9,7 @@ class ChatDay {
     required this.messages,
     required this.unanswered,
     required this.limits,
+    required this.hasCrisis,
   });
 
   final String conversationId;
@@ -17,6 +18,9 @@ class ChatDay {
   /// Pesan terakhir adalah pesan pengguna tanpa balasan (mis. AI gagal): tampilkan "Coba lagi".
   final bool unanswered;
   final ChatLimits limits;
+
+  /// Krisis pernah terdeteksi di Percakapan hari ini: `CrisisBanner` tampil (FR-M010).
+  final bool hasCrisis;
 
   /// `null` bila bentuknya tidak sesuai kontrak (satu pesan rusak membuat seluruhnya ditolak).
   static ChatDay? tryParse(JsonMap json) {
@@ -47,6 +51,7 @@ class ChatDay {
       messages: messages,
       unanswered: json['unanswered'] == true,
       limits: limits,
+      hasCrisis: conversation['has_crisis'] == true,
     );
   }
 }

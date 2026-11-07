@@ -137,4 +137,29 @@ abstract final class AppTexts {
 
   static String chatRemaining(int remaining, int perDay) =>
       'Sisa pesan hari ini: $remaining dari $perDay';
+
+  // Kontak bantuan dan Crisis Response (SCR-M16, CMP-M04). Teks tetap di klien, bukan
+  // keluaran AI (FR-M011). Daftar kontak sendiri dari server atau aset, bukan dari sini.
+  static const String crisisContactsTitle = 'Kontak bantuan';
+  static const String crisisContactsIntro =
+      'Kalau kamu butuh bicara dengan manusia sekarang, hubungi layanan di '
+      'bawah ini. Kamu tidak harus menghadapi ini sendirian.';
+  static const String crisisContactsEmergency =
+      'Kalau ada bahaya langsung bagi dirimu atau orang lain, hubungi layanan '
+      'darurat setempat.';
+  static const String crisisBannerTitle = 'Kamu tidak sendirian';
+  static const String crisisBannerBody =
+      'Kalau kamu berpikir untuk menyakiti dirimu sendiri, tolong hubungi '
+      'bantuan sekarang atau minta seseorang yang kamu percaya menemanimu.';
+  static const String crisisSeeAll = 'Lihat semua kontak bantuan';
+  static const String crisisCall = 'Telepon';
+  static const String crisisOpenSite = 'Buka situs';
+  static const String crisisNeedHelp =
+      'Butuh bantuan sekarang? Lihat kontak bantuan';
+  static const String crisisMenuTooltip = 'Kontak bantuan';
+
+  static String crisisCallFailed(String phone) =>
+      'Panggilan belum bisa dimulai. Hubungi $phone lewat aplikasi telepon.';
+
+  static String crisisCallContact(String name) => 'Hubungi $name';
 }

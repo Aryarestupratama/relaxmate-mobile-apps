@@ -30,11 +30,16 @@
 //                   GET /__slow-ai           POST pesan berikutnya dijawab setelah 25 detik (meniru timeout klien, sekali)
 //                   GET /__close-day         POST pesan berikutnya: 409 conversation_closed, percakapan baru (sekali)
 //                   GET /__set-sent?email=...&n=19  atur jumlah pesan terkirim hari ini (uji batas harian)
+//                 Krisis (TASK-M025): pesan berisi "uji krisis" dibalas Crisis Response tetap (is_crisis true)
+//                 dan percakapan bertanda has_crisis. GET /crisis-contacts (API-M011) memuat satu kontak asli
+//                 dan satu kontak bertanda dummy (tidak boleh tampil di build prod).
+//                   GET /__contacts-v2       ganti isi daftar kontak (versi baru) untuk uji penyegaran cache
+//                   GET /__contacts-v1       kembalikan daftar awal
 //                 Halaman /ketentuan dan /privasi disajikan sebagai teks tiruan.
 //                 Batas tiruan: daftar 5/menit, login gagal 5/menit per email, kirim ulang 3/jam.
 //
 // Log hanya memuat metode, path, status, dan versi aplikasi (tidak ada token, email, atau isi pesan).
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import http from 'node:http';
 
 const mode = process.argv[2] ?? 'ok';
@@ -90,6 +95,7 @@ let failConsentOnce = false;
 let failAiOnce = false;
 let slowAiOnce = false;
 let closeDayOnce = false;
+let contactsVariant = 1; // 1 = daftar awal, 2 = daftar berubah (uji penyegaran cache)
 let messageSeq = 100;
 
 const CHAT_PER_DAY = 20;
@@ -108,6 +114,7 @@ function resetData() {
   failAiOnce = false;
   slowAiOnce = false;
   closeDayOnce = false;
+  contactsVariant = 1;
   const seed = [
     ['Akun Terverifikasi', 'verified@example.test', true, true],
     ['Akun Belum Verifikasi', 'unverified@example.test', false, true],
@@ -199,12 +206,12 @@ function consentState(user) {
 
 function chatOf(user) {
   if (!user.chat) {
-    user.chat = { id: randomUUID(), messages: [], sent: 0 };
+    user.chat = { id: randomUUID(), messages: [], sent: 0, hasCrisis: false };
   }
   return user.chat;
 }
 
-function chatMessage(role, content) {
+function chatMessage(role, content, isCrisis = false) {
   const now = new Date();
   messageSeq += 1;
   return {
@@ -212,10 +219,25 @@ function chatMessage(role, content) {
     role,
     content,
     time: `${String((now.getUTCHours() + 7) % 24).padStart(2, '0')}.${String(now.getUTCMinutes()).padStart(2, '0')} WIB`,
-    is_crisis: false,
+    is_crisis: isCrisis,
     suggestion: null,
     created_at: now.toISOString(),
   };
+}
+
+// Sama dengan App\\Support\\CrisisResponse::TEXT di repo web (teks tetap, bukan keluaran AI).
+const CRISIS_TEXT = 'Aku mendengarmu, dan aku senang kamu mau bercerita. Kamu tidak harus menghadapi ini sendirian. Kalau kamu berpikir untuk menyakiti dirimu sendiri, tolong hubungi bantuan sekarang atau minta seseorang yang kamu percaya menemanimu.';
+
+function crisisContacts() {
+  const contacts = [
+    { name: 'Healing119.id (Kementerian Kesehatan)', phone: '119 ext 8', url: 'https://www.healing119.id', note: 'Layanan konseling gratis, 24 jam.', dummy: false },
+    { name: 'Kontak Contoh (dummy)', phone: '021 0000 0000', url: null, note: 'Hanya untuk uji. Tidak boleh tampil di build prod.', dummy: true },
+  ];
+  if (contactsVariant === 2) {
+    contacts.push({ name: 'Layanan Baru Contoh', phone: '+62 812 3456 789', url: 'https://example.test/bantuan', note: 'Muncul setelah daftar berubah.', dummy: false });
+  }
+  const version = createHash('sha1').update(JSON.stringify(contacts)).digest('hex').slice(0, 12);
+  return { version, contacts };
 }
 
 function chatLimits(chat) {
@@ -421,7 +443,7 @@ async function authApi(req, res, path) {
     const last = chat.messages[chat.messages.length - 1];
     return send(res, 200, {
       data: {
-        conversation: { id: chat.id, has_crisis: false, day: new Date().toISOString().slice(0, 10), created_at: new Date().toISOString() },
+        conversation: { id: chat.id, has_crisis: chat.hasCrisis, day: new Date().toISOString().slice(0, 10), created_at: new Date().toISOString() },
         messages: chat.messages,
         unanswered: last !== undefined && last.role === 'user',
         limits: chatLimits(chat),
@@ -436,7 +458,7 @@ async function authApi(req, res, path) {
     const chat = chatOf(user);
     if (closeDayOnce) {
       closeDayOnce = false;
-      user.chat = { id: randomUUID(), messages: [], sent: 0 };
+      user.chat = { id: randomUUID(), messages: [], sent: 0, hasCrisis: false };
       return apiError(res, 409, 'conversation_closed', 'Percakapan ini sudah berganti hari. Kita mulai yang baru, ya.');
     }
     if (sendMatch[1] !== chat.id) {
@@ -472,11 +494,23 @@ async function authApi(req, res, path) {
       slowAiOnce = false;
       await new Promise((resolve) => setTimeout(resolve, 25000));
     }
-    const reply = chatMessage('assistant', `Aku mendengarmu. Kamu bilang: "${target.content}"`);
+    const crisis = target.content.toLowerCase().includes('uji krisis');
+    if (crisis) {
+      chat.hasCrisis = true;
+    }
+    const reply = crisis
+      ? chatMessage('assistant', CRISIS_TEXT, true)
+      : chatMessage('assistant', `Aku mendengarmu. Kamu bilang: "${target.content}"`);
     chat.messages.push(reply);
     return send(res, 200, {
-      data: { user_message: target, assistant_message: reply, has_crisis: false, remaining_today: chatLimits(chat).remaining_today },
+      data: { user_message: target, assistant_message: reply, has_crisis: chat.hasCrisis, remaining_today: chatLimits(chat).remaining_today },
     });
+  }
+
+  if (method === 'GET' && path === '/api/v1/crisis-contacts') {
+    const user = authedUser(req, res);
+    if (!user) return undefined;
+    return send(res, 200, { data: crisisContacts() });
   }
 
   if (method === 'GET' && path === '/api/v1/me') {
@@ -553,6 +587,11 @@ function devHelpers(req, res, url) {
   if (url.pathname === '/__fail-training') {
     failTrainingOnce = true;
     sendText(res, 200, 'POST persetujuan pelatihan berikutnya akan dijawab 503 satu kali.');
+    return true;
+  }
+  if (url.pathname === '/__contacts-v1' || url.pathname === '/__contacts-v2') {
+    contactsVariant = url.pathname === '/__contacts-v2' ? 2 : 1;
+    sendText(res, 200, `Daftar kontak: varian ${contactsVariant}, versi ${crisisContacts().version}`);
     return true;
   }
   if (url.pathname === '/__reset') {

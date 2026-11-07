@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:relaxmate/core/router/app_routes.dart';
+import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar.dart';
 
@@ -6,8 +9,7 @@ import 'package:relaxmate/shared/widgets/mate_avatar.dart';
 /// bisa diperiksa): avatar, judul, keterangan, lalu isi. Bisa digulir agar muat saat
 /// keyboard terbuka dan saat teks 200% (RULE-M055).
 ///
-/// TODO(TASK-M025): tambahkan tautan Kontak bantuan di kerangka ini
-/// (bantuan nyata tidak boleh tersembunyi, Design-M prinsip 4).
+/// Tautan Kontak bantuan selalu ada di bawah isi (Design-M prinsip 4, TASK-M025).
 class AuthScaffold extends StatelessWidget {
   const AuthScaffold({
     required this.title,
@@ -56,6 +58,11 @@ class AuthScaffold extends StatelessWidget {
                 ],
                 SizedBox(height: space.lg),
                 ...children,
+                SizedBox(height: space.md),
+                TextButton(
+                  onPressed: () => context.push(AppRoutes.crisisContacts),
+                  child: const Text(AppTexts.crisisNeedHelp),
+                ),
               ],
             ),
           ),

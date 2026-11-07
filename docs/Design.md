@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Design System dan Spesifikasi Layar
-Version: 0.7 | Status: Draft | Last updated: 2026-11-06
+Version: 0.8 | Status: Draft | Last updated: 2026-11-07
 Depends on: PRD-Mobile v0.3, Architecture-Mobile v0.3, Design RelaxBoss (web) | Owner: Founder (solo developer)
 
 Label: `[Assumption]` bisa diubah. Kedalaman: **Lite**. Platform: Android (phone) dulu, mode terang. Tata letak layar yang tidak tertulis dibangun sederhana (fungsi dulu) memakai token dan komponen di dokumen ini (RULE-M007).
@@ -98,7 +98,7 @@ Teks layar penting (judul sambutan, krisis) tidak lebih kecil dari 16sp.
 | CMP-M01 | `MateAvatar` | Lingkaran 40/56/72dp berisi avatar RelaxMate (aset web) di atas `softLavender`. Dibangun di TASK-M020 (`MateAvatar`, ukuran `small`/`medium`/`large`) |
 | CMP-M02 | `ChatBubble` (dibangun di TASK-M024; lebar maks. 80% = `RbSize.bubbleMaxWidthFactor`, waktu WIB kecil di bawah isi, tanpa `MateAvatar` kecil) | Pengguna: rata kanan, `softLavender`; RelaxMate: rata kiri, `surfaceAlt` + `MateAvatar` kecil; radius 20 (sudut dekat pengirim 6); teks isi; lebar maks. 80% layar; teks biasa; `Semantics` "RelaxMate berkata: ..." |
 | CMP-M03 | `TypingIndicator` (TASK-M024: versi teks "RelaxMate sedang menulis..."; titik beranimasi menyusul di M030) | Tiga titik navy bergantian di gelembung RelaxMate; teks tersembunyi "RelaxMate sedang menulis" untuk TalkBack; maks. 20 detik |
-| CMP-M04 | `CrisisBanner` | Latar `crisisBg`, teks `crisisText`, ikon, tombol "Hubungi bantuan" (`tel:`); menempel di atas daftar pesan, **tidak dapat ditutup** setelah krisis terdeteksi |
+| CMP-M04 | `CrisisBanner` | Latar `crisisBg`, teks `crisisText`, judul "Kamu tidak sendirian", maksimal 2 tombol telepon (`tel:`) dan tautan "Lihat semua kontak bantuan"; menempel di atas daftar pesan, **tidak dapat ditutup**; tinggi maksimal 40% layar dan isinya bisa digulir (teks 200%) |
 | CMP-M05 | `SuggestionChip` | Pil putih berbingkai navy 2dp, label + ikon; di bawah balasan; chip `escalate_crisis` tidak dapat ditutup |
 | CMP-M06 | `ChatInputBar` (TASK-M024: tanpa mikrofon, tombol kirim `IconButton.filled` berikon Lucide `send`; kolom tetap bisa diketik saat pesan diproses) | Kolom teks 1-4 baris (`inputBorder`), placeholder, tombol mikrofon (kiri tombol kirim), tombol kirim navy; dinonaktifkan dengan penjelasan saat batas harian tercapai |
 | CMP-M07 | `VoiceButton` | Lingkaran 56dp navy dengan ikon mikrofon; keadaan idle, mendengarkan (cincin berdenyut), nonaktif; selalu ada label teks |
@@ -146,7 +146,7 @@ Teks layar penting (judul sambutan, krisis) tidak lebih kecil dari 16sp.
 
 Pemeriksaan versi berjalan **sekali per pembukaan aplikasi** (bukan saat kembali dari latar belakang) dan membungkus seluruh router lewat `StartupGate` di `MaterialApp.builder`; selama pemeriksaan (maks. 5 detik) hanya `SplashView` yang tampil. Judul SCR-M20 diberi `Semantics(header: true)` `[Verified]`.
 
-Utang: SCR-M20 dan semua layar tamu dan sesi (`AuthScaffold`) belum memuat tautan Kontak bantuan; Design-M prinsip 4 mewajibkan bantuan nyata tidak tersembunyi (`TODO(TASK-M025)`).
+Bantuan (TASK-M025 `[Verified: kode, belum diuji manual]`): semua layar tamu dan sesi (`AuthScaffold`, termasuk consent) memuat tautan "Butuh bantuan sekarang? Lihat kontak bantuan"; SCR-M20 memuat tautan yang sama dan membuka daftar kontak inline (layar di luar router); SCR-M08 memiliki ikon telepon di AppBar, banner krisis saat `has_crisis`, dan tombol "Lihat semua kontak bantuan" saat batas harian tercapai. SCR-M16 `CrisisContactsScreen` (`/kontak-bantuan`): AppBar "Kontak bantuan", kalimat pengantar, kartu kontak (nama, catatan, nomor, tombol "Telepon" dan "Buka situs"), catatan darurat; loading memakai indikator, galat memakai `ErrorAlert`. Kegagalan membuka `tel:` atau situs menampilkan `Snack`. Teks baru ada di `AppTexts` (`crisis*`).
 
 ---
 
@@ -321,6 +321,7 @@ Ikon: satu set (`[Assumption]` Lucide untuk Flutter), ukuran 24dp, stroke 2. OQ-
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.8 | 2026-11-07 | TASK-M025: CMP-M04 dan SCR-M16 diimplementasikan, tautan bantuan di layar tamu, sesi, consent, SCR-M20 dan SCR-M08, utang bantuan dihapus. |
 | 0.7 | 2026-11-07 | TASK-M024: SCR-M08 diganti `ChatScreen` aliran harian, catatan CMP-M02, M03, M06, bank teks chat, keputusan paket ikon Lucide. |
 | 0.6 | 2026-11-06 | TASK-M023: SCR-M07 di bagian 4.1, CMP-M14 diterapkan sebagai `ConsentScreen` layar penuh, CMP-M20 `ConsentChoiceTile`, token tebal garis, bank teks consent, OQ-D3 ditutup. |
 | 0.5 | 2026-11-06 | TASK-M022: status layar SCR-M03 sampai M06 dan layar sesi di bagian 4.1; bank teks auth; `ErrorAlert` diterapkan; A-D6, A-D7; ikon sementara; OQ-D3 digeser ke M023. |

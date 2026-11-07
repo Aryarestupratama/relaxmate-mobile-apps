@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Progress
-Version: 0.13 | Status: Living document | Last updated: 2026-11-07
+Version: 0.14 | Status: Living document | Last updated: 2026-11-07
 Owner: Founder (solo developer)
 
 Dokumen ini dibaca pertama setiap mulai bekerja di proyek mobile. Perbarui di akhir setiap task atau sesi. Dokumen proyek disimpan **di luar repo kode** (RULE-M014). Task di sisi backend (repo web RelaxBoss) mengikuti `Rules.md` web dan juga dicatat di sini, dengan awalan `TASK-M`, agar satu sumber kebenaran untuk fitur mobile. Perubahan di repo web tetap mengikuti Doc Sync web (`progress.md` web diperbarui bila menyentuh perilaku web).
@@ -10,12 +10,12 @@ Dokumen ini dibaca pertama setiap mulai bekerja di proyek mobile. Perbarui di ak
 
 | Hal | Status terbaru |
 |---|---|
-| Tahap | Implementasi berjalan. Selesai (uji manual lolos): **TASK-M010 sampai M017** (seluruh backend MM1, repo web), **M020, M021, M022, M023** (Flutter; M023 lolos 2026-11-07). **MM1 (Backend API) selesai** kecuali prasyarat rilis web. **TASK-M024** (layar chat harian, mobile) kodenya selesai dan **menunggu uji manual founder**. Dokumen mobile: PRD v0.4, Architecture v0.9, Schema v0.1 (**perlu pembaruan**, lihat Utang dokumen), Design v0.7, Rules v0.8, progress v0.13. Sejak 2026-11-06 **dokumen mengikuti kode**. |
-| Berikutnya | Uji manual **TASK-M024** (butuh `flutter pub add lucide_icons_flutter`, lihat panduan uji), lalu mobile **M025** (Crisis Response: banner permanen dan kontak bantuan). **Peringatan:** sampai M025 selesai, layar chat belum punya banner krisis; aplikasi hanya untuk pengembangan. TASK-M001 (menutup dokumen) tersisa sebagian. |
+| Tahap | Implementasi berjalan. Selesai (uji manual lolos): **TASK-M010 sampai M017** (seluruh backend MM1, repo web), **M020, M021, M022, M023** (Flutter; M023 lolos 2026-11-07). **MM1 (Backend API) selesai** kecuali prasyarat rilis web. **TASK-M024** (layar chat harian, mobile) kodenya selesai dan **menunggu uji manual founder**. Dokumen mobile: PRD v0.4, Architecture v0.9, Schema v0.1 (**perlu pembaruan**, lihat Utang dokumen), Design v0.7, Rules v0.8, progress v0.13. Sejak 2026-11-06 **dokumen mengikuti kode**. **TASK-M025** (Crisis Response) kode selesai 2026-11-07, menunggu uji manual. |
+| Berikutnya | Uji manual **TASK-M025** (butuh `flutter pub add shared_preferences`, lihat `docs/M025-Test-Guide.md`), lalu mobile **M026** (chip saran dan penyempurnaan chat). Uji kasus krisis lewat aplikasi dengan backend nyata dan kunci Groq dilakukan founder. |
 | Pemblokir | Prasyarat web untuk **rilis**: TASK-031 (go-live), OQ-3 (kontak krisis terverifikasi), OQ-5 (telaah hukum data AI dan pelatihan, termasuk layanan suara pihak ketiga). Tanpa itu, tidak ada rilis mobile. **Keputusan founder (sesi 2026-11-05/06, dicatat di sini sebagai keputusan tertulis):** task kode dibuka tanpa menunggu TASK-M002. TASK-M002 tetap `Blocked` dan wajib selesai sebelum TASK-M045. |
 | Alur kerja | Kerja di `main`, commit lalu push, pesan commit bahasa Inggris. Dokumen di luar repo. Uji manual wajib; tanpa CI. |
 | Data | Sebelum TASK-M044, hanya data dummy bertanda jelas (akun `example.test`, kontak krisis `dummy`). Build `prod` tidak boleh memuat dummy (RULE-M048). |
-| Versi dokumen | PRD-Mobile 0.4, Architecture-Mobile 0.9, Schema-Mobile 0.1 (**perlu pembaruan**, lihat Utang dokumen), Design-Mobile 0.7, Rules-Mobile 0.8, progress 0.13. |
+| Versi dokumen | PRD-Mobile 0.4, Architecture-Mobile 0.10, Schema-Mobile 0.1 (**perlu pembaruan**, lihat Utang dokumen), Design-Mobile 0.8, Rules-Mobile 0.9, progress 0.14. |
 
 > Status task yang perlu uji manual atau konfirmasi founder tidak dianggap terverifikasi hanya karena catatan Doc Sync sudah ditulis.
 
@@ -82,7 +82,7 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 | ID | Task | Repo | Rujukan | Status |
 |---|---|---|---|---|
 | TASK-M024 | Layar chat harian: aliran per hari, kirim, indikator mengetik, galat, "Coba lagi" (retry), sisa kuota, input nonaktif saat batas harian | M | FR-M004, M006, M007, SCR-M08 | **Doing** (kode selesai 2026-11-07; menunggu uji manual) |
-| TASK-M025 | Crisis Response: banner permanen, kontak bantuan (cache + fallback aset, bukan dummy di `prod`), tombol `tel:`, uji manual kasus krisis dari `cases.json` lewat aplikasi | M | FR-M010, M011, SCR-M16 | Todo |
+| TASK-M025 | Crisis Response: banner permanen, kontak bantuan (cache + fallback aset, bukan dummy di `prod`), tombol `tel:`, uji manual kasus krisis dari `cases.json` lewat aplikasi | M | FR-M010, M011, SCR-M16 | Doing (kode selesai, menunggu uji manual) |
 | TASK-M026 | Saran tindakan: chip dan peta intent/`suggestion.type` ke tujuan (napas, grounding, kontak, Konsultasi web) | M | FR-M008 | Todo |
 | TASK-M027 | Riwayat: garis waktu per tanggal (hanya baca) | M | FR-M005, SCR-M14, M15 | Todo |
 
@@ -133,6 +133,7 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 
 ### Catatan hasil task selesai
 
+**TASK-M025 (mobile; kode selesai 2026-11-07, uji manual belum dilakukan).** Fitur `crisis/`: `CrisisContact` (`telUri` memecah `119 ext 8` menjadi `tel:119,8`), `CrisisContactSet`, `CrisisContactsRepository` (cache `shared_preferences` lalu aset `assets/crisis/crisis_contacts.json`; API-M011 hanya untuk menyegarkan), `CrisisContactsController` (kontak `dummy` disembunyikan di flavor `prod`, tanpa percobaan ulang otomatis), `CrisisBanner` (CMP-M04, permanen, tinggi dibatasi 40% layar dan bisa digulir), `CrisisContactsScreen` (SCR-M16, `/kontak-bantuan`, terbuka di semua status auth). Tautan "Butuh bantuan sekarang?" ada di `AuthScaffold` (termasuk consent) dan layar "Perbarui aplikasi" (daftar inline karena di luar router); ikon telepon di AppBar chat. Chat membaca `has_crisis` dan `is_crisis`; gelembung krisis memakai token `crisis*`. Mock API: kata "uji krisis" memicu balasan krisis; `/__contacts-v2` dan `/__contacts-v1` untuk uji penyegaran cache. **Belum terverifikasi:** `flutter analyze`, `dart format`, build (sandbox tanpa Flutter); format `tel:` ekstensi di perangkat nyata; isi aset fallback terhadap kontak terverifikasi (OQ-3).
 **TASK-M024 (mobile; kode selesai 2026-11-07, uji manual belum dilakukan).** Fitur `chat/`: `data/` (`ChatMessage`, `ChatLimits`, `ChatDay`, `SendResult`, `ChatRepository` untuk API-M012 dan M013), `state/` (`ChatState` bertingkat: `ChatLoading`, `ChatLoadFailed`, `ChatReady`; `ChatController` autoDispose; `SendOutcome`), `ui/` (`ChatScreen` menggantikan layar sambutan, `ChatBubble`, `ChatInputBar`, `TypingIndicator`). Layar tetap dibungkus `ConsentGate`. Pesan tampil langsung sebagai pesan tertunda; galat dipilah: ditolak sebelum tersimpan (teks dikembalikan ke kolom isian), mungkin tersimpan (timeout, 5xx, 503 `ai_unavailable`: hari ini dimuat ulang dari server lalu "Coba lagi" bila `unanswered`), `conversation_closed` dan `nothing_to_retry` (muat ulang), `daily_limit` (input diganti penjelasan), `consent_required` (gerbang consent memeriksa ulang). Sisa kuota tampil sebagai teks; panjang input dibatasi dari server. Paket ikon diputuskan **Lucide**: `lucide_icons_flutter` dipasang lewat `flutter pub add` (versi tidak saya tebak), hanya `LucideIcons.send` dipakai. `is_crisis` dan `suggestion` belum dibaca (M025, M026). Teks `signedInAs` dan `devBadge` dihapus karena tidak terpakai. Tampilan sengaja sederhana (desain final belum ada). `tool/mock_api.mjs` mendapat `GET /relaxmate/today`, `POST .../messages` (balasan gema, 20 pesan/hari, `retry`), dan pembantu `/__fail-ai`, `/__slow-ai`, `/__close-day`, `/__set-sent`; semua skenario galat diuji dengan curl di sandbox. **Diperiksa di sandbox:** `dart format` gaya Dart 3.5 bersih dan `node --check`. **Belum dijalankan (sandbox tanpa Flutter): `flutter pub get`, `flutter analyze`, build, dan uji emulator.** Risiko yang saya tahu: nama ikon `LucideIcons.send` belum dapat saya verifikasi terhadap versi paket yang akan terpasang.
 
 **TASK-M017 (web; uji manual lolos 2026-11-07).** Bukti yang diberikan: potongan `storage/logs/laravel.log` (2026-11-07 00:42 sampai 01:05). Yang terbaca dari log: (a) dua akun uji `a-mw5ohdku@example.test` dan `b-mw5ohdku@example.test` (id 7 dan 8) masing-masing dikirimi email verifikasi, jadi pasangan A dan B untuk skenario isolasi sudah ada; akun A juga memicu kirim ulang verifikasi (00:42:01, 00:44:19, 00:44:34, 00:46:49) dan satu email reset sandi (00:42:07); (b) 11 panggilan chat AI berhasil (`ai.completion`: satu pada 00:48, lima pada 00:50, lima pada 00:55) dengan `key_no` bergilir 1 sampai 5; (c) pada 01:05:59 tercatat `ai.unavailable` dengan alasan `no_keys`, tampaknya skenario 503 saat kunci AI tidak tersedia. **RULE-040:** entri `ai.*` hanya memuat `feature`, `version`, `model`, `key_no`, jumlah token, dan `duration_ms`; pada potongan ini tidak ada isi pesan maupun token Sanctum. **Temuan:** mailer `log` (lokal) menulis tautan verifikasi bertanda tangan dan tautan reset sandi beserta tokennya ke `laravel.log`; wajar di lokal, tetapi menjadi kebocoran token bila `MAIL_MAILER=log` terbawa ke produksi (lihat Utang web). **Tidak bisa disimpulkan dari log:** isolasi A vs B (dibuktikan oleh respons, bukan log), batas/429 (respons 429 tidak ditulis ke log aplikasi), dan bentuk respons 503; ketiganya dikonfirmasi lolos oleh founder 2026-11-07, sehingga M017 `Done`.
@@ -195,7 +196,7 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 | OQ-MA12 | Bila pengguna menolak consent AI: aplikasi kini hanya menawarkan "Keluar" (tidak ada dashboard seperti di web, dan latihan serta kontak bantuan belum ada). Setelah TASK-M025 dan M029, apakah penolakan membawa pengguna ke layar yang hanya berisi latihan napas, grounding, dan kontak bantuan (tanpa AI)? Usulan: ya | TASK-M029 |
 | OQ-MA7 | Batas hari kuota (`ChatQuota` mulai 00.00 WIB) berbeda dari hari percakapan (`DailyConversationResolver`, 04.00 WIB). Antara 00.00 dan 04.00 keduanya tidak sejajar | **Diputuskan 2026-11-06 (opsi A)**: kuota tetap 00.00 WIB, hari percakapan 04.00 WIB; ketidaksejajaran 00.00-04.00 hanya didokumentasikan, web tidak diubah | TASK-M011 |
 | OQ-MA8 | **Ditutup 2026-11-06 (TASK-M014):** teks consent ada di `config/relaxboss.php` bagian `consent`; naikkan `ai_consent_version` atau `ai_training_consent_version` bila teks berubah. | - |
-| OQ-MA9 | Kontak krisis web memuat `119 ext 8`; format `tel:` untuk ekstensi perlu diputuskan dan diuji di perangkat | TASK-M025 |
+| OQ-MA9 | Kontak krisis web memuat `119 ext 8`; **sementara** dipakai `tel:119,8` (jeda koma, `AppConstants.telExtensionPause`). Uji di perangkat nyata; bila ekstensi tidak terkirim, coba `,,` atau tampilkan nomor dan ekstensi terpisah | TASK-M025 (uji perangkat) |
 | OQ-MA10 | Paket ikon: Lucide (`lucide_icons_flutter`, sesuai RULE-M051) atau `Icons` bawaan Material. **Diputuskan founder 2026-11-07: Lucide.** Layar lama (auth, consent, `ErrorAlert`) masih `Icons` bawaan dan dipindahkan saat disentuh lagi | TASK-M024 |
 | OQ-3, OQ-5 (web) | Kontak krisis terverifikasi; telaah hukum data AI, pelatihan, dan layanan suara | TASK-M045 |
 
@@ -230,6 +231,7 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 | Consent: hanya bagian yang kurang yang tampil; tombol utama menyimpan berurutan consent AI lalu pilihan pelatihan; "Keluar" sebagai satu-satunya alternatif sementara (OQ-MA12) | TASK-M023, FR-M002 |
 | Paket ikon: Lucide, dipasang lewat `flutter pub add` (versi tidak ditebak) | TASK-M024, OQ-MA10 |
 | Chat: pesan tertunda tampil langsung; galat dipilah "ditolak" (teks dikembalikan) vs "mungkin tersimpan" (muat ulang dari server lalu "Coba lagi"); `ChatController` autoDispose; 403 `consent_required` memicu pemeriksaan ulang gerbang consent | TASK-M024, FR-M007 |
+| Crisis Response: kontak dibaca dari cache atau aset (tidak pernah memblokir jaringan), kontak `dummy` disaring di `prod`, banner tidak dapat ditutup dan tampil selama `has_crisis` Percakapan hari itu, rute `/kontak-bantuan` dikecualikan dari redirect auth | TASK-M025, FR-M010, FR-M011, RULE-M034, RULE-M048 |
 | **Dokumen mengikuti kode:** bila dokumen dan kode berbeda, kode yang dianggap benar dan dokumen diperbarui | Keputusan founder 2026-11-06 |
 | Paket Dart `relaxmate`; flavor `dev` ber-suffix `.dev`; teks UI di `core/texts/app_texts.dart` | Architecture-M 4, 10 |
 | Sesi dimodelkan sebagai `AuthState` bertingkat (memulihkan, tamu, masuk, sesi belum bisa diperiksa); router memilih layar dari keadaan itu lewat `authRedirect` | TASK-M022, Architecture-M 4 |
@@ -254,27 +256,24 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 | Utang dokumen | Schema-Mobile belum memuat tabel `personal_access_tokens` (Schema-M bagian 2); file tidak ikut serta dalam sinkronisasi ini | Tambahkan: `id`, `tokenable_type`, `tokenable_id`, `name`, `token` (hash, unik), `abilities`, `last_used_at`, `expires_at`, `created_at`, `updated_at` |
 | Utang web | Pemasangan Sanctum ikut menaikkan 36 paket (framework v13.40.0); `composer audit` belum dilaporkan | Jalankan `composer audit` dan catat hasilnya |
 | Utang web | Mailer `log` menulis tautan verifikasi dan token reset sandi ke `laravel.log` (terlihat pada uji M017, lokal). Pastikan `MAIL_MAILER` produksi bukan `log`, dan jangan membagikan potongan log tanpa menyamarkan tautannya | Prasyarat rilis (TASK-M045) |
-| Utang mobile | Layar "Perbarui aplikasi" belum punya tautan Kontak bantuan (menyalahi Design-M prinsip 4) | `TODO(TASK-M025)`; jangan rilis sebelum M025 |
 | Utang mobile | Jalur 401 (`ApiClient` menghapus token, `SessionExpiredSignal`, lalu layar Masuk) sudah dikodekan di M022 tetapi belum diuji | Uji lewat `/__expire` di server tiruan (panduan uji M022); hapus baris ini setelah lolos |
 | Utang dokumen | Rincian uji manual TASK-M014 belum tercatat (repo hanya memuat kode) | Lengkapi di catatan hasil |
-| Utang mobile | `ServerConfig` baru membaca `min_app_version`; `crisis_contacts_version` (string 12 hex) dan `features.overlay` (boolean) sudah dikirim `/config` tetapi belum dibaca | M025 dan M033/M034 |
+| Utang mobile | `ServerConfig` baru membaca `min_app_version`; `crisis_contacts_version` sudah dikirim `/config` tetapi belum dipakai (penyegaran kontak membandingkan `version` dari API-M011), dan `features.overlay` belum dibaca | M033/M034 |
 | Utang mobile | Cek versi baru diuji dengan server tiruan; `/config` asli ada sejak M014 dan bentuknya cocok dengan parser (diperiksa lewat kode, belum dijalankan) | Uji jalan terhadap backend asli sebelum M022 |
 | Utang mobile | `android/app/build.gradle.kts`: rilis masih ditandatangani kunci debug dan ada dua `TODO` templat tanpa ID (RULE-M027) | TASK-M043; jangan rilis sebelumnya |
 | Utang mobile | Komentar di `pubspec.yaml` ("Versi `any` hanya untuk setup awal...") usang karena versi sudah memakai `^` | Hapus di commit berikutnya |
 | Utang mobile | `AppConstants.requestTimeout` berlaku per fase (connect, send, receive) dan dipetakan ke `timeout`, bukan `ai_unavailable` seperti tertulis di komentarnya | Putuskan perlakuan di M024; samakan komentar |
 | Catatan web | `GET /crisis-contacts` memuat penanda `dummy` per kontak; preflight RULE-M048 dapat memakainya. Daftar produksi saat ini hanya Healing119.id (`119 ext 8`); kontak Laboratorium muncul bila `PSYCH_LAB_HOTLINE_PHONE` terisi | M025, M043 |
-| Utang mobile | Layar Daftar, Masuk, Lupa sandi, Cek email, dan sesi belum punya tautan Kontak bantuan (Design-M prinsip 4) | `TODO(TASK-M025)` di `AuthScaffold`; jangan rilis sebelum M025 |
 | Utang mobile | UI untuk mengubah pilihan persetujuan pelatihan kapan saja (FR-M002, "dapat diubah di Pengaturan") belum ada karena layar Pengaturan baru dibuat di TASK-M031. `ConsentRepository.setTraining` (API-M010) sudah ada; M031 menambah layar dan membaca pilihan saat ini (`training.choice` belum diurai `ConsentState`) | M031 |
 | Utang mobile | 403 `consent_required` di tengah sesi (versi consent dinaikkan saat aplikasi terbuka) belum ditangani; `ConsentGate` memeriksa saat layar dibuka | M024: `ref.invalidate(consentControllerProvider)` saat menerima kode itu |
-| Utang mobile | Layar consent memakai `AuthScaffold`, jadi ikut belum punya tautan Kontak bantuan (Design-M prinsip 4) | `TODO(TASK-M025)` yang sama di `AuthScaffold` |
 | Utang mobile | `ChatScreen` memuat tombol Keluar sementara di AppBar | `TODO(TASK-M031)`: pindah ke Pengaturan |
-| Utang mobile | Banner krisis dan chip saran belum ada; `is_crisis` dan `suggestion` belum dibaca, jadi Crisis Response tampil sebagai gelembung biasa | TASK-M025 dan M026 (aplikasi belum boleh dipakai di luar pengembangan sebelum M025) |
+| Utang mobile | Chip saran belum ada; `suggestion` belum dibaca | TASK-M026 |
 | Utang mobile | Pergantian hari saat aplikasi terbuka hanya ditangani lewat 409 `conversation_closed` saat mengirim; belum ada muat ulang saat aplikasi kembali ke depan layar | Pertimbangkan di M027 atau M030 |
 | Utang mobile | `ErrorAlert`, layar auth, dan consent masih memakai `Icons` bawaan (RULE-M051 sekarang Lucide) | Pindahkan saat UI disentuh lagi atau saat desain final |
 | Utang mobile | Panjang minimum sandi baru diketahui pengguna setelah kirim (tidak digandakan di klien) | Pertimbangkan `password_min_length` di `GET /config` (backend) sebagai petunjuk di layar Daftar |
 | Utang mobile | Keluar tanpa internet hanya menghapus token di perangkat; token di server tetap berlaku sampai kedaluwarsa (60 hari) | Putuskan di M031 (antrean pencabutan atau terima risikonya) |
-| Utang mobile | Kode M022 belum melewati `flutter analyze`, `dart format`, dan build debug (sandbox tanpa Flutter) | Jalankan sebelum commit (panduan uji M022) |
-| Observasi mobile | `StartupGate` menahan seluruh aplikasi sampai cek versi selesai (maks. 5 detik); kelak kontak bantuan harus bisa dibuka tanpa menunggu (Design-M prinsip 4, RULE-M034) | Evaluasi di M025 |
+| Utang mobile | Kode M025 belum melewati `flutter analyze`, `dart format`, dan build debug (sandbox tanpa Flutter); `shared_preferences` harus ditambahkan manual | Jalankan sebelum commit (panduan uji M025) |
+| Observasi mobile | `StartupGate` menahan aplikasi sampai cek versi selesai (maks. 5 detik); kontak bantuan di layar auth dan chat tidak menunggu, dan layar "Perbarui aplikasi" memuat kontak inline | Dipantau |
 
 ---
 
@@ -295,13 +294,14 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 | 2026-11-07 (sesi M017) | Founder menjalankan M017 dan memberikan potongan `laravel.log`. Log diperiksa terhadap RULE-040 (bersih untuk `ai.*`), temuan mailer `log` dicatat sebagai utang web. M017 `Doing` sampai founder mengonfirmasi hasil skenario isolasi A vs B, batas, dan 503. `progress.md` digabung dengan versi M023 (v0.10, sudah di `main`) menjadi v0.11. |
 | 2026-11-07 (konfirmasi) | Founder mengonfirmasi uji manual M016, M017, dan M023 lolos: ketiganya `Done`; MM1 (backend) selesai. Utang web `active` varian API dan utang uji M023 dihapus. TASK-M024 menjadi `Next`. Architecture 0.8, Rules 0.7, progress 0.12. |
 | 2026-11-07 (sesi M024) | Founder menyetujui OQ-MA10 (Lucide) dan OQ-MA11 (409), dan meminta UI sederhana. TASK-M024 dikodekan: `features/chat`, token dan teks chat, mock API chat; teks tak terpakai dihapus. Dokumen disinkronkan (Architecture 0.9, Design 0.7, Rules 0.8, progress 0.13). Menunggu uji manual M024. |
+| 2026-11-07 (sesi M025) | Dasar: M024 versi founder (commit `3bc38ee`). TASK-M025 dikodekan: `features/crisis`, aset fallback, rute dan redirect, tautan bantuan di layar auth dan "Perbarui aplikasi", banner di chat, mock API krisis. Dokumen disinkronkan (Architecture 0.10, Design 0.8, Rules 0.9, panduan uji M025). |
 
 ---
 
 ## 9. Catatan Serah Terima
 
-1. Mulai dari uji manual TASK-M024 (jalankan `flutter pub add lucide_icons_flutter` lebih dulu), lalu TASK-M025 (Crisis Response). Task kode sudah dibuka lebih awal lewat keputusan founder 2026-11-05/06; prasyarat web (TASK-M002) tetap wajib sebelum rilis (TASK-M045).
-2. Urutan kerja: MM1 (backend) dan MM2 (Flutter) boleh berselang-seling. Yang sudah ditempuh: M010 sampai M017, M020, M021, M022, M023 (uji lolos). Yang disarankan berikutnya: M024, dan seterusnya sampai MM6. Fase 2 dan 3 dirilis sesudahnya.
+1. Mulai dari uji manual TASK-M025 (jalankan `flutter pub add shared_preferences` lebih dulu), lalu TASK-M026. Prasyarat web (TASK-M002) tetap wajib sebelum rilis (TASK-031, OQ-3, OQ-5).
+2. Urutan kerja: MM1 (backend) dan MM2 (Flutter) boleh berselang-seling. Yang sudah ditempuh: M010 sampai M017, M020, M021, M022, M023 (uji lolos), M024 (committed), M025 (kode selesai). Yang disarankan berikutnya: M026, dan seterusnya sampai MM6. Fase 2 dan 3 dirilis sesudahnya.
 3. Spike TASK-M003 sebaiknya dikerjakan lebih awal karena overlay adalah bagian paling berisiko; bila hasilnya buruk, putuskan apakah overlay keluar dari Fase 1 (ubah PRD-M).
 4. Setiap perubahan perilaku, route, skema, atau keputusan memperbarui dokumen terkait dan progress ini di akhir task yang sama (RULE-M005).
 5. Cara menerapkan hasil task: backend berupa zip untuk ditimpa di root repo web (periksa `git diff --stat` sebelum commit); mobile berupa zip untuk ditimpa di root repo mobile. Sandbox tidak punya PHP penuh, Composer, atau Flutter, jadi verifikasi selalu lewat uji manual lokal.
@@ -311,6 +311,7 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.14 | 2026-11-07 | TASK-M025 `Doing` (kode selesai, menunggu uji manual): catatan hasil, OQ-MA9 sementara, keputusan Crisis Response, utang diperbarui, log sesi. |
 | 0.13 | 2026-11-07 | TASK-M024 `Doing` (kode selesai, menunggu uji manual): catatan hasil, OQ-MA10 dan OQ-MA11 diputuskan, keputusan chat dan ikon, utang baru, log sesi. |
 | 0.12 | 2026-11-07 | M016, M017, M023 `Done` (uji manual lolos); MM1 selesai; M024 `Next`; catatan hasil dan Tahap/Berikutnya disegarkan; utang yang selesai dihapus. |
 | 0.11 | 2026-11-07 | TASK-M017 `Doing` (dijalankan, log diperiksa, menunggu konfirmasi): catatan hasil dan temuan mailer `log`, utang web baru, log sesi; Status Proyek dan Serah Terima disegarkan. Digabung di atas v0.10 (M023). |

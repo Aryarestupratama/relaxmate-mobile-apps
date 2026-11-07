@@ -10,6 +10,17 @@ abstract final class AppConstants {
   /// Pemeriksaan versi saat pembuka tidak boleh menahan aplikasi lama-lama.
   static const Duration versionCheckTimeout = Duration(seconds: 5);
 
+  /// Kunci salinan kontak bantuan di `shared_preferences` (tidak sensitif).
+  static const String crisisContactsCacheKey = 'crisis_contacts_v1';
+
+  /// Sisipan antara nomor dan ekstensi pada `tel:` (`119 ext 8` menjadi `tel:119,8`).
+  /// Koma = jeda pemanggil sebelum menekan ekstensi. `[Assumption]` OQ-MA9: diuji di
+  /// perangkat nyata (TASK-M025); bila ekstensi terlewat, perpanjang jeda dengan `,,`.
+  static const String telExtensionPause = ',';
+
+  /// Banyak kontak yang tampil langsung di `CrisisBanner`; sisanya lewat "Lihat semua".
+  static const int crisisBannerMaxContacts = 2;
+
   /// Nama kunci token di penyimpanan aman.
   static const String tokenStorageKey = 'auth_token';
 

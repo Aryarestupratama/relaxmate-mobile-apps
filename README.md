@@ -30,6 +30,7 @@ Build debug: `flutter build apk --debug --flavor dev -t lib/main_dev.dart --dart
 node tool/mock_api.mjs old        # versi minimum 9.0.0 -> layar "Perbarui aplikasi"
 node tool/mock_api.mjs ok 8001    # aplikasi lanjut normal (port bawaan 8001)
 node tool/mock_api.mjs auth       # alur akun; akun contoh dan pembantu dijelaskan di kepala berkas
+                                   # (chat: ketik "uji krisis" untuk banner krisis; /__contacts-v2 dan /__contacts-v1 mengubah versi kontak bantuan)
 ```
 
 Lalu jalankan aplikasi dengan `API_BASE_URL=http://10.0.2.2:8001`. Mode lain: `slow`, `error`, `unauthorized`.

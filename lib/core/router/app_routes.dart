@@ -14,6 +14,9 @@ abstract final class AppRoutes {
   static const String forgotPassword = '/lupa-sandi'; // SCR-M05
   static const String checkEmail = '/cek-email'; // SCR-M06
 
+  /// Kontak bantuan (SCR-M16): terbuka untuk semua keadaan sesi (FR-M011).
+  static const String crisisContacts = '/kontak-bantuan';
+
   /// Layar yang hanya untuk tamu; pengguna yang sudah masuk dialihkan keluar.
   static const Set<String> guestOnly = <String>{
     login,
