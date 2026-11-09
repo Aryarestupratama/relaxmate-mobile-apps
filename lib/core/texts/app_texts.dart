@@ -188,6 +188,17 @@ abstract final class AppTexts {
   // Menu di bilah atas chat (SCR-M08).
   static const String chatMenuTooltip = 'Menu';
 
+  // Maskot dan Temani saja (SCR-M13, FR-M015). Tanpa AI dan tanpa kuota; maskot tidak
+  // mengaku punya perasaan (RULE-M046).
+  static const String companionMenu = 'Temani saja';
+  static const String companionTitle = 'Temani saja';
+  static const String companionBody = 'Aku di sini. Tidak perlu bicara.';
+  static const String companionDone = 'Selesai';
+  static const String mascotStateIdle = 'Maskot RelaxMate sedang diam';
+  static const String mascotStateListening = 'Maskot RelaxMate menyimak';
+  static const String mascotStateThinking = 'Maskot RelaxMate sedang berpikir';
+  static const String mascotStateSpeaking = 'Maskot RelaxMate sedang bicara';
+
   // Latihan lokal (SCR-M11, SCR-M12, FR-M014). Berjalan di perangkat: tanpa AI, tanpa kuota,
   // tanpa internet. Disclaimer dan jalur ke bantuan mengikuti RULE-M046.
   static const String exercisesTitle = 'Latihan';

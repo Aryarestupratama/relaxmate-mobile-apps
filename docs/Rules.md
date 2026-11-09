@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Rules (Aturan Proyek)
-Version: 0.14 | Status: Draft | Last updated: 2026-11-07
+Version: 0.15 | Status: Draft | Last updated: 2026-11-10
 Depends on: PRD-Mobile v0.4, Architecture-Mobile v0.3, Schema-Mobile v0.1, Design-Mobile v0.4, Rules RelaxBoss (web) v1.5 | Owner: Founder (solo developer)
 
 Dokumen ini adalah panduan kerja founder sebagai pengembang tunggal untuk **repo mobile (Flutter)**; bantuan AI boleh dipakai dengan tetap mengikuti seluruh aturan, melakukan verifikasi manual, dan tidak menganggap keluaran otomatis sebagai bukti kebenaran. Untuk pekerjaan di **repo web** (task backend `TASK-M01x`), `Rules.md` web tetap berlaku penuh; aturan di sini hanya menambah. Kata MUST, MUST NOT, SHOULD dipakai secara tegas. Kedalaman: **Lite**. Prinsip: sederhana, fungsi dulu, aman dulu.
@@ -83,7 +83,7 @@ Dokumen ini adalah panduan kerja founder sebagai pengembang tunggal untuk **repo
 | ID | Aturan |
 |---|---|
 | RULE-M050 | Warna, ukuran teks, radius, dan bayangan hanya dari token di `core/theme` (`RbColors`, `RbText`, `RbSpace` sebagai ThemeExtension; `RbRadius`, `RbSize`, `RbShadow`, `RbMotion` sebagai kelas konstanta). Dilarang nilai heksadesimal, `Color(0x...)`, `Colors.*`, dan angka ukuran/jarak lepas di widget; warna transparan diturunkan dari token (`withValues`/`Color.alphaBlend`), bukan angka terpisah. **Nilai token mengikuti kode website (`app.css`)**, bukan tabel di dokumen Design web yang belum sinkron. Widget mengakses token lewat `context.rbColors`, `context.rbText`, dan `context.rbSpace` (`RbThemeContext`). |
-| RULE-M051 | Satu set ikon (`[Assumption]` Lucide untuk Flutter) dan satu library animasi maskot; menambah library lain dicatat di Architecture-M bagian 12. OQ-MA10 diputuskan 2026-11-07: Lucide (`lucide_icons_flutter`); `Icons` bawaan yang sudah ada dipindahkan saat layarnya disentuh lagi. |
+| RULE-M051 | Satu set ikon (`[Assumption]` Lucide untuk Flutter) dan satu cara animasi maskot (sejak M030: WebP beranimasi bawaan Flutter, tanpa library; Rive tidak dipakai); menambah library lain dicatat di Architecture-M bagian 12. OQ-MA10 diputuskan 2026-11-07: Lucide (`lucide_icons_flutter`); `Icons` bawaan yang sudah ada dipindahkan saat layarnya disentuh lagi. |
 | RULE-M052 | Teks pada permukaan pastel MUST memakai token teks navy; jangan mengandalkan warna saja untuk status atau makna (selalu ada label atau ikon). |
 | RULE-M053 | Setiap layar punya status memuat, kosong, galat, sukses, dan offline (Design-M bagian 4). |
 | RULE-M054 | Teks UI pendek diambil dari bank teks Design-M yang diwujudkan di `core/texts/app_texts.dart` (`AppTexts`); teks panjang (privasi, ketentuan) dari `assets/texts`; teks baru mengikuti nada yang sama ("kamu", hangat, tidak menggurui). |
@@ -136,6 +136,7 @@ Jangan: menambah fitur di luar PRD, memanggil Groq atau layanan suara langsung d
 
 - A-R6: Pemeriksaan kode TASK-M022 terhadap aturan (2026-11-06, pencarian teks): lihat catatan hasil M022 di `progress.md`; `flutter analyze` dan `dart format` belum dijalankan (A-R2).
 - A-R11: Pemeriksaan kode TASK-M028 terhadap aturan (2026-11-07, pencarian teks): tanpa `print`, `// ignore:`, `Colors.*`/`Color(0x...)`, `dynamic`, null-bang, atau `TODO` di `lib/features/checkin` dan `chat_welcome.dart`; ukuran, jarak, dan warna hanya dari token (ditambah `RbSize.moodBlob`); teks di `AppTexts`; jalur aset di `AppAssets`; panggilan jaringan hanya lewat `MoodRepository` (RULE-M022); tombol blob `Semantics` dengan target >= 48dp (RULE-M055); `dart format` gaya Dart 3.5 bersih; `flutter analyze` bersih (dijalankan founder, 2026-11-07).
+- A-R13: Pemeriksaan kode TASK-M030 terhadap aturan (2026-11-10, pencarian teks): `lib/features/mascot` dan `typing_indicator.dart` tanpa `print`, `// ignore:`, `Colors.*`/`Color(0x...)`, `dynamic`, null-bang, atau `TODO`; teks hanya dari `AppTexts`; ukuran dari `RbSize`; gerak dikurangi dihormati. Belum dijalankan: `dart format`, `flutter analyze`, uji emulator.
 - A-R12: Pemeriksaan kode TASK-M029 terhadap aturan (2026-11-07, pencarian teks): `lib/features/exercises` tanpa `print`, `// ignore:`, `Colors.*`/`Color(0x...)`, `dynamic`, null-bang, atau `TODO`; teks hanya dari `AppTexts`, angka produk (ritme napas, pilihan menit) dari `AppConstants`, ukuran dan kurva dari token `RbSize`/`RbMotion` (RULE-M026, M050); lebar baris kode <= 80. Sandbox tanpa Flutter dan Dart (pub.dev diblokir), jadi `dart format`, `flutter analyze`, dan emulator belum dijalankan (A-R2); logika murni (putaran 4/13/21, urutan tahap, langkah grounding) direplikasi di Python.
 - A-R10: Pemeriksaan kode TASK-M026 terhadap aturan (2026-11-07, pencarian teks): tanpa `print`, `// ignore:`, `Colors.*`/`Color(0x...)`, `dynamic`, atau null-bang di berkas saran; teks hanya dari `AppTexts`, URL halaman dari `AppConstants` dan `AppConfig.webUri` (RULE-M026), ikon Lucide (RULE-M051); empat `TODO(TASK-M029)` sengaja untuk tujuan latihan yang belum ada. Logika murni diuji di Dart (21 pemeriksaan); `flutter analyze` dan emulator belum dijalankan (A-R2).
 - A-R9: Pemeriksaan kode TASK-M025 terhadap aturan (2026-11-07, pencarian teks): tanpa `print`, `// ignore:`, `Colors.*`, `dynamic`, atau null-bang di `lib/features/crisis`; warna dan jarak lewat token; teks di `AppTexts`; tombol memakai `Semantics` dan target minimal 48dp; kontak dummy tidak ada di aset dan disaring di `prod` (RULE-M048); isi chat tidak disimpan (RULE-M031). `flutter analyze` belum dijalankan (sandbox tanpa Flutter).
@@ -147,6 +148,7 @@ Jangan: menambah fitur di luar PRD, memanggil Groq atau layanan suara langsung d
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.15 | 2026-11-10 | RULE-M051 disesuaikan (maskot WebP tanpa library); A-R13 (pemeriksaan kode M030). |
 | 0.14 | 2026-11-07 | A-R12: pemeriksaan kode TASK-M029. |
 | 0.13 | 2026-11-07 | A-R11 diperbarui: `flutter analyze` M028 bersih. |
 | 0.12 | 2026-11-07 | A-R11 (pemeriksaan kode M028). |

@@ -1,5 +1,5 @@
 # RelaxMate Mobile - PRD
-Version: 0.5 | Status: Draft | Last updated: 2026-11-07
+Version: 0.6 | Status: Draft | Last updated: 2026-11-10
 Depends on: PRD RelaxBoss v1.8, Architecture v1.74, Rules v1.5 | Owner: Founder (solo developer)
 
 Label klaim: `[Verified]` = ada sumber yang dicek, `[Inference]` = kesimpulan dari konteks, `[Assumption]` = asumsi yang bisa diubah. Kedalaman: **Lite**.
@@ -191,7 +191,7 @@ Dokumen ini terpisah dari PRD RelaxBoss (web). Aplikasi mobile masuk daftar Won'
 | Token | `flutter_secure_storage` | Tanpa cache chat polos; terpasang ^11.2.0 (TASK-M021) |
 | STT / TTS | `speech_to_text`, `flutter_tts` | Pengenal dan suara bawaan perangkat |
 | Klip suara | `just_audio` atau sejenis | Berkas dibundel di aset |
-| Maskot | Rive atau Lottie | Animasi menyimak, berpikir, bicara |
+| Maskot | WebP beranimasi per keadaan (Image.asset, tanpa paket) | Animasi diam, menyimak, berpikir, bicara; Rive dibuang di TASK-M030 |
 | Overlay Android | Kandidat: `flutter_overlay_window` + kode Kotlin, atau modul Kotlin sendiri | Diputuskan di spike TASK-M003 (OQ-MA1); foreground service; izin overlay |
 | Backend | Laravel yang sama, `/api/v1/*` | Controller tipis di atas Service (RULE-022); Sanctum token (terpasang di TASK-M012; alasan dicatat di Architecture web bagian 13, RULE-060); tanpa streaming/WebSocket/queue (RULE-034) |
 
@@ -248,6 +248,7 @@ Dokumen ini terpisah dari PRD RelaxBoss (web). Aplikasi mobile masuk daftar Won'
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.6 | 2026-11-10 | Tabel teknologi: maskot memakai WebP beranimasi, bukan Rive atau Lottie (TASK-M030). |
 | 0.5 | 2026-11-07 | OQ-M3 diputuskan: Cek Rasa juga menulis Mood Entry (FR-M013 diperbarui; non-goal Mood Tracker dipertegas). |
 | 0.4 | 2026-11-06 | Sinkronisasi ke kode dan backend: teks consent dari server (FR-M002), versi paket terpasang dan kandidat overlay disamakan dengan Architecture-M (bagian 9), OQ-M7 sebagian ditutup. |
 | 0.3 | 2026-11-05 | Panduan suara latihan napas ditunda ke Fase 2 (keputusan founder): US-M07 dan FR-M014 diperbarui; Fase 1 hanya visual dan getar opsional. |

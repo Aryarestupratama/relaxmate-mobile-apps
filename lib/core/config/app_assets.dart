@@ -4,6 +4,11 @@ abstract final class AppAssets {
       'assets/images/mascot/relaxmate-avatar.webp';
   static const String mascotHalf = 'assets/images/mascot/relaxmate-half.webp';
 
+  /// Animasi maskot per keadaan (WebP beranimasi transparan, 24 fps, dirender dari rig SVG
+  /// oleh skrip `tool/mascot`; bukan Rive). Nama berkas = nama `MascotState`.
+  static String mascotAnim(String name) =>
+      'assets/images/mascot/anim/$name.webp';
+
   /// Blob mood tingkat 1 sampai 5 (Cek Rasa, `MoodBlobRow`); gambar yang sama dengan web.
   static String moodBlob(int level) => 'assets/images/mood/mood-$level.webp';
 

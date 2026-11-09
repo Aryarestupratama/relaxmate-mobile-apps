@@ -23,7 +23,7 @@ import 'package:relaxmate/shared/widgets/mate_avatar.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar_size.dart';
 
 /// Pilihan di menu bilah atas chat. Ikon telepon (kontak bantuan) sengaja di luar menu.
-enum _ChatMenuAction { history, exercises }
+enum _ChatMenuAction { history, exercises, companion }
 
 /// SCR-M08: aliran chat harian (FR-M004, M006, M007). Dibungkus `ConsentGate` di router.
 /// Tampilan sengaja sederhana sampai desain final tersedia.
@@ -107,6 +107,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   context.push<void>(AppRoutes.history);
                 case _ChatMenuAction.exercises:
                   context.push<void>(AppRoutes.exercises);
+                case _ChatMenuAction.companion:
+                  context.push<void>(AppRoutes.companion);
               }
             },
             itemBuilder: (context) => const <PopupMenuEntry<_ChatMenuAction>>[
@@ -117,6 +119,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               PopupMenuItem<_ChatMenuAction>(
                 value: _ChatMenuAction.exercises,
                 child: Text(AppTexts.exercisesTitle),
+              ),
+              PopupMenuItem<_ChatMenuAction>(
+                value: _ChatMenuAction.companion,
+                child: Text(AppTexts.companionMenu),
               ),
             ],
           ),

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
+import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/features/checkin/state/checkin_controller.dart';
 import 'package:relaxmate/features/checkin/ui/checkin_card.dart';
+import 'package:relaxmate/features/mascot/data/mascot_state.dart';
+import 'package:relaxmate/features/mascot/ui/mascot_view.dart';
 
 /// Sambutan saat belum ada pesan hari ini (SCR-M08). Bila [canCheckin], kartu Cek Rasa
 /// (SCR-M09) ditawarkan di bawah sambutan sampai pengguna mengirim atau melewatinya.
@@ -29,6 +32,11 @@ class ChatWelcome extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
+            const MascotView(
+              state: MascotState.idle,
+              height: RbSize.mascotWelcomeHeight,
+            ),
+            SizedBox(height: space.md),
             Text(
               AppTexts.welcome,
               textAlign: TextAlign.center,

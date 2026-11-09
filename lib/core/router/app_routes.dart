@@ -29,6 +29,10 @@ abstract final class AppRoutes {
   static const String breathing = '/latihan/napas';
   static const String grounding = '/latihan/grounding';
 
+  /// Temani saja (SCR-M13): hanya perlu masuk; di luar `ConsentGate` karena tanpa AI dan
+  /// tanpa kuota (FR-M015).
+  static const String companion = '/temani';
+
   /// Layar yang hanya untuk tamu; pengguna yang sudah masuk dialihkan keluar.
   static const Set<String> guestOnly = <String>{
     login,

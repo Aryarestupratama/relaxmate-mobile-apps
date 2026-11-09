@@ -33,4 +33,15 @@ abstract final class RbSize {
   /// diperkecil otomatis (`FittedBox`) bila teks sistem sangat besar.
   static const double groundingBadge = 112;
   static const double groundingNumber = 56;
+
+  /// Tinggi maskot beranimasi (CMP-M20): di sambutan chat dan di layar Temani saja. Lebar
+  /// mengikuti rasio gambar.
+  static const double mascotWelcomeHeight = 140;
+  static const double mascotCompanionHeight = 280;
+
+  /// Titik pada `TypingIndicator` (CMP-M03) dan jarak antarnya.
+  static const double typingDot = 8;
+
+  /// Seberapa tinggi titik naik pada puncak geraknya.
+  static const double typingDotLift = 5;
 }

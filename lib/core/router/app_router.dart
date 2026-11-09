@@ -18,6 +18,7 @@ import 'package:relaxmate/features/exercises/ui/exercises_screen.dart';
 import 'package:relaxmate/features/exercises/ui/grounding_screen.dart';
 import 'package:relaxmate/features/history/ui/conversation_screen.dart';
 import 'package:relaxmate/features/history/ui/history_screen.dart';
+import 'package:relaxmate/features/mascot/ui/companion_screen.dart';
 import 'package:relaxmate/features/startup/ui/splash_view.dart';
 
 /// Memberi tahu router bahwa keadaan sesi berubah, agar `redirect` dijalankan ulang.
@@ -86,6 +87,11 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.grounding,
         builder: (context, state) => const GroundingScreen(),
+      ),
+      // Temani saja: perlu masuk, tanpa ConsentGate (tanpa AI, FR-M015).
+      GoRoute(
+        path: AppRoutes.companion,
+        builder: (context, state) => const CompanionScreen(),
       ),
       GoRoute(
         path: AppRoutes.history,

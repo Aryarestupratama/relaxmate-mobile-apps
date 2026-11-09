@@ -29,6 +29,7 @@ flutter:
   # Folder aset lain (audio/clips, texts) didaftarkan pada task yang mengisinya.
   assets:
     - assets/images/mascot/
+    - assets/images/mascot/anim/
     - assets/images/mood/
     - assets/crisis/
 
