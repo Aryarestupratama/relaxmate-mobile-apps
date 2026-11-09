@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Design System dan Spesifikasi Layar
-Version: 0.14 | Status: Draft | Last updated: 2026-11-10
+Version: 0.15 | Status: Draft | Last updated: 2026-11-10
 Depends on: PRD-Mobile v0.3, Architecture-Mobile v0.3, Design RelaxBoss (web) | Owner: Founder (solo developer)
 
 Label: `[Assumption]` bisa diubah. Kedalaman: **Lite**. Platform: Android (phone) dulu, mode terang. Tata letak layar yang tidak tertulis dibangun sederhana (fungsi dulu) memakai token dan komponen di dokumen ini (RULE-M007).
@@ -217,7 +217,7 @@ Dibangun di TASK-M029 `[Verified: uji manual founder 2026-11-09]`: daftar `/lati
 ### SCR-M13 Temani saja
 Layar gradien tenang, maskot napas pelan, satu kalimat ("Aku di sini. Tidak perlu bicara."), tombol "Selesai". Tanpa AI dan tanpa kuota.
 
-Dibangun di TASK-M030 `[Belum diuji manual]` (`CompanionScreen`, rute `/temani`): gradien `gradientTop` ke `gradientMid` ke `gradientBottom` (pertama kali dipakai), `MascotView` `idle` 280dp, kalimat `h2` (header untuk pembaca layar), `FilledButton` "Selesai" yang kembali ke layar sebelumnya (atau chat bila dibuka langsung). Tanpa AppBar agar layar tetap sunyi; tombol kembali sistem juga menutup. Dibuka dari menu tiga titik chat (Riwayat, Latihan, Temani saja). Hanya perlu masuk, tanpa `ConsentGate`. Gerak dikurangi: maskot diam.
+Dibangun di TASK-M030 `[Verified: uji manual dan `flutter analyze` lolos, founder 2026-11-10]` (`CompanionScreen`, rute `/temani`): gradien `gradientTop` ke `gradientMid` ke `gradientBottom` (pertama kali dipakai), `MascotView` `idle` 280dp, kalimat `h2` (header untuk pembaca layar), `FilledButton` "Selesai" yang kembali ke layar sebelumnya (atau chat bila dibuka langsung). Tanpa AppBar agar layar tetap sunyi; tombol kembali sistem juga menutup. Dibuka dari menu tiga titik chat (Riwayat, Latihan, Temani saja). Hanya perlu masuk, tanpa `ConsentGate`. Gerak dikurangi: maskot diam.
 
 ### SCR-M18 Maskot mengambang
 Penjelasan sederhana sebelum izin: "Maskot bisa muncul kecil di layarmu supaya kamu merasa ditemani. Maskot tidak membaca layarmu dan tidak mendengarkan." Toggle aktif/nonaktif, status izin ("Izin tampil di atas aplikasi lain: aktif/belum"), tombol "Buka pengaturan izin", pilihan istirahat. Default mati.
@@ -341,6 +341,7 @@ Ikon: satu set (`[Assumption]` Lucide untuk Flutter), ukuran 24dp, stroke 2. OQ-
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.15 | 2026-11-10 | TASK-M030 diverifikasi (SCR-M13, CMP-M28, CMP-M03). |
 | 0.14 | 2026-11-10 | TASK-M030: SCR-M13 dibangun, CMP-M28 `MascotView`, CMP-M03 titik beranimasi, bagian 9 (format animasi diputuskan), OQ-D2 dan OQ-D4 ditutup; M029 diverifikasi. |
 | 0.13 | 2026-11-07 | TASK-M029: SCR-M11 dan M12 dibangun, CMP-M11 diterapkan, CMP-M25 sampai M27 (`ExerciseTile`, `ExerciseDoneView`, `ExerciseDisclaimer`), token latihan, menu AppBar chat (Riwayat, Latihan), bank teks latihan dan grounding disesuaikan, baris status 4.1. |
 | 0.12 | 2026-11-07 | SCR-M14 dan M15 (M027) serta SCR-M09 (M028) terverifikasi uji manual; penanda diperbarui. |
