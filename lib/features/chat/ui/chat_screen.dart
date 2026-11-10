@@ -16,6 +16,7 @@ import 'package:relaxmate/features/chat/ui/chat_welcome.dart';
 import 'package:relaxmate/features/chat/ui/suggestion_chips.dart';
 import 'package:relaxmate/features/chat/ui/typing_indicator.dart';
 import 'package:relaxmate/features/checkin/state/checkin_controller.dart';
+import 'package:relaxmate/features/overlay/ui/overlay_resume_banner.dart';
 import 'package:relaxmate/features/crisis/ui/crisis_banner.dart';
 import 'package:relaxmate/shared/widgets/error_alert.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar.dart';
@@ -219,6 +220,7 @@ class _ChatBody extends StatelessWidget {
     return Column(
       children: <Widget>[
         if (ready.hasCrisis) const CrisisBanner(),
+        const OverlayResumeBanner(),
         Expanded(
           child: newestFirst.isEmpty
               ? ChatWelcome(canCheckin: !ready.limitReached)

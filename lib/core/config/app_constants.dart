@@ -27,6 +27,10 @@ abstract final class AppConstants {
       'settings_breathing_haptics_v1';
   static const String settingsPrivacyCoverKey = 'settings_privacy_cover_v1';
 
+  /// Epoch milidetik sampai kapan maskot istirahat (0 atau tidak ada = tidak istirahat). Ditulis
+  /// juga oleh layanan Kotlin (`OverlayPrefs.KEY_SNOOZE_UNTIL`), jadi harus sama.
+  static const String overlaySnoozeUntilKey = 'overlay_snooze_until_v1';
+
   /// Pilihan pengguna untuk maskot mengambang (TASK-M032). Bawaan mati; pilihan ini bukan izin.
   static const String settingsOverlayEnabledKey = 'settings_overlay_enabled_v1';
 

@@ -22,6 +22,8 @@ import io.flutter.plugin.common.MethodChannel
  * - `start`: memulai `OverlayService` (hanya dari aksi pengguna saat aplikasi terbuka); `true` bila
  *   izin overlay ada dan permintaan dikirim
  * - `stop`: menghentikan `OverlayService`
+ * - `takeLaunchAction`: perintah yang dititipkan maskot saat membuka aplikasi (`chat`) atau null;
+ *   dibaca sekali lalu dihapus
  * - `openOverlaySettings`: membuka halaman "tampil di atas aplikasi lain" untuk aplikasi ini
  * - `requestNotifications`: meminta POST_NOTIFICATIONS (Android 13+); hasilnya `true` bila aktif
  * - `openNotificationSettings`: membuka pengaturan notifikasi aplikasi
@@ -33,6 +35,9 @@ class OverlayChannel(
 
     private val channel = MethodChannel(messenger, NAME)
     private var pendingNotificationResult: MethodChannel.Result? = null
+
+    /** Perintah dari maskot (mis. `chat`), dititipkan di intent dan diambil Dart sekali. */
+    private var pendingLaunchAction: String? = null
 
     init {
         channel.setMethodCallHandler(this)
@@ -76,6 +81,11 @@ class OverlayChannel(
                 result.success(launch(intent))
             }
 
+            "takeLaunchAction" -> {
+                result.success(pendingLaunchAction)
+                pendingLaunchAction = null
+            }
+
             "requestNotifications" -> requestNotifications(result)
 
             "openNotificationSettings" -> {
@@ -86,6 +96,13 @@ class OverlayChannel(
 
             else -> result.notImplemented()
         }
+    }
+
+    /** Dipanggil `MainActivity` untuk intent awal dan `onNewIntent`. */
+    fun onLaunchIntent(intent: Intent?) {
+        val action = intent?.getStringExtra(EXTRA_LAUNCH_ACTION) ?: return
+        pendingLaunchAction = action
+        intent.removeExtra(EXTRA_LAUNCH_ACTION)
     }
 
     /** Dipanggil `MainActivity` setelah pengguna menjawab dialog izin sistem. */
@@ -145,6 +162,8 @@ class OverlayChannel(
     }
 
     companion object {
+        const val EXTRA_LAUNCH_ACTION = "id.my.relaxboss.relaxmate.overlay.LAUNCH_ACTION"
+        const val LAUNCH_CHAT = "chat"
         const val NAME = "id.my.relaxboss.relaxmate/overlay"
         private const val REQUEST_NOTIFICATIONS = 4101
     }

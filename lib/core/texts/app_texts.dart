@@ -246,6 +246,13 @@ abstract final class AppTexts {
       'bisa mematikannya kapan saja.';
   static const String overlayExplainConfirm = 'Buka pengaturan';
   static const String overlayExplainLater = 'Nanti saja';
+  static const String overlayResumeOffer =
+      'Maskot sedang istirahat. Mau dinyalakan lagi?';
+  static const String overlayResumeYes = 'Nyalakan';
+  static const String overlayResumeLater = 'Nanti';
+  static const String overlayRestingTomorrow = 'Maskot istirahat sampai besok.';
+  static String overlayRestingUntil(String time) =>
+      'Maskot istirahat sampai $time.';
   static const String overlayStartFailed =
       'Maskot belum bisa dimulai. Pastikan izin tampil di atas aplikasi lain '
       'aktif, lalu coba lagi.';

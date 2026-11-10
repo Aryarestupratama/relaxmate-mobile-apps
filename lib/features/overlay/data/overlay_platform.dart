@@ -39,6 +39,18 @@ class OverlayPlatform {
 
   Future<bool> stop() => _invokeBool('stop');
 
+  /// Perintah yang dititipkan maskot mengambang saat membuka aplikasi (`chat`), atau `null`.
+  /// Dibaca sekali lalu dihapus.
+  Future<String?> takeLaunchAction() async {
+    try {
+      return await _channel.invokeMethod<String>('takeLaunchAction');
+    } on PlatformException {
+      return null;
+    } on MissingPluginException {
+      return null;
+    }
+  }
+
   /// Meminta izin notifikasi (dialog sistem di Android 13+). `true` bila notifikasi aktif.
   Future<bool> requestNotifications() => _invokeBool('requestNotifications');
 

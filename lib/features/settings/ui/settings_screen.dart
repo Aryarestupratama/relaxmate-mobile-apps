@@ -16,6 +16,7 @@ import 'package:relaxmate/features/auth/state/auth_state.dart';
 import 'package:relaxmate/features/consent/data/consent_prompt.dart';
 import 'package:relaxmate/features/consent/data/training_choice.dart';
 import 'package:relaxmate/features/consent/ui/consent_choice_tile.dart';
+import 'package:relaxmate/features/overlay/state/overlay_feature_provider.dart';
 import 'package:relaxmate/features/settings/state/settings_controller.dart';
 import 'package:relaxmate/features/settings/state/training_consent_controller.dart';
 import 'package:relaxmate/shared/widgets/error_alert.dart';
@@ -141,7 +142,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
             ),
             SizedBox(height: space.lg),
-            if (defaultTargetPlatform == TargetPlatform.android) ...<Widget>[
+            if (defaultTargetPlatform == TargetPlatform.android &&
+                (ref.watch(overlayFeatureProvider).value ?? true)) ...<Widget>[
               const _SectionTitle(AppTexts.settingsMascot),
               _LinkTile(
                 icon: LucideIcons.heartHandshake,

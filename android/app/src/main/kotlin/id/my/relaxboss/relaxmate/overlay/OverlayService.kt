@@ -375,6 +375,7 @@ class OverlayService : Service(), OverlayPanel.Actions {
                     Intent.FLAG_ACTIVITY_SINGLE_TOP or
                     Intent.FLAG_ACTIVITY_REORDER_TO_FRONT,
             )
+            .putExtra(OverlayChannel.EXTRA_LAUNCH_ACTION, OverlayChannel.LAUNCH_CHAT)
         try {
             startActivity(intent)
         } catch (error: RuntimeException) {

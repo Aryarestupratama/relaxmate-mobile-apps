@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Design System dan Spesifikasi Layar
-Version: 0.19 | Status: Draft | Last updated: 2026-11-10
+Version: 0.20 | Status: Draft | Last updated: 2026-11-10
 Depends on: PRD-Mobile v0.3, Architecture-Mobile v0.3, Design RelaxBoss (web) | Owner: Founder (solo developer)
 
 Label: `[Assumption]` bisa diubah. Kedalaman: **Lite**. Platform: Android (phone) dulu, mode terang. Tata letak layar yang tidak tertulis dibangun sederhana (fungsi dulu) memakai token dan komponen di dokumen ini (RULE-M007).
@@ -226,10 +226,10 @@ Dibangun di TASK-M031 `[Verified: uji manual dan `flutter analyze` lolos, founde
 ### SCR-M18 Maskot mengambang
 Penjelasan sederhana sebelum izin: "Maskot bisa muncul kecil di layarmu supaya kamu merasa ditemani. Maskot tidak membaca layarmu dan tidak mendengarkan." Toggle aktif/nonaktif, status izin ("Izin tampil di atas aplikasi lain: aktif/belum"), tombol "Buka pengaturan izin", pilihan istirahat. Default mati.
 
-Dibangun di TASK-M032 `[Belum diuji manual]` (`OverlaySettingsScreen`, `/pengaturan/maskot`, hanya Android; tautan di Pengaturan bagian "Maskot"): kalimat penjelasan persis seperti di atas; `SwitchListTile` "Tampilkan maskot mengambang" (bawaan mati, tampil menyala hanya bila pilihan tersimpan dan izin overlay aktif); dua baris status ("Izin tampil di atas aplikasi lain: aktif/belum", "Izin notifikasi: aktif/belum", hijau saat aktif); tombol teks "Buka pengaturan izin" bila izin overlay belum ada; untuk notifikasi, keterangan pendek dan tombol "Izinkan notifikasi" (bila dialog sistem tidak muncul lagi, membuka pengaturan notifikasi). Menyalakan tanpa izin: dialog "Izinkan tampil di atas aplikasi lain?" (Nanti saja / Buka pengaturan), lalu halaman izin sistem, lalu kembali ke layar dan alur lanjut sendiri. Penolakan dihormati tanpa desakan. Pilihan istirahat menyusul di TASK-M034; gelembung di TASK-M033.
+Dibangun di TASK-M032 `[Verified: uji manual lolos, founder 2026-11-10]` (`OverlaySettingsScreen`, `/pengaturan/maskot`, hanya Android; tautan di Pengaturan bagian "Maskot"): kalimat penjelasan persis seperti di atas; `SwitchListTile` "Tampilkan maskot mengambang" (bawaan mati, tampil menyala hanya bila pilihan tersimpan dan izin overlay aktif); dua baris status ("Izin tampil di atas aplikasi lain: aktif/belum", "Izin notifikasi: aktif/belum", hijau saat aktif); tombol teks "Buka pengaturan izin" bila izin overlay belum ada; untuk notifikasi, keterangan pendek dan tombol "Izinkan notifikasi" (bila dialog sistem tidak muncul lagi, membuka pengaturan notifikasi). Menyalakan tanpa izin: dialog "Izinkan tampil di atas aplikasi lain?" (Nanti saja / Buka pengaturan), lalu halaman izin sistem, lalu kembali ke layar dan alur lanjut sendiri. Penolakan dihormati tanpa desakan. TASK-M034 menambah: baris "Maskot istirahat sampai HH.mm" (atau "sampai besok") di bawah saklar, dan **spanduk tawaran** di atas chat "Maskot sedang istirahat. Mau dinyalakan lagi?" (Nanti / Nyalakan) yang muncul setelah waktu istirahat lewat; spanduk memakai `surfaceAlt` dan sudut kartu. Tautan di Pengaturan disembunyikan bila server mematikan fitur (`features.overlay`). "Ngobrol" dari maskot mengantar ke chat.
 
 ### OVL-M01 / M02 Overlay
-Dibangun di TASK-M033 `[Belum diuji manual]` (Kotlin native, tanpa Flutter). Deviasi dari teks di bawah: aksi **Bicara** belum ada (ditunda bersama mode suara Fase 2); panel memuat tambahan **Matikan maskot** dan tombol tutup panel; "Istirahatkan" tampil sebagai dua tombol ("Istirahat 1 jam", "Istirahat sampai besok"). Gelembung memutar animasi `idle` (WebP) dan menempel ke tepi kiri atau kanan setelah digeser; disembunyikan saat layar mati.
+Dibangun di TASK-M033 `[Verified: uji manual lolos, founder 2026-11-10]` (Kotlin native, tanpa Flutter). Deviasi dari teks di bawah: aksi **Bicara** belum ada (ditunda bersama mode suara Fase 2); panel memuat tambahan **Matikan maskot** dan tombol tutup panel; "Istirahatkan" tampil sebagai dua tombol ("Istirahat 1 jam", "Istirahat sampai besok"). Gelembung memutar animasi `idle` (WebP) dan menempel ke tepi kiri atau kanan setelah digeser; disembunyikan saat layar mati.
 Gelembung 64dp di tepi layar; sentuh membuka mini-panel dengan sapaan dari teks lokal dan tiga aksi: **Ngobrol** (buka aplikasi), **Bicara** (buka aplikasi di mode suara), **Istirahatkan** (1 jam / sampai besok). Tidak tampil di layar kunci; tidak merekam; tidak memuat data pengguna.
 
 ---
@@ -348,6 +348,7 @@ Ikon: satu set (`[Assumption]` Lucide untuk Flutter), ukuran 24dp, stroke 2. OQ-
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.20 | 2026-11-10 | M032 dan M033 diverifikasi; TASK-M034: tampilan istirahat, spanduk tawaran lanjut. |
 | 0.19 | 2026-11-10 | TASK-M033: OVL-M01 dan OVL-M02 dibangun (deviasi: tanpa Bicara). |
 | 0.18 | 2026-11-10 | TASK-M032: SCR-M18 dibangun (izin dan saklar), bagian "Maskot" di Pengaturan. |
 | 0.17 | 2026-11-10 | TASK-M031 diverifikasi (SCR-M17, SCR-M19, lapisan privasi). |

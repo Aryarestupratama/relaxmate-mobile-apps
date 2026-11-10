@@ -4,6 +4,7 @@ import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/features/overlay/data/overlay_permissions.dart';
 import 'package:relaxmate/features/overlay/data/overlay_platform.dart';
+import 'package:relaxmate/features/overlay/state/overlay_home_provider.dart';
 import 'package:relaxmate/features/overlay/state/overlay_permissions_controller.dart';
 import 'package:relaxmate/features/settings/state/settings_controller.dart';
 
@@ -52,6 +53,7 @@ class _OverlaySettingsScreenState extends ConsumerState<OverlaySettingsScreen>
   Future<void> _onResumed() async {
     // Layanan native dapat mengubah pilihan sendiri (Nonaktifkan, Istirahat sampai besok).
     await ref.read(settingsControllerProvider.notifier).reload();
+    ref.invalidate(overlayRestProvider);
     if (!mounted) {
       return;
     }
@@ -191,6 +193,16 @@ class _OverlaySettingsScreenState extends ConsumerState<OverlaySettingsScreen>
     }
   }
 
+  /// "sampai besok" bila masih jauh (istirahat sampai besok), jam bila dekat (1 jam).
+  String _restLabel(DateTime until) {
+    if (until.difference(DateTime.now()) > const Duration(hours: 2)) {
+      return AppTexts.overlayRestingTomorrow;
+    }
+    final hour = until.hour.toString().padLeft(2, '0');
+    final minute = until.minute.toString().padLeft(2, '0');
+    return AppTexts.overlayRestingUntil('$hour.$minute');
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.rbColors;
@@ -200,6 +212,7 @@ class _OverlaySettingsScreenState extends ConsumerState<OverlaySettingsScreen>
     final permissions = ref.watch(overlayPermissionsControllerProvider).value ??
         OverlayPermissions.unsupported;
     final effectiveOn = settings.overlayEnabled && permissions.canDrawOverlays;
+    final restUntil = ref.watch(overlayRestProvider).value;
 
     return Scaffold(
       appBar: AppBar(title: const Text(AppTexts.overlayTitle)),
@@ -215,6 +228,12 @@ class _OverlaySettingsScreenState extends ConsumerState<OverlaySettingsScreen>
               onChanged: _busy ? null : _toggle,
               title: Text(AppTexts.overlayToggle, style: text.body),
             ),
+            if (restUntil != null) ...<Widget>[
+              Text(
+                _restLabel(restUntil),
+                style: text.small.copyWith(color: colors.textSecondary),
+              ),
+            ],
             SizedBox(height: space.md),
             _PermissionRow(
               label: AppTexts.overlayPermissionOverlay,
