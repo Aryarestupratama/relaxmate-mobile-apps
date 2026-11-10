@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Progress
-Version: 0.23 | Status: Living document | Last updated: 2026-11-10
+Version: 0.24 | Status: Living document | Last updated: 2026-11-10
 Owner: Founder (solo developer)
 
 Dokumen ini dibaca pertama setiap mulai bekerja di proyek mobile. Perbarui di akhir setiap task atau sesi. Dokumen proyek disimpan **di luar repo kode** (RULE-M014). Task di sisi backend (repo web RelaxBoss) mengikuti `Rules.md` web dan juga dicatat di sini, dengan awalan `TASK-M`, agar satu sumber kebenaran untuk fitur mobile. Perubahan di repo web tetap mengikuti Doc Sync web (`progress.md` web diperbarui bila menyentuh perilaku web).
@@ -10,8 +10,8 @@ Dokumen ini dibaca pertama setiap mulai bekerja di proyek mobile. Perbarui di ak
 
 | Hal | Status terbaru |
 |---|---|
-| Tahap | Implementasi berjalan. Selesai (uji manual lolos): **TASK-M010 sampai M017** (seluruh backend MM1, repo web), **M020 sampai M031** (Flutter; M024 sampai M028 lolos 2026-11-07, M029 lolos 2026-11-09, M030 dan M031 lolos 2026-11-10, termasuk `flutter analyze` bersih untuk M027 dan M028; M028 juga mencakup API-M018 di repo web). **MM1 (Backend API) selesai** kecuali prasyarat rilis web. **MM3 (chat inti, krisis, saran, riwayat) selesai.** OQ-M3 diputuskan 2026-11-07 (Cek Rasa juga menulis Mood Entry). **TASK-M029** (latihan napas dan grounding 5-4-3-2-1 lokal) `Done` (uji manual lolos 2026-11-09, dipush `e658a31`). **TASK-M030** (maskot beranimasi dan Temani saja) `Done` (uji manual dan `flutter analyze` lolos 2026-11-10, dipush). **TASK-M031** (Pengaturan, Hapus akun, lapisan privasi) `Done` (uji manual dan `flutter analyze` lolos 2026-11-10, dipush). Dokumen mobile: PRD v0.6, Architecture v0.19, Schema v0.1 (**perlu pembaruan**, lihat Utang dokumen), Design v0.17, Rules v0.16, progress v0.23. Sejak 2026-11-06 **dokumen mengikuti kode**. |
-| Berikutnya | **TASK-M032** (alur izin maskot mengambang: penjelasan, `SYSTEM_ALERT_WINDOW`, `POST_NOTIFICATIONS`, status izin). Spike TASK-M003 sebaiknya dikerjakan lebih dulu karena overlay adalah bagian paling berisiko (lihat Urutan kerja). Uji kasus krisis lewat aplikasi dengan backend nyata dan kunci Groq dilakukan founder. |
+| Tahap | Implementasi berjalan. Selesai (uji manual lolos): **TASK-M010 sampai M017** (seluruh backend MM1, repo web), **M020 sampai M031** (Flutter; M024 sampai M028 lolos 2026-11-07, M029 lolos 2026-11-09, M030 dan M031 lolos 2026-11-10, termasuk `flutter analyze` bersih untuk M027 dan M028; M028 juga mencakup API-M018 di repo web). **MM1 (Backend API) selesai** kecuali prasyarat rilis web. **MM3 (chat inti, krisis, saran, riwayat) selesai.** OQ-M3 diputuskan 2026-11-07 (Cek Rasa juga menulis Mood Entry). **TASK-M029** (latihan napas dan grounding 5-4-3-2-1 lokal) `Done` (uji manual lolos 2026-11-09, dipush `e658a31`). **TASK-M030** (maskot beranimasi dan Temani saja) `Done` (uji manual dan `flutter analyze` lolos 2026-11-10, dipush). **TASK-M031** (Pengaturan, Hapus akun, lapisan privasi) `Done` (uji manual dan `flutter analyze` lolos 2026-11-10, dipush). Dokumen mobile: PRD v0.6, Architecture v0.20, Schema v0.1 (**perlu pembaruan**, lihat Utang dokumen), Design v0.17, Rules v0.16, progress v0.24. Sejak 2026-11-06 **dokumen mengikuti kode**. |
+| Berikutnya | **TASK-M032** (alur izin maskot mengambang; keputusan spike M003 sudah ada di Architecture-M 6.4). Sebelum M033, founder menyiapkan perangkat uji (lihat daftar uji di 6.4 butir 6). Uji kasus krisis lewat aplikasi dengan backend nyata dan kunci Groq dilakukan founder. |
 | Pemblokir | Prasyarat web untuk **rilis**: TASK-031 (go-live), OQ-3 (kontak krisis terverifikasi), OQ-5 (telaah hukum data AI dan pelatihan, termasuk layanan suara pihak ketiga). Tanpa itu, tidak ada rilis mobile. **Keputusan founder (sesi 2026-11-05/06, dicatat di sini sebagai keputusan tertulis):** task kode dibuka tanpa menunggu TASK-M002. TASK-M002 tetap `Blocked` dan wajib selesai sebelum TASK-M045. |
 | Alur kerja | Kerja di `main`, commit lalu push, pesan commit bahasa Inggris. Dokumen di luar repo. Uji manual wajib; tanpa CI. |
 | Data | Sebelum TASK-M044, hanya data dummy bertanda jelas (akun `example.test`, kontak krisis `dummy`). Build `prod` tidak boleh memuat dummy (RULE-M048). |
@@ -51,7 +51,7 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 |---|---|---|---|---|
 | TASK-M001 | Menutup dokumen mobile: baca ulang PRD, Architecture, Schema, Design, Rules; pastikan nomor FR/OQ antar dokumen sinkron; serahkan ke folder dokumen | D | Semua | Todo (sebagian: kontrak API dan nama kode diselaraskan di Architecture-M v0.2; sisa: nomor FR/OQ antar dokumen) |
 | TASK-M002 | Prasyarat web: TASK-031 selesai, TASK-050 selesai, OQ-3 dan OQ-5 dijawab (atau keputusan tertulis untuk mulai API tanpa menunggu) | W | PRD-M 10 | Blocked |
-| TASK-M003 | Spike overlay Android: plugin vs Kotlin sendiri, jenis foreground service (Android 14+), izin, kebijakan Play. Keluaran: catatan keputusan di Architecture-M (menutup OQ-MA1) | M | Architecture-M 6.4, OQ-MA1 | Todo |
+| TASK-M003 | Spike overlay Android: plugin vs Kotlin sendiri, jenis foreground service (Android 14+), izin, kebijakan Play. Keluaran: catatan keputusan di Architecture-M (menutup OQ-MA1) | M | Architecture-M 6.4, OQ-MA1 | **Done** (riset 2026-11-10; hasil di Architecture-M 6.4 dan ADR-M15; uji perangkat menjadi syarat selesai M033) |
 | TASK-M004 | Spike STT: kualitas Bahasa Indonesia di 2-3 perangkat, perilaku jeda dan offline (menutup OQ-MA3) | M | Architecture-M 6.3, OQ-MA3 | Todo |
 | TASK-M005 | Putuskan OQ yang menghalangi: OQ-M2 (ejaan dan cara menyapa), OQ-M3 (Cek Rasa dan Mood Entry; **selesai 2026-11-07**: pesan chat dan Mood Entry), OQ-MA2 (**selesai 2026-11-06**: tautan tanpa login hanya untuk email dari API), OQ-MA4 (`SendChatMessage` sekarang atau bungkus dulu) | D | PRD-M, Architecture-M | Todo |
 
@@ -99,8 +99,8 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 
 | ID | Task | Repo | Rujukan | Status |
 |---|---|---|---|---|
-| TASK-M032 | Alur izin: penjelasan, `SYSTEM_ALERT_WINDOW`, `POST_NOTIFICATIONS`, status izin, default mati | M | FR-M022, Design-M SCR-M18 | **Next** |
-| TASK-M033 | `OverlayService` (foreground service + notifikasi dengan tombol "Nonaktifkan"), gelembung geser/tempel tepi, mini-panel, "Istirahatkan" (1 jam / sampai besok) | M | FR-M022..M024, Architecture-M 6.4 | Todo |
+| TASK-M032 | Alur izin: penjelasan, `SYSTEM_ALERT_WINDOW`, `POST_NOTIFICATIONS`, status izin, default mati | M | FR-M022, Design-M SCR-M18, Architecture-M 6.4 (hasil spike M003: izin dan alur) | **Next** |
+| TASK-M033 | `OverlayService` (foreground service + notifikasi dengan tombol "Nonaktifkan"), gelembung geser/tempel tepi, mini-panel, "Istirahatkan" (1 jam / sampai besok) | M | FR-M022..M024, Architecture-M 6.4 (Kotlin sendiri, `specialUse`, modul yang dapat dilepas, tanpa mulai dari latar belakang) | Todo |
 | TASK-M034 | Pengaturan overlay (aktif/nonaktif, snooze), deep link "Ngobrol" dan "Bicara" ke aplikasi, tanpa mikrofon/jaringan di overlay; uji di beberapa versi Android | M | FR-M023, ADR-M06 | Todo |
 
 ### MM6 - Hardening dan rilis Fase 1
@@ -198,7 +198,9 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 | OQ-M4 | Ingatan lintas hari (ringkasan terenkripsi) | Setelah MVP |
 | OQ-M5 | Batas harian untuk obrolan suara | TASK-M050 |
 | OQ-M6 | TTS: suara perangkat saja atau ElevenLabs API terbatas | TASK-M061 |
-| OQ-MA1 | Plugin overlay vs Kotlin; jenis foreground service | TASK-M003 |
+| OQ-MA1 | **Ditutup 2026-11-10 (spike M003):** Kotlin sendiri; foreground service `specialUse`; lihat Architecture-M 6.4 dan ADR-M15. | - |
+| OQ-MA13 | Apakah Play menerima `SYSTEM_ALERT_WINDOW` dan `specialUse` untuk maskot yang bersifat pelengkap (kebijakan meminta fitur inti tanpa alternatif)? Hanya diketahui saat tinjauan rilis; bila ditolak, rilis tanpa overlay (modul dilepas) dan pertimbangkan notifikasi gelembung | Rilis pertama ke Play (M040 dan sekitarnya) |
+| OQ-MA14 | Ketuk "Ngobrol" dari overlay membuka aplikasi di latar belakang pada Xiaomi, Oppo, Vivo, Samsung dan Android 10 sampai 16? Layanan bertahan? | Uji perangkat M033 |
 | OQ-MA2 | **Ditutup 2026-11-06:** email verifikasi yang dipicu API memakai rute bertanda tangan tanpa login (`verification.verify.guest`); email dari alur web tidak berubah (ADR-M09). | - |
 | OQ-MA3 | Kualitas STT Bahasa Indonesia, paket bahasa | TASK-M004 |
 | OQ-MA4 | `SendChatMessage` diekstrak sekarang atau bungkus dulu. Temuan 2026-11-06: logika ada di satu metode `ChatMessageController::store()` dan retry sudah ada (`retry=true`), jadi ekstraksi terbatas dan jelas batasnya | **Selesai 2026-11-06**: diekstrak sekarang | TASK-M010 |
@@ -273,7 +275,7 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 |---|---|---|
 | R-M1 | Penolakan toko | Karakter orisinal, disclaimer, hapus akun, overlay default mati |
 | R-M3 | Krisis terlewat karena salah dengar | TASK-M041, M053 |
-| R-M4 | Aturan foreground service/overlay berubah; Fase 1 lebih berat karena overlay ikut MVP | Spike TASK-M003; modul overlay terpisah dan bisa dimatikan lewat feature flag |
+| R-M4 | Aturan foreground service/overlay berubah; Fase 1 lebih berat karena overlay ikut MVP; Play dapat menolak izin dekoratif (OQ-MA13) | Spike TASK-M003 selesai (ADR-M15); modul overlay terpisah dengan entri manifest yang dapat dilepas; `features.overlay` mematikan fitur dari server; cadangan notifikasi gelembung |
 | R-M5/M7 | Biaya dan konsistensi suara | Generate semua klip dalam satu sesi selagi paket berbayar aktif |
 | Utang web | Refaktor `SendChatMessage` menyentuh produksi web | Uji manual sebelum dan sesudah (TASK-M010) |
 | Utang dokumen | Sinkronisasi nama OQ-MA/OQ-M dan nomor FR antar dokumen | Dicek di TASK-M001 |
@@ -332,12 +334,13 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 | 2026-11-10 (konfirmasi M030) | Founder melaporkan uji manual dan `flutter analyze` M030 lolos dan sudah dipush: `Done`. Architecture 0.17, Design 0.15, progress 0.21. Task berikutnya: M031. |
 | 2026-11-10 (sesi M031) | Dasar: `main` dad6fea (M030 `Done`). TASK-M031 dikodekan: `features/settings`, Pengaturan, Hapus akun, lapisan privasi, getar napas tersimpan, tautan di layar consent (OQ-MA12 ditutup), Keluar dipindah. Dokumen disinkronkan (Architecture 0.18, Design 0.16, Rules 0.16, progress 0.22). Menunggu `flutter analyze` dan uji manual M031. |
 | 2026-11-10 (konfirmasi M031) | Founder melaporkan semua uji manual M031 dan `flutter analyze` lolos dan sudah dipush: `Done`; lapisan privasi lolos uji di daftar aplikasi terbaru (utang `FLAG_SECURE` tidak perlu). Architecture 0.19, Design 0.17, progress 0.23. Task berikutnya: M032. |
+| 2026-11-10 (sesi spike M003) | Riset dokumen resmi Android dan Play: foreground service `specialUse` (satu-satunya jenis yang cocok), aturan Android 15 untuk `SYSTEM_ALERT_WINDOW`, kebijakan izin terbatas Play, plugin vs Kotlin (keputusan Kotlin sendiri), Bubbles sebagai cadangan. Hasil di Architecture 0.20 (6.4, ADR-M15). OQ-MA1 ditutup; OQ-MA13 dan OQ-MA14 baru. Belum ada uji perangkat. |
 
 ---
 
 ## 9. Catatan Serah Terima
 
-1. Mulai dari TASK-M032 (MM5; M027 sampai M031 sudah `Done`). Prasyarat web (TASK-M002) tetap wajib sebelum rilis (TASK-031, OQ-3, OQ-5).
+1. Mulai dari TASK-M032 (MM5; M027 sampai M031 sudah `Done`; spike M003 selesai). Prasyarat web (TASK-M002) tetap wajib sebelum rilis (TASK-031, OQ-3, OQ-5).
 2. Urutan kerja: MM1 (backend) dan MM2 (Flutter) boleh berselang-seling. Yang sudah ditempuh: M010 sampai M017, M020, M021, M022, M023 (uji lolos), M024, M025, M026 (uji lolos), M027 dan M028 (uji lolos), M029 (uji lolos), M030 (uji lolos), M031 (uji lolos). Yang disarankan berikutnya: M032, dan seterusnya sampai MM6. Fase 2 dan 3 dirilis sesudahnya.
 3. Spike TASK-M003 sebaiknya dikerjakan lebih awal karena overlay adalah bagian paling berisiko; bila hasilnya buruk, putuskan apakah overlay keluar dari Fase 1 (ubah PRD-M).
 4. Setiap perubahan perilaku, route, skema, atau keputusan memperbarui dokumen terkait dan progress ini di akhir task yang sama (RULE-M005).
@@ -348,6 +351,7 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.24 | 2026-11-10 | TASK-M003 (spike overlay) `Done` sebagai riset; OQ-MA1 ditutup; OQ-MA13 dan OQ-MA14 baru; R-M4 diperbarui; M032 dan M033 diberi catatan hasil spike. |
 | 0.23 | 2026-11-10 | M031 `Done` (uji manual dan analyze lolos); M032 berikutnya. |
 | 0.22 | 2026-11-10 | TASK-M031 `Doing` (kode selesai): Pengaturan, Hapus akun, lapisan privasi; OQ-MA12 ditutup; utang diperbarui; log sesi. |
 | 0.21 | 2026-11-10 | M030 `Done` (uji manual dan analyze lolos); M031 berikutnya. |

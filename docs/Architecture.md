@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Architecture
-Version: 0.19 | Status: Draft | Last updated: 2026-11-10
+Version: 0.20 | Status: Draft | Last updated: 2026-11-10
 Depends on: PRD RelaxMate Mobile v0.3, Architecture RelaxBoss (web), Schema RelaxBoss (web), Rules v1.5 | Owner: Founder (solo developer)
 
 Label: `[Verified]` ada sumber (sisi mobile: repo `relaxmate-mobile-apps` commit `8014c38`; sisi backend: repo `RELAXBOSS_WEBSITE` commit `9afd27c`), `[Inference]` kesimpulan, `[Assumption]` bisa diubah. **Dokumen ini mengikuti kode:** bila berbeda dari kode, kode yang benar. Kedalaman: **Lite**. Dokumen ini hanya mengatur sisi mobile dan tambahan di backend. Subsistem AI (rotasi key, `ChatbotService`, `CrisisDetector`), enkripsi, dan admin tetap di Architecture web dan tidak diulang di sini.
@@ -33,7 +33,7 @@ Label: `[Verified]` ada sumber (sisi mobile: repo `relaxmate-mobile-apps` commit
 | Klip suara | `just_audio` | Putar klip rekaman bundel | Cek versi |
 | Suara balasan | `flutter_tts` | Suara bawaan perangkat, percobaan (Fase 3) | Cek versi |
 | Maskot | WebP beranimasi transparan per keadaan, diputar `Image.asset` | Animasi diam, menyimak, berpikir, bicara | `[Verified: keputusan founder 2026-11-09]` Rive dibuang (paket gratis menyisipkan splash Rive); tanpa paket baru |
-| Overlay Android | Plugin overlay atau modul Kotlin sendiri | Maskot mengambang | Putuskan di spike (OQ-MA1) |
+| Overlay Android | Modul Kotlin sendiri (tanpa plugin Flutter); foreground service `specialUse` | Maskot mengambang | `[Verified: spike M003 2026-11-10]` riset dokumen; uji perangkat menyusul di M033 |
 | Server | Laravel 13 yang sama, `/api/v1`, Sanctum token | ADR-M02 | `[Verified]` Laravel 13.40.0 dan Sanctum 4.3.3 terpasang (TASK-M012) |
 
 ---
@@ -260,9 +260,25 @@ Interupsi (telepon masuk, fokus audio hilang, aplikasi ke latar belakang) selalu
 | Tidak dilakukan | Tidak merekam di overlay, tidak memanggil API dari overlay, tidak membawa data pengguna, tidak memakai `AccessibilityService`, tidak membaca layar, tidak menampilkan di layar kunci |
 | Status | `enabled`, `snoozeUntil`, posisi Y di `shared_preferences` (bukan data sensitif) |
 | Setelah reboot | Tidak mulai sendiri; pengguna mengaktifkan lagi dari aplikasi `[Assumption]` (mengurangi izin dan risiko review) |
-| Jenis foreground service | Dicek terhadap aturan Android 14+ dan kebijakan Play saat spike (OQ-MA1) |
+| Jenis foreground service | **`specialUse`** (hasil spike M003, lihat di bawah): izin `FOREGROUND_SERVICE_SPECIAL_USE`, `<property>` `PROPERTY_SPECIAL_USE_FGS_SUBTYPE` berisi penjelasan, dan deklarasi di Play Console |
+| Implementasi | **Kotlin sendiri, tanpa plugin Flutter** (hasil spike M003): `OverlayService` memakai `View` native; tidak ada mesin Flutter kedua |
 
 Karena overlay tidak merekam dan tidak memanggil jaringan, mikrofon hanya pernah aktif di dalam aplikasi yang sedang terbuka.
+
+**Hasil spike TASK-M003 (2026-11-10) `[Verified: dokumentasi resmi Android dan Play, dibaca 2026-11-10]` kecuali yang bertanda lain.** Riset dokumen; belum ada uji di perangkat (lihat daftar uji di bawah).
+
+1. **Jenis foreground service.** Android 14 mewajibkan setiap foreground service menyatakan jenis (`startForeground()` tanpa jenis melempar `MissingForegroundServiceTypeException`). Dari 13 jenis resmi, tidak ada yang khusus overlay; `systemExempted` hanya untuk aplikasi sistem, VPN, dan sejenisnya. Satu-satunya yang cocok adalah `specialUse` ("kasus yang tidak tercakup jenis lain"): izin `FOREGROUND_SERVICE_SPECIAL_USE` (normal, otomatis diberikan), tanpa prasyarat runtime, dengan `<property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE">` berisi penjelasan yang ditinjau Play. Play Console mewajibkan deklarasi di **App content**: deskripsi fitur, dampak bagi pengguna bila ditunda atau dihentikan sistem, tautan video yang memperlihatkan langkah memicu fitur, dan kasus penggunaan.
+2. **Android 15 (target 35+).** Aplikasi pemegang `SYSTEM_ALERT_WINDOW` hanya boleh memulai foreground service dari latar belakang bila saat itu punya **jendela overlay yang terlihat** (sebelumnya pengecualiannya lebih luas); sekadar memegang izin tidak cukup. Akibat rancangan: `OverlayService` **hanya dimulai dari aksi pengguna saat aplikasi terbuka** (saklar di Pengaturan atau tombol di SCR-M18), tidak pernah dari alarm, penerima siaran, atau pekerjaan latar belakang. Pembatasan `BOOT_COMPLETED` Android 15 tidak berlaku bagi kita karena kita memang tidak mulai sendiri setelah reboot.
+3. **Kebijakan Play.** `SYSTEM_ALERT_WINDOW` tergolong izin khusus dalam kebijakan "Permissions and APIs that Access Sensitive Information" (bagian izin terbatas): hanya diminta untuk fitur inti yang penting tanpa alternatif, pengguna diarahkan ke halaman Pengaturan sistem, penolakan harus dihormati, aplikasi tetap berfungsi tanpa izin, dan pengguna tidak boleh dipaksa atau dimanipulasi. Tidak ada formulir deklarasi khusus untuk izin ini di halaman kebijakan tersebut. **Risiko:** maskot bersifat pelengkap (bukan fitur inti), jadi tinjauan bisa mempersoalkannya; hasilnya baru diketahui saat tinjauan `[Assumption]`.
+4. **Plugin atau Kotlin: Kotlin sendiri.** `flutter_overlay_window` (kandidat terkuat) menjalankan overlay sebagai aplikasi Flutter terpisah (titik masuk Dart sendiri, `MediaQuery` tidak tersedia, komunikasi lewat `shareData`), yaitu mesin Flutter kedua untuk gelembung yang hanya berisi gambar dan tiga tombol. Pelacak isunya menampilkan sekitar 22 isu dan PR terbuka, termasuk "crash setelah naik ke SDK 34" dan "butuh `foregroundServiceType`" tanpa komentar pengelola yang terlihat; informasi versi dari dua sumber berbeda (0.5.0 sekitar 11 bulan lalu, README menyebut 1.0.2), jadi kondisi perawatannya tidak jelas `[Assumption]`. Kebutuhan kita kecil dan jelas (gelembung, geser, tempel tepi, mini-panel, tombol "Nonaktifkan", Istirahatkan, tanpa papan ketik), dan kontrol atas bendera jendela, notifikasi, serta Play lebih penting daripada menghemat kode. Animasi: `ImageDecoder`/`AnimatedImageDrawable` (API 28+) memutar WebP maskot yang sama; di API 26 dan 27 tampil gambar diam `relaxmate-half.webp`.
+5. **Rancangan yang mengikuti dari hasil ini (untuk M032 sampai M034).**
+   - Alur izin M032: `Settings.canDrawOverlays()` dan `ACTION_MANAGE_OVERLAY_PERMISSION` dengan URI paket; hasilnya tidak dikembalikan, jadi cek ulang saat aplikasi kembali ke depan. `POST_NOTIFICATIONS` (Android 13+) diminta bersama penjelasan; bila ditolak, tombol "Tutup" di mini-panel tetap tersedia dan layar menjelaskan bahwa notifikasi dengan tombol "Nonaktifkan" tidak akan terlihat.
+   - Istirahatkan: 1 jam = layanan tetap hidup, gelembung disembunyikan, pewaktu di dalam layanan. "Sampai besok" = layanan berhenti dan `snoozeUntil` disimpan; saat aplikasi dibuka setelah waktu itu, aplikasi menawarkan mengaktifkan lagi. **Tidak ada pemulihan otomatis dari latar belakang** (akan melanggar butir 2).
+   - **Modul overlay terpisah:** entri manifest (`SYSTEM_ALERT_WINDOW`, `FOREGROUND_SERVICE_SPECIAL_USE`, layanan) ditaruh di source set Gradle sendiri yang dapat dilepas (mis. flavor atau properti build), sehingga bila Play menolak, build tanpa overlay tetap bisa dirilis tanpa izin itu di manifest. Penanda server `features.overlay` hanya mematikan fitur, tidak mencabut izin dari manifest.
+   - Cadangan bila Play menolak: **notifikasi gelembung (Bubbles API)** tanpa izin khusus, tetapi syaratnya berat: notifikasi percakapan dengan shortcut berbagi, isi yang membesar berupa Activity yang resizable dan embedded, gelembung hanya ada selama notifikasinya, pengguna dapat memblokir, tampil sebagai notifikasi biasa di layar kunci, dan ikon tidak beranimasi. Cukup untuk "pintasan cepat ke Ngobrol", bukan maskot yang selalu ada.
+6. **Belum bisa dipastikan dari dokumen (uji perangkat, syarat selesai M033 dan M034):** (a) mengetuk "Ngobrol" atau "Bicara" dari overlay benar-benar membuka aplikasi saat aplikasi di latar belakang di Android 10+ dan di Xiaomi, Oppo, Vivo, Samsung (OEM punya izin tambahan seperti "tampilkan jendela pop-up saat berjalan di latar belakang" dan pembunuh baterai agresif); (b) layanan bertahan di perangkat tersebut; (c) layar yang melarang overlay (Android 12+ dapat menyembunyikan overlay di layar sensitif) tidak menimbulkan kebingungan; (d) gelembung kecil dengan bendera tidak-fokus tidak menghalangi sentuhan ke aplikasi di bawahnya secara tidak wajar.
+
+**Sumber:** [Foreground service types are required (Android 14)](https://developer.android.com/about/versions/14/changes/fgs-types-required); [Changes to foreground services (Android 15 dan 16)](https://developer.android.com/develop/background-work/services/fgs/changes); [Play: foreground service dan full-screen intent](https://support.google.com/googleplay/android-developer/answer/13392821); [Play: Permissions and APIs that Access Sensitive Information](https://support.google.com/googleplay/android-developer/answer/16558241); [Bubbles](https://developer.android.com/guide/topics/ui/bubbles); [README flutter_overlay_window](https://pub.dev/documentation/flutter_overlay_window/latest/); [isu flutter_overlay_window](https://issues.ecosyste.ms/hosts/GitHub/repositories/X-SLAYER%2Fflutter_overlay_window/issues?page=1).
 
 ---
 
@@ -405,6 +421,7 @@ Alat pengembangan di luar aplikasi: Node.js untuk `tool/mock_api.mjs` (tanpa dep
 | ADR-M12 | CORS dimatikan untuk API | Klien hanya aplikasi native; mengurangi paparan ke peramban pihak lain | Bila suatu hari ada klien peramban, CORS harus dibuka dengan daftar origin eksplisit |
 | ADR-M13 | Pemeriksaan versi aplikasi (`min_app_version`) gagal-terbuka dengan batas 5 detik | Kontak bantuan dan latihan harus tetap bisa dipakai offline (RULE-M034) | Aplikasi lama tidak diblokir bila server tidak terjangkau |
 | ADR-M14 | Gerbang consent berupa widget pembungkus (`ConsentGate`) dengan `ConsentController` sendiri, bukan cabang `authRedirect` | Consent bukan keadaan sesi; latihan dan kontak bantuan tidak boleh ikut tertahan; `authRedirect` tetap fungsi murni dan kecil | Setiap layar AI baru harus dibungkus `ConsentGate` (atau satu `ShellRoute` bila sudah banyak); riwayat dan detail hari sudah (TASK-M027), Cek Rasa menyusul |
+| ADR-M15 | Overlay maskot: Kotlin sendiri, foreground service `specialUse`, hanya dimulai dari aksi pengguna saat aplikasi terbuka, entri manifest di modul yang dapat dilepas | Android 14 mewajibkan jenis (tidak ada jenis overlay selain `specialUse`); Android 15 menyempitkan pengecualian `SYSTEM_ALERT_WINDOW`; plugin memakai mesin Flutter kedua dan punya isu Android 14 terbuka; Play dapat menolak izin dekoratif sehingga perlu build tanpa overlay | Spike M003, 6.4 |
 
 ---
 
@@ -437,6 +454,7 @@ Alat pengembangan di luar aplikasi: Node.js untuk `tool/mock_api.mjs` (tanpa dep
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.20 | 2026-11-10 | TASK-M003 (spike overlay): hasil di 6.4, ADR-M15, baris teknologi overlay diputuskan, OQ-MA1 ditutup. |
 | 0.19 | 2026-11-10 | TASK-M031 diverifikasi (uji manual dan analyze lolos). |
 | 0.18 | 2026-11-10 | TASK-M031: struktur `features/settings`, paragraf Pengaturan, Hapus akun, dan lapisan privasi, penggunaan API-M010 dan M017 oleh klien, OQ-MA12 diputuskan. |
 | 0.17 | 2026-11-10 | TASK-M030 diverifikasi (uji manual dan analyze lolos). |
