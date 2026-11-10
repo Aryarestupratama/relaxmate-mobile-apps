@@ -8,6 +8,8 @@
          POST_NOTIFICATIONS: izin runtime Android 13+ untuk notifikasi dengan tombol "Nonaktifkan". -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
     <!-- OVERLAY-END -->
     <!-- allowBackup=false: token dan data tidak ikut cadangan (RULE-M048, Architecture-M bagian 8).
          Tidak ada usesCleartextTraffic di sini: bawaan false (targetSdk >= 28); hanya build debug
@@ -36,6 +38,17 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- OVERLAY-BEGIN: layanan maskot mengambang (TASK-M033). specialUse: tidak ada jenis
+             layanan khusus overlay (spike M003). Subjenis dibaca peninjau Play. -->
+        <service
+            android:name=".overlay.OverlayService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Maskot pendamping kecil yang ditampilkan di atas aplikasi lain atas permintaan pengguna, dengan tombol untuk membuka aplikasi dan menonaktifkannya. Tidak membaca layar atau merekam."/>
+        </service>
+        <!-- OVERLAY-END -->
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />

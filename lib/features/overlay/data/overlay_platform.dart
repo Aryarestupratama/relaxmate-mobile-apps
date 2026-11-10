@@ -20,6 +20,7 @@ class OverlayPlatform {
       return OverlayPermissions(
         canDrawOverlays: result['canDrawOverlays'] == true,
         notificationsGranted: result['notificationsGranted'] == true,
+        running: result['running'] == true,
       );
     } on PlatformException {
       return OverlayPermissions.unsupported;
@@ -31,6 +32,12 @@ class OverlayPlatform {
   /// Membuka halaman izin "tampil di atas aplikasi lain" untuk aplikasi ini. Hasil izin tidak
   /// dikembalikan; periksa ulang `status()` saat aplikasi kembali ke depan.
   Future<bool> openOverlaySettings() => _invokeBool('openOverlaySettings');
+
+  /// Memulai layanan maskot. Hanya dari aksi pengguna saat aplikasi terbuka (Android 15).
+  /// `false` bila izin overlay belum ada atau sistem menolak.
+  Future<bool> start() => _invokeBool('start');
+
+  Future<bool> stop() => _invokeBool('stop');
 
   /// Meminta izin notifikasi (dialog sistem di Android 13+). `true` bila notifikasi aktif.
   Future<bool> requestNotifications() => _invokeBool('requestNotifications');

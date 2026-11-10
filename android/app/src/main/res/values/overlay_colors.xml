@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Salinan token warna Dart (`RbColors.standard`) untuk overlay native; ubah bersama tokennya. -->
+<resources>
+    <color name="overlay_card">#FFFFFF</color>
+    <color name="overlay_text">#0A2244</color>
+    <color name="overlay_text_secondary">#42506A</color>
+    <color name="overlay_border">#D5DCE8</color>
+    <color name="overlay_primary">#0A2244</color>
+    <color name="overlay_on_primary">#FFFFFF</color>
+    <color name="overlay_surface_alt">#EEF2F8</color>
+</resources>

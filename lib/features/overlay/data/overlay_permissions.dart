@@ -1,8 +1,9 @@
-/// Keadaan izin yang dibutuhkan maskot mengambang (FR-M022).
+/// Keadaan izin dan layanan maskot mengambang (FR-M022, FR-M024).
 class OverlayPermissions {
   const OverlayPermissions({
     required this.canDrawOverlays,
     required this.notificationsGranted,
+    this.running = false,
   });
 
   /// Platform tidak mendukung (bukan Android, atau saluran native tidak ada).
@@ -16,4 +17,7 @@ class OverlayPermissions {
 
   /// Notifikasi aplikasi aktif (izin runtime Android 13+ atau tidak dimatikan pengguna).
   final bool notificationsGranted;
+
+  /// Layanan maskot sedang berjalan.
+  final bool running;
 }

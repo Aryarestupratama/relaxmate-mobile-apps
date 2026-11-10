@@ -18,7 +18,10 @@ import io.flutter.plugin.common.MethodChannel
  * mengarahkan izin; tidak menampilkan apa pun (gelembung dibuat di TASK-M033).
  *
  * Metode:
- * - `status`: `{canDrawOverlays, notificationsGranted}`
+ * - `status`: `{canDrawOverlays, notificationsGranted, running}`
+ * - `start`: memulai `OverlayService` (hanya dari aksi pengguna saat aplikasi terbuka); `true` bila
+ *   izin overlay ada dan permintaan dikirim
+ * - `stop`: menghentikan `OverlayService`
  * - `openOverlaySettings`: membuka halaman "tampil di atas aplikasi lain" untuk aplikasi ini
  * - `requestNotifications`: meminta POST_NOTIFICATIONS (Android 13+); hasilnya `true` bila aktif
  * - `openNotificationSettings`: membuka pengaturan notifikasi aplikasi
@@ -46,8 +49,24 @@ class OverlayChannel(
                 mapOf(
                     "canDrawOverlays" to Settings.canDrawOverlays(activity),
                     "notificationsGranted" to notificationsGranted(),
+                    "running" to OverlayService.running,
                 ),
             )
+
+            "start" -> {
+                if (!Settings.canDrawOverlays(activity)) {
+                    result.success(false)
+                } else {
+                    val intent = Intent(activity, OverlayService::class.java)
+                        .setAction(OverlayService.ACTION_START)
+                    result.success(startService(intent))
+                }
+            }
+
+            "stop" -> {
+                activity.stopService(Intent(activity, OverlayService::class.java))
+                result.success(true)
+            }
 
             "openOverlaySettings" -> {
                 val intent = Intent(
@@ -104,6 +123,16 @@ class OverlayChannel(
     private fun notificationsGranted(): Boolean {
         val manager = activity.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         return manager.areNotificationsEnabled()
+    }
+
+    private fun startService(intent: Intent): Boolean {
+        return try {
+            activity.startForegroundService(intent)
+            true
+        } catch (error: RuntimeException) {
+            // Mis. ForegroundServiceStartNotAllowedException bila aplikasi tidak di depan layar.
+            false
+        }
     }
 
     private fun launch(intent: Intent): Boolean {

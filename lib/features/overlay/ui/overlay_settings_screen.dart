@@ -8,13 +8,13 @@ import 'package:relaxmate/features/overlay/state/overlay_permissions_controller.
 import 'package:relaxmate/features/settings/state/settings_controller.dart';
 
 /// SCR-M18: Maskot mengambang (FR-M022, Architecture-M 6.4). Penjelasan sebelum izin, saklar
-/// (bawaan mati), status dua izin, dan tombol ke pengaturan sistem. Memasang saklar hanya
-/// menyimpan pilihan pengguna; gelembungnya sendiri dibuat di TASK-M033.
+/// (bawaan mati), status dua izin, dan tombol ke pengaturan sistem. Menyalakan saklar memulai
+/// `OverlayService` (gelembung, TASK-M033); mematikannya menghentikan layanan.
 ///
 /// Alur menyalakan: (1) bila izin "tampil di atas aplikasi lain" belum ada, dialog penjelasan
 /// lalu halaman izin sistem; hasilnya tidak dikembalikan, jadi status dibaca ulang saat
 /// aplikasi kembali ke depan dan alur dilanjutkan; (2) izin notifikasi diminta (Android 13+),
-/// tetapi penolakan tidak menghentikan alur; (3) pilihan disimpan. Penolakan dihormati dan
+/// tetapi penolakan tidak menghentikan alur; (3) layanan dimulai dan pilihan disimpan. Penolakan dihormati dan
 /// tidak ada desakan (kebijakan Play untuk izin khusus).
 class OverlaySettingsScreen extends ConsumerStatefulWidget {
   const OverlaySettingsScreen({super.key});
@@ -50,6 +50,11 @@ class _OverlaySettingsScreenState extends ConsumerState<OverlaySettingsScreen>
   }
 
   Future<void> _onResumed() async {
+    // Layanan native dapat mengubah pilihan sendiri (Nonaktifkan, Istirahat sampai besok).
+    await ref.read(settingsControllerProvider.notifier).reload();
+    if (!mounted) {
+      return;
+    }
     final permissions =
         await ref.read(overlayPermissionsControllerProvider.notifier).refresh();
     if (!mounted) {
@@ -60,9 +65,10 @@ class _OverlaySettingsScreenState extends ConsumerState<OverlaySettingsScreen>
       if (permissions.canDrawOverlays) {
         await _finishEnable();
       }
-    } else if (!permissions.canDrawOverlays &&
-        ref.read(settingsControllerProvider).overlayEnabled) {
-      // Izin dicabut di pengaturan sistem: pilihan ikut dimatikan agar tidak menyesatkan.
+    } else if (ref.read(settingsControllerProvider).overlayEnabled &&
+        (!permissions.canDrawOverlays || !permissions.running)) {
+      // Izin dicabut, atau layanan berhenti tanpa sepengetahuan layar (mis. ponsel dimulai
+      // ulang atau sistem mematikannya): pilihan ikut dimatikan agar tidak menyesatkan.
       await ref.read(settingsControllerProvider.notifier).setOverlayEnabled(
             false,
           );
@@ -83,6 +89,10 @@ class _OverlaySettingsScreenState extends ConsumerState<OverlaySettingsScreen>
       await ref.read(settingsControllerProvider.notifier).setOverlayEnabled(
             false,
           );
+      await ref.read(overlayPlatformProvider).stop();
+      if (mounted) {
+        await ref.read(overlayPermissionsControllerProvider.notifier).refresh();
+      }
       return;
     }
 
@@ -150,10 +160,19 @@ class _OverlaySettingsScreenState extends ConsumerState<OverlaySettingsScreen>
         await ref.read(overlayPermissionsControllerProvider.notifier).refresh();
       }
     }
-    if (mounted) {
-      await ref.read(settingsControllerProvider.notifier).setOverlayEnabled(
-            true,
-          );
+    if (!mounted) {
+      return;
+    }
+    // Layanan dimulai dari sini, saat aplikasi terbuka (syarat Android 15).
+    final started = await platform.start();
+    if (!mounted) {
+      return;
+    }
+    await ref.read(settingsControllerProvider.notifier).setOverlayEnabled(
+          started,
+        );
+    if (!started) {
+      _snack(AppTexts.overlayStartFailed);
     }
   }
 

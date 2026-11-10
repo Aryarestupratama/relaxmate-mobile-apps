@@ -24,6 +24,15 @@ class SettingsController extends Notifier<AppSettings> {
     }
   }
 
+  /// Membaca ulang dari disk, mis. setelah layanan maskot mematikan pilihannya sendiri lewat
+  /// tombol "Nonaktifkan" atau "Istirahat sampai besok".
+  Future<void> reload() async {
+    final stored = await ref.read(settingsRepositoryProvider).read();
+    if (ref.mounted) {
+      state = stored;
+    }
+  }
+
   Future<void> setBreathingHaptics(bool enabled) {
     return _update(state.copyWith(breathingHaptics: enabled));
   }

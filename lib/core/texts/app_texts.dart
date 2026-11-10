@@ -246,6 +246,9 @@ abstract final class AppTexts {
       'bisa mematikannya kapan saja.';
   static const String overlayExplainConfirm = 'Buka pengaturan';
   static const String overlayExplainLater = 'Nanti saja';
+  static const String overlayStartFailed =
+      'Maskot belum bisa dimulai. Pastikan izin tampil di atas aplikasi lain '
+      'aktif, lalu coba lagi.';
   static const String overlaySettingsFailed =
       'Halaman pengaturan belum bisa dibuka. Buka pengaturan Android secara manual.';
 

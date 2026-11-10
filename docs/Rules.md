@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Rules (Aturan Proyek)
-Version: 0.17 | Status: Draft | Last updated: 2026-11-10
+Version: 0.18 | Status: Draft | Last updated: 2026-11-10
 Depends on: PRD-Mobile v0.4, Architecture-Mobile v0.3, Schema-Mobile v0.1, Design-Mobile v0.4, Rules RelaxBoss (web) v1.5 | Owner: Founder (solo developer)
 
 Dokumen ini adalah panduan kerja founder sebagai pengembang tunggal untuk **repo mobile (Flutter)**; bantuan AI boleh dipakai dengan tetap mengikuti seluruh aturan, melakukan verifikasi manual, dan tidak menganggap keluaran otomatis sebagai bukti kebenaran. Untuk pekerjaan di **repo web** (task backend `TASK-M01x`), `Rules.md` web tetap berlaku penuh; aturan di sini hanya menambah. Kata MUST, MUST NOT, SHOULD dipakai secara tegas. Kedalaman: **Lite**. Prinsip: sederhana, fungsi dulu, aman dulu.
@@ -136,6 +136,7 @@ Jangan: menambah fitur di luar PRD, memanggil Groq atau layanan suara langsung d
 
 - A-R6: Pemeriksaan kode TASK-M022 terhadap aturan (2026-11-06, pencarian teks): lihat catatan hasil M022 di `progress.md`; `flutter analyze` dan `dart format` belum dijalankan (A-R2).
 - A-R11: Pemeriksaan kode TASK-M028 terhadap aturan (2026-11-07, pencarian teks): tanpa `print`, `// ignore:`, `Colors.*`/`Color(0x...)`, `dynamic`, null-bang, atau `TODO` di `lib/features/checkin` dan `chat_welcome.dart`; ukuran, jarak, dan warna hanya dari token (ditambah `RbSize.moodBlob`); teks di `AppTexts`; jalur aset di `AppAssets`; panggilan jaringan hanya lewat `MoodRepository` (RULE-M022); tombol blob `Semantics` dengan target >= 48dp (RULE-M055); `dart format` gaya Dart 3.5 bersih; `flutter analyze` bersih (dijalankan founder, 2026-11-07).
+- A-R16: Pemeriksaan TASK-M033 (2026-11-10): layanan tidak memakai mikrofon, kamera, jaringan, `AccessibilityService`, atau pembacaan layar; tidak dimulai dari latar belakang (hanya `OverlayChannel.start` atas aksi pengguna); `START_NOT_STICKY`; teks native di `strings.xml`, warna di `colors.xml` (RULE tokens berlaku untuk Dart saja `[Assumption]`). Kotlin belum dikompilasi di sandbox.
 - A-R15: Pemeriksaan kode TASK-M032 terhadap aturan (2026-11-10, pencarian teks): `lib/features/overlay` tanpa `print`, `// ignore:`, `dynamic`, null-bang, atau `TODO`; teks dari `AppTexts`; warna dari token; izin diminta hanya setelah penjelasan dan atas aksi pengguna; tidak ada izin latar belakang. Kotlin belum dikompilasi di sandbox. Belum dijalankan: `dart format`, `flutter analyze`, build Android, uji perangkat.
 - A-R14: Pemeriksaan kode TASK-M031 terhadap aturan (2026-11-10, pencarian teks): `lib/features/settings` dan berkas yang diubah tanpa `print`, `// ignore:`, `Colors.*`/`Color(0x...)`, null-bang, atau `TODO`; teks hanya dari `AppTexts`; warna dari token; kata sandi tidak disimpan, dicatat, atau dikirim selain ke API-M017 (RULE-M040). Belum dijalankan: `dart format`, `flutter analyze`, uji emulator.
 - A-R13: Pemeriksaan kode TASK-M030 terhadap aturan (2026-11-10, pencarian teks): `lib/features/mascot` dan `typing_indicator.dart` tanpa `print`, `// ignore:`, `Colors.*`/`Color(0x...)`, `dynamic`, null-bang, atau `TODO`; teks hanya dari `AppTexts`; ukuran dari `RbSize`; gerak dikurangi dihormati. Belum dijalankan: `dart format`, `flutter analyze`, uji emulator.
@@ -150,6 +151,7 @@ Jangan: menambah fitur di luar PRD, memanggil Groq atau layanan suara langsung d
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.18 | 2026-11-10 | A-R16 (pemeriksaan M033). |
 | 0.17 | 2026-11-10 | A-R15 (pemeriksaan kode M032). |
 | 0.16 | 2026-11-10 | A-R14 (pemeriksaan kode M031). |
 | 0.15 | 2026-11-10 | RULE-M051 disesuaikan (maskot WebP tanpa library); A-R13 (pemeriksaan kode M030). |

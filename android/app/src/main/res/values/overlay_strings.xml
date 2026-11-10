@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Teks maskot mengambang (TASK-M033). Overlay dijalankan Kotlin tanpa mesin Flutter, jadi
+     teksnya tidak bisa memakai AppTexts; disalin dari Design-M bagian 7 dan 6.4. -->
+<resources>
+    <string name="overlay_bubble_description">Maskot RelaxMate. Ketuk untuk membuka panel.</string>
+    <string name="overlay_panel_name">RelaxMate</string>
+    <string name="overlay_panel_greeting">Hai! Hari ini rasanya gimana?</string>
+    <string name="overlay_action_chat">Ngobrol</string>
+    <string name="overlay_action_rest_hour">Istirahat 1 jam</string>
+    <string name="overlay_action_rest_tomorrow">Istirahat sampai besok</string>
+    <string name="overlay_action_turn_off">Matikan maskot</string>
+    <string name="overlay_action_close_panel">Tutup panel</string>
+    <string name="overlay_notification_channel">Maskot mengambang</string>
+    <string name="overlay_notification_title">Maskot RelaxMate aktif</string>
+    <string name="overlay_notification_text">Maskot tampil di atas aplikasi lain.</string>
+    <string name="overlay_notification_resting">Maskot sedang istirahat.</string>
+    <string name="overlay_notification_turn_off">Nonaktifkan</string>
+</resources>

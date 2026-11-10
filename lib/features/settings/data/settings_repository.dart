@@ -11,6 +11,8 @@ class SettingsRepository {
   Future<AppSettings> read() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      // Sisi Kotlin (layanan maskot) juga menulis berkas ini; baca ulang dari disk.
+      await prefs.reload();
       return AppSettings(
         breathingHaptics:
             prefs.getBool(AppConstants.settingsBreathingHapticsKey) ??
