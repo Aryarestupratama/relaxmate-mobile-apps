@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:relaxmate/core/error/api_exception.dart';
+import 'package:relaxmate/core/router/app_routes.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/features/auth/state/auth_controller.dart';
@@ -144,6 +146,18 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
           onPressed:
               enabled ? ref.read(authControllerProvider.notifier).logout : null,
           child: const Text(AppTexts.logout),
+        ),
+        // Jalan keluar bagi yang belum atau tidak menyetujui (OQ-MA12): latihan lokal dan
+        // Pengaturan (hapus akun). Kontak bantuan sudah ada di kerangka layar.
+        TextButton(
+          onPressed:
+              enabled ? () => context.push<void>(AppRoutes.exercises) : null,
+          child: const Text(AppTexts.consentExercisesLink),
+        ),
+        TextButton(
+          onPressed:
+              enabled ? () => context.push<void>(AppRoutes.settings) : null,
+          child: const Text(AppTexts.consentSettingsLink),
         ),
       ],
     );

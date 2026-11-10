@@ -638,6 +638,25 @@ async function authApi(req, res, path) {
     });
   }
 
+  if (method === 'DELETE' && path === '/api/v1/account') {
+    const user = authedUser(req, res);
+    if (!user) return undefined;
+    const body = await readJson(req);
+    const password = typeof body.password === 'string' ? body.password : '';
+    if (!password) {
+      return validation(res, { password: ['Kata sandi wajib diisi.'] });
+    }
+    if (user.password !== password) {
+      return validation(res, { password: ['Kata sandi tidak cocok.'] });
+    }
+    users.delete(user.email);
+    for (const [token, email] of [...tokens.entries()]) {
+      if (email === user.email) tokens.delete(token);
+    }
+    res.writeHead(204);
+    return res.end();
+  }
+
   if (method === 'POST' && path === '/api/v1/mood-entries') {
     const user = authedUser(req, res);
     if (!user) return undefined;

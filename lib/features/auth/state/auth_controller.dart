@@ -106,6 +106,13 @@ class AuthController extends Notifier<AuthState> {
     await _endSession();
   }
 
+  /// Menghapus akun di server (butuh kata sandi), lalu mengakhiri sesi di perangkat. Bila
+  /// server menolak, galatnya dilempar dan sesi tetap berjalan.
+  Future<void> deleteAccount(String password) async {
+    await ref.read(authRepositoryProvider).deleteAccount(password);
+    await _endSession();
+  }
+
   /// Keluar hanya di perangkat (tanpa memanggil server), mis. saat server tak terjangkau.
   Future<void> signOutLocally() => _endSession();
 

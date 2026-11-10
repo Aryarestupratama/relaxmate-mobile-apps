@@ -6,7 +6,6 @@ import 'package:relaxmate/core/router/app_routes.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_radius.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
-import 'package:relaxmate/features/auth/state/auth_controller.dart';
 import 'package:relaxmate/features/chat/data/suggestion_visibility.dart';
 import 'package:relaxmate/features/chat/state/chat_controller.dart';
 import 'package:relaxmate/features/chat/state/chat_state.dart';
@@ -23,11 +22,10 @@ import 'package:relaxmate/shared/widgets/mate_avatar.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar_size.dart';
 
 /// Pilihan di menu bilah atas chat. Ikon telepon (kontak bantuan) sengaja di luar menu.
-enum _ChatMenuAction { history, exercises, companion }
+enum _ChatMenuAction { history, exercises, companion, settings }
 
 /// SCR-M08: aliran chat harian (FR-M004, M006, M007). Dibungkus `ConsentGate` di router.
 /// Tampilan sengaja sederhana sampai desain final tersedia.
-/// TODO(TASK-M031): pindahkan tombol Keluar ke Pengaturan.
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
 
@@ -109,6 +107,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   context.push<void>(AppRoutes.exercises);
                 case _ChatMenuAction.companion:
                   context.push<void>(AppRoutes.companion);
+                case _ChatMenuAction.settings:
+                  context.push<void>(AppRoutes.settings);
               }
             },
             itemBuilder: (context) => const <PopupMenuEntry<_ChatMenuAction>>[
@@ -124,11 +124,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 value: _ChatMenuAction.companion,
                 child: Text(AppTexts.companionMenu),
               ),
+              PopupMenuItem<_ChatMenuAction>(
+                value: _ChatMenuAction.settings,
+                child: Text(AppTexts.settingsTitle),
+              ),
             ],
-          ),
-          TextButton(
-            onPressed: ref.read(authControllerProvider.notifier).logout,
-            child: const Text(AppTexts.logout),
           ),
         ],
       ),

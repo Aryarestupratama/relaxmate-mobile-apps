@@ -1,4 +1,5 @@
 import 'package:relaxmate/core/api/json_map.dart';
+import 'package:relaxmate/features/consent/data/training_choice.dart';
 
 /// Status consent pengguna dari server (`state` pada `GET /consent`, `GET /me`, dan balasan
 /// POST consent). Hanya kolom yang dipakai klien yang dibaca.
@@ -7,6 +8,7 @@ class ConsentState {
     required this.aiGranted,
     required this.trainingAnswered,
     required this.complete,
+    this.trainingChoice,
   });
 
   /// Consent AI sudah disetujui pada versi terbaru.
@@ -14,6 +16,9 @@ class ConsentState {
 
   /// Pilihan persetujuan pelatihan sudah dijawab pada versi terbaru.
   final bool trainingAnswered;
+
+  /// Pilihan pelatihan yang tersimpan (`training.choice`); `null` bila belum dijawab.
+  final TrainingChoice? trainingChoice;
 
   /// Keduanya lengkap: fitur AI boleh dipakai.
   final bool complete;
@@ -33,6 +38,7 @@ class ConsentState {
       aiGranted: ai['granted'] == true,
       trainingAnswered: training['answered'] == true,
       complete: value['complete'] == true,
+      trainingChoice: TrainingChoice.fromWire(training['choice']),
     );
   }
 }

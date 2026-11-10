@@ -33,6 +33,12 @@ abstract final class AppRoutes {
   /// tanpa kuota (FR-M015).
   static const String companion = '/temani';
 
+  /// Pengaturan (SCR-M17) dan Hapus akun (SCR-M19). Pengaturan perlu email terverifikasi;
+  /// Hapus akun juga terbuka bagi akun yang belum terverifikasi (API-M017 tanpa
+  /// `api.verified`), supaya yang salah mengetik email tetap bisa menghapus datanya.
+  static const String settings = '/pengaturan';
+  static const String deleteAccount = '/pengaturan/hapus-akun';
+
   /// Layar yang hanya untuk tamu; pengguna yang sudah masuk dialihkan keluar.
   static const Set<String> guestOnly = <String>{
     login,

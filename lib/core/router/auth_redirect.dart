@@ -9,7 +9,8 @@ import 'package:relaxmate/features/auth/state/auth_state.dart';
 /// - Memeriksa token tersimpan: hanya layar peralihan `/memuat`.
 /// - Sesi belum bisa diperiksa: hanya layar `/sesi` (coba lagi atau keluar).
 /// - Tamu: hanya Masuk, Daftar, Lupa sandi.
-/// - Masuk tetapi email belum terverifikasi: hanya Cek email (SCR-M06).
+/// - Masuk tetapi email belum terverifikasi: hanya Cek email (SCR-M06) dan Hapus akun
+///   (SCR-M19).
 /// - Masuk dan terverifikasi: tidak boleh di layar tamu atau peralihan.
 String? authRedirect(AuthState auth, String location) {
   if (location == AppRoutes.crisisContacts) {
@@ -28,7 +29,9 @@ String? authRedirect(AuthState auth, String location) {
 
 String? _authenticatedRedirect(UserSummary user, String location) {
   if (!user.emailVerified) {
-    return location == AppRoutes.checkEmail ? null : AppRoutes.checkEmail;
+    final allowed =
+        location == AppRoutes.checkEmail || location == AppRoutes.deleteAccount;
+    return allowed ? null : AppRoutes.checkEmail;
   }
 
   final leaving = AppRoutes.guestOnly.contains(location) ||

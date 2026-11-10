@@ -21,6 +21,12 @@ abstract final class AppConstants {
   /// Banyak kontak yang tampil langsung di `CrisisBanner`; sisanya lewat "Lihat semua".
   static const int crisisBannerMaxContacts = 2;
 
+  /// Kunci pengaturan di `shared_preferences` (tidak sensitif): getar halus latihan napas dan
+  /// lapisan privasi di daftar aplikasi terbaru (TASK-M031).
+  static const String settingsBreathingHapticsKey =
+      'settings_breathing_haptics_v1';
+  static const String settingsPrivacyCoverKey = 'settings_privacy_cover_v1';
+
   /// Nama kunci token di penyimpanan aman.
   static const String tokenStorageKey = 'auth_token';
 

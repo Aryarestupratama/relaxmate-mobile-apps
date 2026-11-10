@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:relaxmate/core/error/api_exception.dart';
+import 'package:relaxmate/core/router/app_routes.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/features/auth/state/auth_controller.dart';
@@ -169,6 +171,13 @@ class _CheckEmailScreenState extends ConsumerState<CheckEmailScreen>
           child: Text(
             _busy == _Busy.signingOut ? AppTexts.processing : AppTexts.logout,
           ),
+        ),
+        // API-M017 tidak meminta email terverifikasi: yang salah mengetik email tetap bisa
+        // menghapus datanya.
+        TextButton(
+          onPressed:
+              idle ? () => context.push<void>(AppRoutes.deleteAccount) : null,
+          child: const Text(AppTexts.settingsDeleteAccount),
         ),
       ],
     );

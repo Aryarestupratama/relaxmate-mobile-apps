@@ -53,6 +53,16 @@ class AuthRepository {
     await _api.post('/auth/logout');
   }
 
+  /// API-M017: menghapus akun beserta datanya (balasan 204). Galat 422 membawa
+  /// `fieldErrors['password']` (sandi salah, terlalu banyak percobaan) atau
+  /// `fieldErrors['account']` (admin terakhir).
+  Future<void> deleteAccount(String password) async {
+    await _api.delete(
+      '/account',
+      body: <String, Object?>{'password': password},
+    );
+  }
+
   /// API-M004. Balasan selalu sama, terdaftar atau tidak. Mengembalikan pesan server.
   Future<String> forgotPassword(String email) async {
     final json = await _api.post(

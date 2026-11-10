@@ -8,4 +8,14 @@ enum TrainingChoice {
 
   /// Nilai yang dikirim ke server pada kolom `choice`.
   final String wireValue;
+
+  /// `null` bila belum dijawab atau nilainya tidak dikenal.
+  static TrainingChoice? fromWire(Object? value) {
+    for (final choice in TrainingChoice.values) {
+      if (choice.wireValue == value) {
+        return choice;
+      }
+    }
+    return null;
+  }
 }

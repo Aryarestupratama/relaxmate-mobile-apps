@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:relaxmate/features/exercises/data/breathing_phase.dart';
 import 'package:relaxmate/features/exercises/data/breathing_plan.dart';
 import 'package:relaxmate/features/exercises/state/breathing_state.dart';
+import 'package:relaxmate/features/settings/state/settings_controller.dart';
 
 /// Pemilik alur latihan napas (FR-M014): memilih durasi, berjalan tahap demi tahap, selesai.
 /// Berjalan sepenuhnya di perangkat; tanpa jaringan, tanpa AI, tanpa kuota.
@@ -18,7 +19,9 @@ class BreathingController extends Notifier<BreathingState> {
   @override
   BreathingState build() {
     ref.onDispose(_cancel);
-    return const BreathingState();
+    return BreathingState(
+      haptics: ref.read(settingsControllerProvider).breathingHaptics,
+    );
   }
 
   void selectMinutes(int minutes) {
@@ -28,8 +31,15 @@ class BreathingController extends Notifier<BreathingState> {
     state = state.copyWith(minutes: minutes);
   }
 
+  /// Pilihan getar juga disimpan sebagai pengaturan (TASK-M031), jadi dipakai lagi pada
+  /// pembukaan layar berikutnya.
   void setHaptics(bool enabled) {
     state = state.copyWith(haptics: enabled);
+    unawaited(
+      ref
+          .read(settingsControllerProvider.notifier)
+          .setBreathingHaptics(enabled),
+    );
   }
 
   /// Mulai dari putaran pertama, tahap tarik napas.

@@ -188,6 +188,39 @@ abstract final class AppTexts {
   // Menu di bilah atas chat (SCR-M08).
   static const String chatMenuTooltip = 'Menu';
 
+  // Pengaturan (SCR-M17) dan Hapus akun (SCR-M19), FR-M003, FR-M025.
+  static const String settingsTitle = 'Pengaturan';
+  static const String settingsAccount = 'Akun';
+  static const String settingsTraining = 'Persetujuan pelatihan';
+  static const String settingsTrainingSaved = 'Pilihanmu disimpan.';
+  static const String settingsPractice = 'Latihan';
+  static const String settingsPrivacy = 'Privasi dan bantuan';
+  static const String settingsPrivacyCover =
+      'Sembunyikan layar di aplikasi terbaru';
+  static const String settingsPrivacyCoverHint =
+      'Saat kamu berpindah aplikasi, layar RelaxMate diganti gambar polos '
+      'supaya isinya tidak terlihat di daftar aplikasi terbaru.';
+  static const String settingsPolicy = 'Kebijakan Privasi';
+  static const String settingsTerms = 'Ketentuan layanan';
+  static const String settingsHelp = 'Kontak bantuan';
+  static const String settingsDeleteAccount = 'Hapus akun';
+  static String settingsVersion(String version) => 'Versi $version';
+
+  static const String deleteBody =
+      'Akunmu dan semua datamu akan dihapus dan tidak bisa dipulihkan: '
+      'percakapan, riwayat, dan catatan suasana hati. Masukkan kata sandimu '
+      'untuk melanjutkan.';
+  static const String deleteButton = 'Hapus akun saya';
+  static const String deleteConfirmTitle = 'Hapus akunmu?';
+  static const String deleteConfirmBody =
+      'Ini tidak bisa dibatalkan. Semua datamu akan hilang.';
+  static const String deleteCancel = 'Batal';
+  static const String deleteConfirm = 'Ya, hapus';
+
+  // Tautan di layar consent bagi yang belum atau tidak menyetujui (OQ-MA12).
+  static const String consentExercisesLink = 'Latihan napas dan grounding';
+  static const String consentSettingsLink = 'Pengaturan dan hapus akun';
+
   // Maskot dan Temani saja (SCR-M13, FR-M015). Tanpa AI dan tanpa kuota; maskot tidak
   // mengaku punya perasaan (RULE-M046).
   static const String companionMenu = 'Temani saja';

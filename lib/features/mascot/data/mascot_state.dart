@@ -7,7 +7,7 @@ enum MascotState {
   /// Diam / bernapas: sambutan chat dan Temani saja.
   idle,
 
-  /// Menyimak: mode suara saat mendengarkan (dipakai di TASK-M034).
+  /// Menyimak: mode suara saat mendengarkan (mode suara Fase 2, SCR-M10).
   listening,
 
   /// Berpikir: menunggu balasan.
