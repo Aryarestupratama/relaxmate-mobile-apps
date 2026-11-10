@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Design System dan Spesifikasi Layar
-Version: 0.20 | Status: Draft | Last updated: 2026-11-10
+Version: 0.21 | Status: Draft | Last updated: 2026-11-11
 Depends on: PRD-Mobile v0.3, Architecture-Mobile v0.3, Design RelaxBoss (web) | Owner: Founder (solo developer)
 
 Label: `[Assumption]` bisa diubah. Kedalaman: **Lite**. Platform: Android (phone) dulu, mode terang. Tata letak layar yang tidak tertulis dibangun sederhana (fungsi dulu) memakai token dan komponen di dokumen ini (RULE-M007).
@@ -348,6 +348,7 @@ Ikon: satu set (`[Assumption]` Lucide untuk Flutter), ukuran 24dp, stroke 2. OQ-
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.21 | 2026-11-11 | Tampilan istirahat dan spanduk tawaran lanjut diverifikasi (Redmi Note 10S, Android 14). |
 | 0.20 | 2026-11-10 | M032 dan M033 diverifikasi; TASK-M034: tampilan istirahat, spanduk tawaran lanjut. |
 | 0.19 | 2026-11-10 | TASK-M033: OVL-M01 dan OVL-M02 dibangun (deviasi: tanpa Bicara). |
 | 0.18 | 2026-11-10 | TASK-M032: SCR-M18 dibangun (izin dan saklar), bagian "Maskot" di Pengaturan. |
