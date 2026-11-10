@@ -32,6 +32,10 @@ class SettingsController extends Notifier<AppSettings> {
     return _update(state.copyWith(privacyCover: enabled));
   }
 
+  Future<void> setOverlayEnabled(bool enabled) {
+    return _update(state.copyWith(overlayEnabled: enabled));
+  }
+
   Future<void> _update(AppSettings next) async {
     _touched = true;
     state = next;

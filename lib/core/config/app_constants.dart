@@ -27,6 +27,9 @@ abstract final class AppConstants {
       'settings_breathing_haptics_v1';
   static const String settingsPrivacyCoverKey = 'settings_privacy_cover_v1';
 
+  /// Pilihan pengguna untuk maskot mengambang (TASK-M032). Bawaan mati; pilihan ini bukan izin.
+  static const String settingsOverlayEnabledKey = 'settings_overlay_enabled_v1';
+
   /// Nama kunci token di penyimpanan aman.
   static const String tokenStorageKey = 'auth_token';
 

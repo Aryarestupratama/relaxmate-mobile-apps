@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -140,6 +141,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
             ),
             SizedBox(height: space.lg),
+            if (defaultTargetPlatform == TargetPlatform.android) ...<Widget>[
+              const _SectionTitle(AppTexts.settingsMascot),
+              _LinkTile(
+                icon: LucideIcons.heartHandshake,
+                label: AppTexts.overlayTitle,
+                onTap: () => context.push<void>(AppRoutes.overlaySettings),
+              ),
+              SizedBox(height: space.lg),
+            ],
             const _SectionTitle(AppTexts.settingsPrivacy),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,

@@ -2,6 +2,13 @@
     <!-- Aplikasi memanggil API RelaxBoss (HTTPS di prod), jadi izin INTERNET wajib di manifest
          utama agar build rilis juga bisa terhubung (TASK-M022). Sebelumnya hanya ada di debug. -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- OVERLAY-BEGIN (TASK-M032, ADR-M15): izin maskot mengambang. Hanya blok ini dan paket
+         Kotlin `overlay/` yang perlu dilepas bila Play menolak izin overlay (OQ-MA13).
+         SYSTEM_ALERT_WINDOW: izin khusus, diminta lewat halaman Pengaturan sistem.
+         POST_NOTIFICATIONS: izin runtime Android 13+ untuk notifikasi dengan tombol "Nonaktifkan". -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- OVERLAY-END -->
     <!-- allowBackup=false: token dan data tidak ikut cadangan (RULE-M048, Architecture-M bagian 8).
          Tidak ada usesCleartextTraffic di sini: bawaan false (targetSdk >= 28); hanya build debug
          yang mengaktifkannya lewat src/debug/AndroidManifest.xml. -->

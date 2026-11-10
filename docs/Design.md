@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Design System dan Spesifikasi Layar
-Version: 0.17 | Status: Draft | Last updated: 2026-11-10
+Version: 0.18 | Status: Draft | Last updated: 2026-11-10
 Depends on: PRD-Mobile v0.3, Architecture-Mobile v0.3, Design RelaxBoss (web) | Owner: Founder (solo developer)
 
 Label: `[Assumption]` bisa diubah. Kedalaman: **Lite**. Platform: Android (phone) dulu, mode terang. Tata letak layar yang tidak tertulis dibangun sederhana (fungsi dulu) memakai token dan komponen di dokumen ini (RULE-M007).
@@ -226,6 +226,8 @@ Dibangun di TASK-M031 `[Verified: uji manual dan `flutter analyze` lolos, founde
 ### SCR-M18 Maskot mengambang
 Penjelasan sederhana sebelum izin: "Maskot bisa muncul kecil di layarmu supaya kamu merasa ditemani. Maskot tidak membaca layarmu dan tidak mendengarkan." Toggle aktif/nonaktif, status izin ("Izin tampil di atas aplikasi lain: aktif/belum"), tombol "Buka pengaturan izin", pilihan istirahat. Default mati.
 
+Dibangun di TASK-M032 `[Belum diuji manual]` (`OverlaySettingsScreen`, `/pengaturan/maskot`, hanya Android; tautan di Pengaturan bagian "Maskot"): kalimat penjelasan persis seperti di atas; `SwitchListTile` "Tampilkan maskot mengambang" (bawaan mati, tampil menyala hanya bila pilihan tersimpan dan izin overlay aktif); dua baris status ("Izin tampil di atas aplikasi lain: aktif/belum", "Izin notifikasi: aktif/belum", hijau saat aktif); tombol teks "Buka pengaturan izin" bila izin overlay belum ada; untuk notifikasi, keterangan pendek dan tombol "Izinkan notifikasi" (bila dialog sistem tidak muncul lagi, membuka pengaturan notifikasi). Menyalakan tanpa izin: dialog "Izinkan tampil di atas aplikasi lain?" (Nanti saja / Buka pengaturan), lalu halaman izin sistem, lalu kembali ke layar dan alur lanjut sendiri. Penolakan dihormati tanpa desakan. Pilihan istirahat menyusul di TASK-M034; gelembung di TASK-M033.
+
 ### OVL-M01 / M02 Overlay
 Gelembung 64dp di tepi layar; sentuh membuka mini-panel dengan sapaan dari teks lokal dan tiga aksi: **Ngobrol** (buka aplikasi), **Bicara** (buka aplikasi di mode suara), **Istirahatkan** (1 jam / sampai besok). Tidak tampil di layar kunci; tidak merekam; tidak memuat data pengguna.
 
@@ -345,6 +347,7 @@ Ikon: satu set (`[Assumption]` Lucide untuk Flutter), ukuran 24dp, stroke 2. OQ-
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.18 | 2026-11-10 | TASK-M032: SCR-M18 dibangun (izin dan saklar), bagian "Maskot" di Pengaturan. |
 | 0.17 | 2026-11-10 | TASK-M031 diverifikasi (SCR-M17, SCR-M19, lapisan privasi). |
 | 0.16 | 2026-11-10 | TASK-M031: SCR-M17 dan SCR-M19 dibangun, lapisan privasi, tautan Latihan dan Pengaturan di SCR-M07 (OQ-MA12), AppBar chat tanpa tombol Keluar. |
 | 0.15 | 2026-11-10 | TASK-M030 diverifikasi (SCR-M13, CMP-M28, CMP-M03). |

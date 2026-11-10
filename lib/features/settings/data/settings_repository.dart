@@ -17,6 +17,8 @@ class SettingsRepository {
                 AppSettings.defaults.breathingHaptics,
         privacyCover: prefs.getBool(AppConstants.settingsPrivacyCoverKey) ??
             AppSettings.defaults.privacyCover,
+        overlayEnabled: prefs.getBool(AppConstants.settingsOverlayEnabledKey) ??
+            AppSettings.defaults.overlayEnabled,
       );
     } on Object {
       return AppSettings.defaults;
@@ -33,6 +35,10 @@ class SettingsRepository {
       await prefs.setBool(
         AppConstants.settingsPrivacyCoverKey,
         settings.privacyCover,
+      );
+      await prefs.setBool(
+        AppConstants.settingsOverlayEnabledKey,
+        settings.overlayEnabled,
       );
     } on Object {
       // Pengaturan tetap berlaku selama aplikasi terbuka; hanya tidak tersimpan.

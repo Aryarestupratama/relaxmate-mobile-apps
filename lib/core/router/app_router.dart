@@ -19,6 +19,7 @@ import 'package:relaxmate/features/exercises/ui/grounding_screen.dart';
 import 'package:relaxmate/features/history/ui/conversation_screen.dart';
 import 'package:relaxmate/features/history/ui/history_screen.dart';
 import 'package:relaxmate/features/mascot/ui/companion_screen.dart';
+import 'package:relaxmate/features/overlay/ui/overlay_settings_screen.dart';
 import 'package:relaxmate/features/settings/ui/delete_account_screen.dart';
 import 'package:relaxmate/features/settings/ui/settings_screen.dart';
 import 'package:relaxmate/features/startup/ui/splash_view.dart';
@@ -95,6 +96,10 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.settings,
         builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.overlaySettings,
+        builder: (context, state) => const OverlaySettingsScreen(),
       ),
       GoRoute(
         path: AppRoutes.deleteAccount,

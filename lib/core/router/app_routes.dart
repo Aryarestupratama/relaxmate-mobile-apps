@@ -39,6 +39,9 @@ abstract final class AppRoutes {
   static const String settings = '/pengaturan';
   static const String deleteAccount = '/pengaturan/hapus-akun';
 
+  /// Maskot mengambang (SCR-M18), Android saja (TASK-M032).
+  static const String overlaySettings = '/pengaturan/maskot';
+
   /// Layar yang hanya untuk tamu; pengguna yang sudah masuk dialihkan keluar.
   static const Set<String> guestOnly = <String>{
     login,

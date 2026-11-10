@@ -194,6 +194,7 @@ abstract final class AppTexts {
   static const String settingsTraining = 'Persetujuan pelatihan';
   static const String settingsTrainingSaved = 'Pilihanmu disimpan.';
   static const String settingsPractice = 'Latihan';
+  static const String settingsMascot = 'Maskot';
   static const String settingsPrivacy = 'Privasi dan bantuan';
   static const String settingsPrivacyCover =
       'Sembunyikan layar di aplikasi terbaru';
@@ -216,6 +217,37 @@ abstract final class AppTexts {
       'Ini tidak bisa dibatalkan. Semua datamu akan hilang.';
   static const String deleteCancel = 'Batal';
   static const String deleteConfirm = 'Ya, hapus';
+
+  // Maskot mengambang (SCR-M18, FR-M022): izin dan pilihan. Gelembungnya sendiri di TASK-M033.
+  static const String overlayTitle = 'Maskot mengambang';
+  static const String overlayIntro =
+      'Maskot bisa muncul kecil di layarmu supaya kamu merasa ditemani. '
+      'Maskot tidak membaca layarmu dan tidak mendengarkan.';
+  static const String overlayToggle = 'Tampilkan maskot mengambang';
+  static const String overlayPermissionOverlay =
+      'Izin tampil di atas aplikasi lain';
+  static const String overlayPermissionNotifications = 'Izin notifikasi';
+  static const String overlayGranted = 'aktif';
+  static const String overlayNotGranted = 'belum';
+  static const String overlayOpenSettings = 'Buka pengaturan izin';
+  static const String overlayAllowNotifications = 'Izinkan notifikasi';
+  static const String overlayOpenNotificationSettings =
+      'Buka pengaturan notifikasi';
+  static const String overlayNotificationsHint =
+      'Notifikasi dipakai untuk tombol "Nonaktifkan" pada maskot. Tanpa izin ini '
+      'kamu tetap bisa menutup maskot lewat tombol tutup di panelnya, tetapi '
+      'tombol di notifikasi tidak terlihat.';
+  static const String overlayExplainTitle =
+      'Izinkan tampil di atas aplikasi lain?';
+  static const String overlayExplainBody =
+      'Android akan membuka halaman pengaturan. Cari RelaxMate lalu nyalakan '
+      '"Izinkan tampil di atas aplikasi lain". Izin ini hanya dipakai untuk '
+      'menampilkan maskot; maskot tidak membaca layar dan tidak merekam. Kamu '
+      'bisa mematikannya kapan saja.';
+  static const String overlayExplainConfirm = 'Buka pengaturan';
+  static const String overlayExplainLater = 'Nanti saja';
+  static const String overlaySettingsFailed =
+      'Halaman pengaturan belum bisa dibuka. Buka pengaturan Android secara manual.';
 
   // Tautan di layar consent bagi yang belum atau tidak menyetujui (OQ-MA12).
   static const String consentExercisesLink = 'Latihan napas dan grounding';
