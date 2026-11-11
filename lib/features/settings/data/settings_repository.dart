@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:relaxmate/core/config/app_constants.dart';
 import 'package:relaxmate/features/settings/data/app_settings.dart';
+import 'package:relaxmate/features/settings/data/chat_view_mode.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Pengaturan lokal di `shared_preferences` (tidak sensitif, tanpa jaringan). Gagal membaca
@@ -21,6 +22,10 @@ class SettingsRepository {
             AppSettings.defaults.privacyCover,
         overlayEnabled: prefs.getBool(AppConstants.settingsOverlayEnabledKey) ??
             AppSettings.defaults.overlayEnabled,
+        chatViewMode: ChatViewMode.parse(
+          prefs.getString(AppConstants.settingsChatViewModeKey),
+          fallback: AppSettings.defaults.chatViewMode,
+        ),
       );
     } on Object {
       return AppSettings.defaults;
@@ -41,6 +46,10 @@ class SettingsRepository {
       await prefs.setBool(
         AppConstants.settingsOverlayEnabledKey,
         settings.overlayEnabled,
+      );
+      await prefs.setString(
+        AppConstants.settingsChatViewModeKey,
+        settings.chatViewMode.storageValue,
       );
     } on Object {
       // Pengaturan tetap berlaku selama aplikasi terbuka; hanya tidak tersimpan.

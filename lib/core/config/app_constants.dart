@@ -34,6 +34,9 @@ abstract final class AppConstants {
   /// Pilihan pengguna untuk maskot mengambang (TASK-M032). Bawaan mati; pilihan ini bukan izin.
   static const String settingsOverlayEnabledKey = 'settings_overlay_enabled_v1';
 
+  /// Tampilan chat harian: `mascot` atau `conversation` (TASK-M035, FR-M027).
+  static const String settingsChatViewModeKey = 'settings_chat_view_mode_v1';
+
   /// Nama kunci token di penyimpanan aman.
   static const String tokenStorageKey = 'auth_token';
 

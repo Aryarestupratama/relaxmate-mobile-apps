@@ -187,6 +187,9 @@ abstract final class AppTexts {
 
   // Menu di bilah atas chat (SCR-M08).
   static const String chatMenuTooltip = 'Menu';
+  static const String chatModeToConversation = 'Tampilkan sebagai obrolan';
+  static const String chatModeToMascot = 'Tampilkan dengan maskot';
+  static const String chatSeeConversation = 'Lihat percakapan';
 
   // Pengaturan (SCR-M17) dan Hapus akun (SCR-M19), FR-M003, FR-M025.
   static const String settingsTitle = 'Pengaturan';
@@ -195,6 +198,10 @@ abstract final class AppTexts {
   static const String settingsTrainingSaved = 'Pilihanmu disimpan.';
   static const String settingsPractice = 'Latihan';
   static const String settingsMascot = 'Maskot';
+  static const String settingsDisplay = 'Tampilan';
+  static const String settingsChatMascotMode = 'Maskot di chat';
+  static const String settingsChatMascotModeHint =
+      'Maskot di tengah layar dan balasan terakhir di bawahnya. Matikan untuk daftar obrolan biasa.';
   static const String settingsPrivacy = 'Privasi dan bantuan';
   static const String settingsPrivacyCover =
       'Sembunyikan layar di aplikasi terbaru';

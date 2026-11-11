@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:relaxmate/features/settings/data/app_settings.dart';
+import 'package:relaxmate/features/settings/data/chat_view_mode.dart';
 import 'package:relaxmate/features/settings/data/settings_repository.dart';
 
 /// Pemilik pengaturan lokal. Dimuat sekali saat aplikasi dibuka (oleh `PrivacyCover` di
@@ -43,6 +44,10 @@ class SettingsController extends Notifier<AppSettings> {
 
   Future<void> setOverlayEnabled(bool enabled) {
     return _update(state.copyWith(overlayEnabled: enabled));
+  }
+
+  Future<void> setChatViewMode(ChatViewMode mode) {
+    return _update(state.copyWith(chatViewMode: mode));
   }
 
   Future<void> _update(AppSettings next) async {

@@ -1,9 +1,12 @@
+import 'package:relaxmate/features/settings/data/chat_view_mode.dart';
+
 /// Pengaturan lokal pengguna (FR-M025). Suara menyusul di task fiturnya.
 class AppSettings {
   const AppSettings({
     required this.breathingHaptics,
     required this.privacyCover,
     required this.overlayEnabled,
+    required this.chatViewMode,
   });
 
   /// Bawaan: getar mati (hemat dan tidak mengejutkan); lapisan privasi nyala (NFR-M01).
@@ -11,6 +14,7 @@ class AppSettings {
     breathingHaptics: false,
     privacyCover: true,
     overlayEnabled: false,
+    chatViewMode: ChatViewMode.mascot,
   );
 
   /// Getar halus di setiap pergantian tahap latihan napas.
@@ -23,15 +27,20 @@ class AppSettings {
   /// overlay juga aktif.
   final bool overlayEnabled;
 
+  /// Tampilan chat harian (FR-M027); bawaan maskot.
+  final ChatViewMode chatViewMode;
+
   AppSettings copyWith({
     bool? breathingHaptics,
     bool? privacyCover,
     bool? overlayEnabled,
+    ChatViewMode? chatViewMode,
   }) {
     return AppSettings(
       breathingHaptics: breathingHaptics ?? this.breathingHaptics,
       privacyCover: privacyCover ?? this.privacyCover,
       overlayEnabled: overlayEnabled ?? this.overlayEnabled,
+      chatViewMode: chatViewMode ?? this.chatViewMode,
     );
   }
 }

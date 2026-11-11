@@ -10,10 +10,18 @@ import 'package:relaxmate/features/chat/data/chat_message.dart';
 /// dan tidak mengandalkan warna saja: banner dan teks tetap menyertainya. Isi ditampilkan
 /// sebagai teks biasa. [announce] membuat pembaca layar mengumumkan pesan baru dengan sopan.
 class ChatBubble extends StatelessWidget {
-  const ChatBubble({required this.message, this.announce = false, super.key});
+  const ChatBubble({
+    required this.message,
+    this.announce = false,
+    this.fullWidth = false,
+    super.key,
+  });
 
   final ChatMessage message;
   final bool announce;
+
+  /// Memenuhi lebar yang tersedia (tampilan maskot); bawaan dibatasi 80% lebar layar.
+  final bool fullWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +31,9 @@ class ChatBubble extends StatelessWidget {
     final isUser = message.role == ChatRole.user;
     const radius = Radius.circular(RbRadius.bubble);
     const tail = Radius.circular(RbRadius.bubbleTail);
-    final maxWidth =
-        MediaQuery.sizeOf(context).width * RbSize.bubbleMaxWidthFactor;
+    final maxWidth = fullWidth
+        ? double.infinity
+        : MediaQuery.sizeOf(context).width * RbSize.bubbleMaxWidthFactor;
     final speaker = isUser ? AppTexts.chatYouSaid : AppTexts.chatMateSaid;
     final crisis = message.isCrisis && !isUser;
     final background = isUser
@@ -44,6 +53,7 @@ class ChatBubble extends StatelessWidget {
             excludeSemantics: true,
             label: '$speaker: ${message.content}',
             child: Container(
+              width: fullWidth ? double.infinity : null,
               padding: EdgeInsets.symmetric(
                 horizontal: space.md,
                 vertical: space.sm,

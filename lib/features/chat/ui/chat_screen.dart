@@ -13,6 +13,7 @@ import 'package:relaxmate/features/chat/state/send_outcome.dart';
 import 'package:relaxmate/features/chat/ui/chat_bubble.dart';
 import 'package:relaxmate/features/chat/ui/chat_input_bar.dart';
 import 'package:relaxmate/features/chat/ui/chat_welcome.dart';
+import 'package:relaxmate/features/chat/ui/mascot_chat_pane.dart';
 import 'package:relaxmate/features/chat/ui/suggestion_chips.dart';
 import 'package:relaxmate/features/chat/ui/typing_indicator.dart';
 import 'package:relaxmate/features/checkin/state/checkin_controller.dart';
@@ -20,6 +21,8 @@ import 'package:relaxmate/features/overlay/ui/overlay_resume_banner.dart';
 import 'package:relaxmate/features/crisis/ui/crisis_banner.dart';
 import 'package:relaxmate/shared/widgets/error_alert.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar.dart';
+import 'package:relaxmate/features/settings/data/chat_view_mode.dart';
+import 'package:relaxmate/features/settings/state/settings_controller.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar_size.dart';
 
 /// Pilihan di menu bilah atas chat. Ikon telepon (kontak bantuan) sengaja di luar menu.
@@ -72,6 +75,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final chat = ref.watch(chatControllerProvider);
     final controller = ref.read(chatControllerProvider.notifier);
     final space = context.rbSpace;
+    final viewMode = ref.watch(
+      settingsControllerProvider.select((settings) => settings.chatViewMode),
+    );
+    final isMascotView = viewMode == ChatViewMode.mascot;
 
     // Pesan Cek Rasa terkirim tetapi Mood Entry belum tercatat: beri tahu sekali (FR-M013).
     ref.listen<String?>(
@@ -91,6 +98,20 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       appBar: AppBar(
         title: const _ChatTitle(),
         actions: <Widget>[
+          IconButton(
+            onPressed: () =>
+                ref.read(settingsControllerProvider.notifier).setChatViewMode(
+                      isMascotView
+                          ? ChatViewMode.conversation
+                          : ChatViewMode.mascot,
+                    ),
+            tooltip: isMascotView
+                ? AppTexts.chatModeToConversation
+                : AppTexts.chatModeToMascot,
+            icon: Icon(
+              isMascotView ? LucideIcons.messageCircle : LucideIcons.smile,
+            ),
+          ),
           // Jalur ke bantuan nyata selalu terlihat, tidak tersembunyi di menu (Design-M
           // prinsip 4).
           IconButton(
@@ -147,6 +168,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             ),
           final ChatReady ready => _ChatBody(
               ready: ready,
+              viewMode: viewMode,
+              onShowConversation: () => ref
+                  .read(settingsControllerProvider.notifier)
+                  .setChatViewMode(ChatViewMode.conversation),
               input: _input,
               onSend: _send,
               onRetry: controller.retry,
@@ -172,7 +197,14 @@ class _ChatTitle extends StatelessWidget {
       children: <Widget>[
         const MateAvatar(size: MateAvatarSize.small),
         SizedBox(width: space.sm),
-        Text(AppTexts.appName, style: text.h3),
+        Flexible(
+          child: Text(
+            AppTexts.appName,
+            style: text.h3,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
         SizedBox(width: space.xs),
         Container(
           padding: EdgeInsets.symmetric(horizontal: space.xs),
@@ -190,6 +222,8 @@ class _ChatTitle extends StatelessWidget {
 class _ChatBody extends StatelessWidget {
   const _ChatBody({
     required this.ready,
+    required this.viewMode,
+    required this.onShowConversation,
     required this.input,
     required this.onSend,
     required this.onRetry,
@@ -198,6 +232,8 @@ class _ChatBody extends StatelessWidget {
   });
 
   final ChatReady ready;
+  final ChatViewMode viewMode;
+  final VoidCallback onShowConversation;
   final TextEditingController input;
   final VoidCallback onSend;
   final VoidCallback onRetry;
@@ -224,37 +260,44 @@ class _ChatBody extends StatelessWidget {
         Expanded(
           child: newestFirst.isEmpty
               ? ChatWelcome(canCheckin: !ready.limitReached)
-              : ListView.builder(
-                  reverse: true,
-                  padding: EdgeInsets.all(space.md),
-                  itemCount: newestFirst.length + typing,
-                  itemBuilder: (context, index) {
-                    if (typing == 1 && index == 0) {
-                      return const TypingIndicator();
-                    }
-                    final position = index - typing;
-                    final message = newestFirst[position];
-                    final bubble = ChatBubble(
-                      message: message,
-                      announce: position == 0,
-                    );
-                    final suggestion = message.suggestion;
-                    if (suggestion == null ||
-                        !suggestionIds.contains(message.id)) {
-                      return bubble;
-                    }
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        bubble,
-                        SuggestionChips(
-                          suggestion: suggestion,
-                          onDismiss: () => onDismissSuggestion(message.id),
-                        ),
-                      ],
-                    );
-                  },
-                ),
+              : viewMode == ChatViewMode.mascot
+                  ? MascotChatPane(
+                      ready: ready,
+                      suggestionIds: suggestionIds,
+                      onDismissSuggestion: onDismissSuggestion,
+                      onShowConversation: onShowConversation,
+                    )
+                  : ListView.builder(
+                      reverse: true,
+                      padding: EdgeInsets.all(space.md),
+                      itemCount: newestFirst.length + typing,
+                      itemBuilder: (context, index) {
+                        if (typing == 1 && index == 0) {
+                          return const TypingIndicator();
+                        }
+                        final position = index - typing;
+                        final message = newestFirst[position];
+                        final bubble = ChatBubble(
+                          message: message,
+                          announce: position == 0,
+                        );
+                        final suggestion = message.suggestion;
+                        if (suggestion == null ||
+                            !suggestionIds.contains(message.id)) {
+                          return bubble;
+                        }
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            bubble,
+                            SuggestionChips(
+                              suggestion: suggestion,
+                              onDismiss: () => onDismissSuggestion(message.id),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
         ),
         if (error != null)
           Padding(

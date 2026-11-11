@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Design System dan Spesifikasi Layar
-Version: 0.22 | Status: Draft | Last updated: 2026-11-11
+Version: 0.23 | Status: Draft | Last updated: 2026-11-11
 Depends on: PRD-Mobile v0.3, Architecture-Mobile v0.3, Design RelaxBoss (web) | Owner: Founder (solo developer)
 
 Label: `[Assumption]` bisa diubah. Kedalaman: **Lite**. Platform: Android (phone) dulu, mode terang. Tata letak layar yang tidak tertulis dibangun sederhana (fungsi dulu) memakai token dan komponen di dokumen ini (RULE-M007).
@@ -122,6 +122,7 @@ Teks layar penting (judul sambutan, krisis) tidak lebih kecil dari 16sp.
 | CMP-M26 | `ExerciseDoneView` | Penutup latihan napas dan grounding (TASK-M029): `MateAvatar` besar, judul `h2` (header), kalimat penutup, "Aku di sini kapan pun kamu butuh. Jaga dirimu, ya.", tombol "Selesai" (keluar) dan "Ulangi", lalu `ExerciseDisclaimer`; dapat digulir |
 | CMP-M27 | `ExerciseDisclaimer` | Catatan "bukan layanan medis, tidak menggantikan profesional" dan tombol teks "Lihat semua kontak bantuan" (RULE-M046); di daftar Latihan dan akhir tiap latihan (TASK-M029) |
 | CMP-M28 | `MascotView` (TASK-M030) | Maskot beranimasi per keadaan (`MascotState`: `idle`, `listening`, `thinking`, `speaking`); WebP transparan 24 fps, tinggi 140dp di sambutan chat (`RbSize.mascotWelcomeHeight`) dan 280dp di Temani saja (`RbSize.mascotCompanionHeight`); pergantian keadaan memudar silang 250 ms dan mengulang animasi dari awal; gerak dikurangi: gambar diam `half`; `Semantics` gambar dengan label keadaan |
+| CMP-M29 | `MascotChatPane` (TASK-M035) | Isi tengah SCR-M08 pada tampilan maskot (FR-M027): `MascotView` di atas (200dp; 96dp bila papan ketik terbuka atau teks lebih dari 1,3 kali), lalu area yang bisa digulir berisi pesan terakhir pengguna, balasan terakhir RelaxMate selebar penuh (`ChatBubble.fullWidth`), `TypingIndicator` saat menunggu, chip saran (aturan tampil sama dengan obrolan), dan tombol teks "Lihat percakapan". Maskot: berpikir selama `sending`, bicara 4 dtk setelah balasan baru tampil, selain itu diam; setelah krisis terdeteksi hari itu selalu diam. Gulir kembali ke atas tiap pesan baru. Belum diuji manual `[Belum diuji manual]` |
 | CMP-M22 | `HistoryLoadMore` | Kaki daftar riwayat dan detail (TASK-M027): tombol teks "Muat lebih banyak" / "Muat pesan berikutnya", indikator saat memuat, atau `ErrorAlert` dengan "Coba lagi" |
 | CMP-M20 | `ConsentChoiceTile` | Kartu pilihan tunggal setara tombol radio: tinggi >= 48dp, radius kartu, garis `inputBorder` 1dp; terpilih = latar `surfaceAlt`, garis `primary` 2dp, ikon radio terisi (tidak hanya warna). `Semantics`: `inMutuallyExclusiveGroup`, `checked`, label teks pilihan. Dibangun di TASK-M023 `[Verified: kode]` |
 
@@ -198,6 +199,7 @@ Bantuan (TASK-M025 `[Verified: uji manual founder 2026-11-07]`): semua layar tam
 - **Isi:** `DaySeparator` ("Hari ini"), daftar pesan (rata kanan untuk pengguna, rata kiri untuk RelaxMate), `SuggestionChip` di bawah balasan sesuai prioritas intent; `CrisisBanner` menempel di atas setelah krisis terdeteksi.
 - **Awal sesi harian:** `CheckinCard` (berisi `MoodBlobRow`) di bawah kalimat sambutan, tampil selama belum ada pesan hari ini dan batas pesan belum tercapai; dapat dilewati atau diabaikan (kolom ketik tetap tersedia).
 - **Input:** `ChatInputBar` dengan mikrofon (Fase 2); tombol kirim aktif bila ada teks.
+- **Dua tampilan (TASK-M035, FR-M027) `[Belum diuji manual]`:** tombol ikon di AppBar (sebelum ikon telepon) mengganti antara **maskot** (bawaan, ikon obrolan untuk pindah) dan **obrolan** (ikon senyum untuk pindah); pilihan disimpan di `shared_preferences` dan juga ada di Pengaturan, bagian "Tampilan" (saklar "Maskot di chat"). Hanya bagian tengah yang berbeda (`MascotChatPane` atau daftar gelembung); `CrisisBanner`, banner overlay, galat, `ChatInputBar`, kuota, dan sambutan awal (maskot `idle` + Cek Rasa) sama. Judul AppBar kini meluas dengan elipsis (`Flexible`) agar tiga aksi muat pada teks besar. "Lihat percakapan" di tampilan maskot memindahkan ke obrolan (dan menyimpan pilihan itu).
 - **Perilaku:** gulir otomatis ke pesan terbaru; keyboard tidak menutup input; pesan gagal menampilkan "Coba lagi" di bawah gelembung; saat 503 saran statis dan latihan lokal ditawarkan; batas harian: input nonaktif dengan penjelasan.
 - **Aksesibilitas:** pesan baru diumumkan lewat live region (sopan); urutan fokus: bilah atas, banner, pesan, chip, input.
 
@@ -350,6 +352,7 @@ Ikon: satu set (`[Assumption]` Lucide untuk Flutter), ukuran 24dp, stroke 2. OQ-
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.23 | 2026-11-11 | TASK-M035: tampilan maskot chat (CMP-M29), tombol ganti tampilan, bagian Tampilan di Pengaturan. |
 | 0.22 | 2026-11-11 | TASK-M042: hasil pemeriksaan aksesibilitas (bagian 8), `chipTheme`, `MoodBlobRow` menurun pada teks besar. |
 | 0.21 | 2026-11-11 | Tampilan istirahat dan spanduk tawaran lanjut diverifikasi (Redmi Note 10S, Android 14). |
 | 0.20 | 2026-11-10 | M032 dan M033 diverifikasi; TASK-M034: tampilan istirahat, spanduk tawaran lanjut. |

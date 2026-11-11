@@ -43,6 +43,11 @@ abstract final class RbSize {
   static const double mascotWelcomeHeight = 140;
   static const double mascotCompanionHeight = 280;
 
+  /// Maskot di tampilan maskot chat (FR-M027): ukuran biasa, dan ukuran kecil saat papan ketik
+  /// terbuka atau teks sistem besar supaya balasan tetap punya ruang.
+  static const double mascotChatHeight = 200;
+  static const double mascotChatCompactHeight = 96;
+
   /// Titik pada `TypingIndicator` (CMP-M03) dan jarak antarnya.
   static const double typingDot = 8;
 

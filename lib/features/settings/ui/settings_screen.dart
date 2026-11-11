@@ -17,6 +17,7 @@ import 'package:relaxmate/features/consent/data/consent_prompt.dart';
 import 'package:relaxmate/features/consent/data/training_choice.dart';
 import 'package:relaxmate/features/consent/ui/consent_choice_tile.dart';
 import 'package:relaxmate/features/overlay/state/overlay_feature_provider.dart';
+import 'package:relaxmate/features/settings/data/chat_view_mode.dart';
 import 'package:relaxmate/features/settings/state/settings_controller.dart';
 import 'package:relaxmate/features/settings/state/training_consent_controller.dart';
 import 'package:relaxmate/shared/widgets/error_alert.dart';
@@ -125,6 +126,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 prompt: prompt,
                 saving: _savingTraining,
                 onChoose: _choose,
+              ),
+            ),
+            SizedBox(height: space.lg),
+            const _SectionTitle(AppTexts.settingsDisplay),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              value: settings.chatViewMode == ChatViewMode.mascot,
+              onChanged: (enabled) => ref
+                  .read(settingsControllerProvider.notifier)
+                  .setChatViewMode(
+                    enabled ? ChatViewMode.mascot : ChatViewMode.conversation,
+                  ),
+              title: Text(AppTexts.settingsChatMascotMode, style: text.body),
+              subtitle: Text(
+                AppTexts.settingsChatMascotModeHint,
+                style: text.small.copyWith(color: colors.textSecondary),
               ),
             ),
             SizedBox(height: space.lg),
