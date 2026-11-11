@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Rules (Aturan Proyek)
-Version: 0.19 | Status: Draft | Last updated: 2026-11-10
+Version: 0.20 | Status: Draft | Last updated: 2026-11-11
 Depends on: PRD-Mobile v0.4, Architecture-Mobile v0.3, Schema-Mobile v0.1, Design-Mobile v0.4, Rules RelaxBoss (web) v1.5 | Owner: Founder (solo developer)
 
 Dokumen ini adalah panduan kerja founder sebagai pengembang tunggal untuk **repo mobile (Flutter)**; bantuan AI boleh dipakai dengan tetap mengikuti seluruh aturan, melakukan verifikasi manual, dan tidak menganggap keluaran otomatis sebagai bukti kebenaran. Untuk pekerjaan di **repo web** (task backend `TASK-M01x`), `Rules.md` web tetap berlaku penuh; aturan di sini hanya menambah. Kata MUST, MUST NOT, SHOULD dipakai secara tegas. Kedalaman: **Lite**. Prinsip: sederhana, fungsi dulu, aman dulu.
@@ -136,6 +136,7 @@ Jangan: menambah fitur di luar PRD, memanggil Groq atau layanan suara langsung d
 
 - A-R6: Pemeriksaan kode TASK-M022 terhadap aturan (2026-11-06, pencarian teks): lihat catatan hasil M022 di `progress.md`; `flutter analyze` dan `dart format` belum dijalankan (A-R2).
 - A-R11: Pemeriksaan kode TASK-M028 terhadap aturan (2026-11-07, pencarian teks): tanpa `print`, `// ignore:`, `Colors.*`/`Color(0x...)`, `dynamic`, null-bang, atau `TODO` di `lib/features/checkin` dan `chat_welcome.dart`; ukuran, jarak, dan warna hanya dari token (ditambah `RbSize.moodBlob`); teks di `AppTexts`; jalur aset di `AppAssets`; panggilan jaringan hanya lewat `MoodRepository` (RULE-M022); tombol blob `Semantics` dengan target >= 48dp (RULE-M055); `dart format` gaya Dart 3.5 bersih; `flutter analyze` bersih (dijalankan founder, 2026-11-07).
+- A-R18: Pemeriksaan TASK-M040 (2026-11-11): `tool/privacy_audit.mjs` memeriksa 23 hal secara statis (log, manifest, izin, cleartext, aturan ekstraksi data, SDK terlarang, penulisan berkas, kunci penyimpanan, kolom input, overlay) dan dijalankan sebelum rilis (preflight M043). Alat itu terbukti gagal pada kode sebelum M040 (7 dari 23 gagal) dan lolos sesudahnya. RULE-M040 diperluas dalam praktik: build rilis membisukan log kerangka kerja. Belum dijalankan: `dart format`, `flutter analyze`, build.
 - A-R17: Pemeriksaan TASK-M034 (2026-11-10, pencarian teks): `features/overlay` dan `features/startup` tanpa `print`, `// ignore:`, `dynamic`, null-bang, atau `TODO`; manifest tanpa `RECORD_AUDIO`, kamera, atau layanan aksesibilitas; layanan hanya dimulai atas ketukan pengguna saat aplikasi terbuka (saklar Pengaturan atau tombol "Nyalakan" di spanduk). Kotlin belum dikompilasi di sandbox.
 - A-R16: Pemeriksaan TASK-M033 (2026-11-10): layanan tidak memakai mikrofon, kamera, jaringan, `AccessibilityService`, atau pembacaan layar; tidak dimulai dari latar belakang (hanya `OverlayChannel.start` atas aksi pengguna); `START_NOT_STICKY`; teks native di `strings.xml`, warna di `colors.xml` (RULE tokens berlaku untuk Dart saja `[Assumption]`). Kotlin belum dikompilasi di sandbox.
 - A-R15: Pemeriksaan kode TASK-M032 terhadap aturan (2026-11-10, pencarian teks): `lib/features/overlay` tanpa `print`, `// ignore:`, `dynamic`, null-bang, atau `TODO`; teks dari `AppTexts`; warna dari token; izin diminta hanya setelah penjelasan dan atas aksi pengguna; tidak ada izin latar belakang. Kotlin belum dikompilasi di sandbox. Belum dijalankan: `dart format`, `flutter analyze`, build Android, uji perangkat.
@@ -152,6 +153,7 @@ Jangan: menambah fitur di luar PRD, memanggil Groq atau layanan suara langsung d
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.20 | 2026-11-11 | A-R18 (pemeriksaan M040). |
 | 0.19 | 2026-11-10 | A-R17 (pemeriksaan M034). |
 | 0.18 | 2026-11-10 | A-R16 (pemeriksaan M033). |
 | 0.17 | 2026-11-10 | A-R15 (pemeriksaan kode M032). |

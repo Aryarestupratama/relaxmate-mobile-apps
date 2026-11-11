@@ -129,6 +129,8 @@ class OverlayService : Service(), OverlayPanel.Actions {
             getString(R.string.overlay_notification_channel),
             NotificationManager.IMPORTANCE_LOW,
         )
+        // Nama aplikasi kesehatan mental tidak perlu terbaca di layar kunci (TASK-M040).
+        channel.lockscreenVisibility = Notification.VISIBILITY_SECRET
         getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
     }
 
@@ -158,6 +160,7 @@ class OverlayService : Service(), OverlayPanel.Actions {
             .setContentText(text)
             .setContentIntent(openApp)
             .setOngoing(true)
+            .setVisibility(Notification.VISIBILITY_SECRET)
             .addAction(action)
             .build()
     }

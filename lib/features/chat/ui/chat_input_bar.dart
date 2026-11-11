@@ -37,6 +37,8 @@ class ChatInputBar extends StatelessWidget {
               maxLines: 4,
               keyboardType: TextInputType.multiline,
               textCapitalization: TextCapitalization.sentences,
+              // Isi chat bersifat pribadi: keyboard tidak boleh mempelajarinya (RULE-M040).
+              enableIMEPersonalizedLearning: false,
               inputFormatters: <TextInputFormatter>[
                 LengthLimitingTextInputFormatter(maxLength),
               ],

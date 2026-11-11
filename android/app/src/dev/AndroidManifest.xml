@@ -1,0 +1,6 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Cleartext hanya untuk flavor dev agar emulator bisa memanggil API lokal http://10.0.2.2
+         (TASK-M040). Flavor prod tidak pernah mengizinkannya, termasuk pada build debug; konfigurasi
+         prod juga menolak URL http (AppConfig, RULE-M048). -->
+    <application android:usesCleartextTraffic="true" />
+</manifest>

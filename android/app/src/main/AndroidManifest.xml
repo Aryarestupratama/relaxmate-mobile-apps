@@ -12,13 +12,14 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
     <!-- OVERLAY-END -->
     <!-- allowBackup=false: token dan data tidak ikut cadangan (RULE-M048, Architecture-M bagian 8).
-         Tidak ada usesCleartextTraffic di sini: bawaan false (targetSdk >= 28); hanya build debug
-         yang mengaktifkannya lewat src/debug/AndroidManifest.xml. -->
+         Tidak ada usesCleartextTraffic di sini: bawaan false (targetSdk >= 28); hanya flavor dev
+         yang mengaktifkannya lewat src/dev/AndroidManifest.xml. -->
     <application
         android:label="@string/app_name"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:allowBackup="false">
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules">
         <activity
             android:name=".MainActivity"
             android:exported="true"
