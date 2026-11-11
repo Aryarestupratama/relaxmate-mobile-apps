@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Design System dan Spesifikasi Layar
-Version: 0.21 | Status: Draft | Last updated: 2026-11-11
+Version: 0.22 | Status: Draft | Last updated: 2026-11-11
 Depends on: PRD-Mobile v0.3, Architecture-Mobile v0.3, Design RelaxBoss (web) | Owner: Founder (solo developer)
 
 Label: `[Assumption]` bisa diubah. Kedalaman: **Lite**. Platform: Android (phone) dulu, mode terang. Tata letak layar yang tidak tertulis dibangun sederhana (fungsi dulu) memakai token dan komponen di dokumen ini (RULE-M007).
@@ -308,6 +308,8 @@ Kontak bantuan tidak ditulis di bank teks; selalu dari API-M011 atau aset fallba
 - Hormati pengurangan gerak; getar opsional.
 - Pemeriksaan manual per milestone: TalkBack, skala teks 200%, mode kontras tinggi, perangkat kecil (360dp).
 
+**Hasil pemeriksaan kode TASK-M042 (2026-11-11) `[Belum diuji manual]`.** Sudah baik: target sentuh 48dp lewat tema (`minimumSize` tombol, `minHeight` kartu, `IconButton` bertooltip), `Semantics` pada kontrol, tajuk (`header`), live region untuk pesan baru, pengumuman galat, saran, dan fase latihan, gambar dekoratif dikecualikan, tanpa pembatas skala teks, dan gerak dikurangi dihormati di maskot, panduan napas, grounding, dan titik mengetik (juga di overlay native lewat skala animasi sistem). **Kontras (dihitung WCAG):** semua pasangan teks lolos 4,5:1 (terendah `textMuted` di atas `softLavender` 4,79; `danger` di atas putih 4,83; `crisisText` di atas `crisisBg` 7,60; `primary` di atas pastel dan blob mood 5,9 sampai 15,9); bingkai input 3,91:1 lolos. **Celah dan perbaikan:** (1) bingkai `ChoiceChip` memakai `outlineVariant` (`border`, 1,38:1), jadi pilihan yang belum dipilih nyaris tak terlihat: `chipTheme` baru memakai `inputBorder` (3,91:1) dan bingkai tebal `primary` untuk yang dipilih; (2) `MoodBlobRow` lima kolom tidak muat pada teks 200% (label terpotong tengah kata): di atas skala `RbSize.moodRowMaxTextScale` (1,3) pilihan disusun menurun, blob di kiri dan label di kanan. **Dicatat, tidak diubah:** bingkai kartu daftar (latihan, riwayat) 1,38:1 karena isinya teks yang sudah jelas dan bisa diketuk (bukan satu-satunya penanda); judul AppBar terpotong elipsis pada teks 200% (TalkBack tetap membaca penuh); panel overlay native tidak bisa digulir, jadi pada layar kecil dengan teks 200% bisa melebihi tinggi layar (diuji di M042, kemungkinan dibungkus `ScrollView`). **Belum dijalankan:** `dart format`, `flutter analyze`, TalkBack dan skala teks 200% di perangkat.
+
 ---
 
 ## 9. Maskot, Aset, dan Gerak
@@ -348,6 +350,7 @@ Ikon: satu set (`[Assumption]` Lucide untuk Flutter), ukuran 24dp, stroke 2. OQ-
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.22 | 2026-11-11 | TASK-M042: hasil pemeriksaan aksesibilitas (bagian 8), `chipTheme`, `MoodBlobRow` menurun pada teks besar. |
 | 0.21 | 2026-11-11 | Tampilan istirahat dan spanduk tawaran lanjut diverifikasi (Redmi Note 10S, Android 14). |
 | 0.20 | 2026-11-10 | M032 dan M033 diverifikasi; TASK-M034: tampilan istirahat, spanduk tawaran lanjut. |
 | 0.19 | 2026-11-10 | TASK-M033: OVL-M01 dan OVL-M02 dibangun (deviasi: tanpa Bicara). |

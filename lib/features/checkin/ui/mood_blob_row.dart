@@ -21,18 +21,31 @@ class MoodBlobRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Teks sangat besar: lima kolom sempit tidak muat, jadi pilihan disusun menurun.
+    final stacked =
+        MediaQuery.textScalerOf(context).scale(1) > RbSize.moodRowMaxTextScale;
+
+    _MoodBlob blobFor(MoodLevel level) => _MoodBlob(
+          level: level,
+          isSelected: level == selected,
+          enabled: enabled,
+          horizontal: stacked,
+          onTap: () => onSelected(level),
+        );
+
+    if (stacked) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          for (final level in MoodLevel.values) blobFor(level),
+        ],
+      );
+    }
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        for (final level in MoodLevel.values)
-          Expanded(
-            child: _MoodBlob(
-              level: level,
-              isSelected: level == selected,
-              enabled: enabled,
-              onTap: () => onSelected(level),
-            ),
-          ),
+        for (final level in MoodLevel.values) Expanded(child: blobFor(level)),
       ],
     );
   }
@@ -43,12 +56,16 @@ class _MoodBlob extends StatelessWidget {
     required this.level,
     required this.isSelected,
     required this.enabled,
+    required this.horizontal,
     required this.onTap,
   });
 
   final MoodLevel level;
   final bool isSelected;
   final bool enabled;
+
+  /// Blob di kiri dan label di kanan (teks besar), bukan label di bawah blob.
+  final bool horizontal;
   final VoidCallback onTap;
 
   @override
@@ -56,6 +73,38 @@ class _MoodBlob extends StatelessWidget {
     final colors = context.rbColors;
     final text = context.rbText;
     final space = context.rbSpace;
+
+    final blob = SizedBox(
+      width: RbSize.moodBlob,
+      height: RbSize.moodBlob,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: RbRadius.cardBorder,
+          border: isSelected
+              ? Border.all(
+                  color: colors.primary,
+                  width: RbSize.borderSelected,
+                )
+              : null,
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(space.xxs),
+          child: Image.asset(
+            level.asset,
+            fit: BoxFit.contain,
+            excludeFromSemantics: true,
+          ),
+        ),
+      ),
+    );
+    final label = Text(
+      level.label,
+      textAlign: horizontal ? TextAlign.start : TextAlign.center,
+      style: text.caption.copyWith(
+        color: colors.primary,
+        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+      ),
+    );
 
     return Semantics(
       button: true,
@@ -69,42 +118,21 @@ class _MoodBlob extends StatelessWidget {
         borderRadius: RbRadius.cardBorder,
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: space.xxs),
-          child: Column(
-            children: <Widget>[
-              SizedBox(
-                width: RbSize.moodBlob,
-                height: RbSize.moodBlob,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: RbRadius.cardBorder,
-                    border: isSelected
-                        ? Border.all(
-                            color: colors.primary,
-                            width: RbSize.borderSelected,
-                          )
-                        : null,
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(space.xxs),
-                    child: Image.asset(
-                      level.asset,
-                      fit: BoxFit.contain,
-                      excludeFromSemantics: true,
-                    ),
-                  ),
+          child: horizontal
+              ? Row(
+                  children: <Widget>[
+                    blob,
+                    SizedBox(width: space.sm),
+                    Expanded(child: label),
+                  ],
+                )
+              : Column(
+                  children: <Widget>[
+                    blob,
+                    SizedBox(height: space.xxs),
+                    label,
+                  ],
                 ),
-              ),
-              SizedBox(height: space.xxs),
-              Text(
-                level.label,
-                textAlign: TextAlign.center,
-                style: text.caption.copyWith(
-                  color: colors.primary,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

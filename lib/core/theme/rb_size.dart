@@ -10,6 +10,10 @@ abstract final class RbSize {
   /// Blob mood pada `MoodBlobRow` (Design-M CMP-M10).
   static const double moodBlob = 56;
 
+  /// Di atas skala teks ini `MoodBlobRow` berganti dari satu baris lima kolom ke daftar menurun,
+  /// karena label kolom sempit tidak muat dan terpotong tengah kata (RULE-M055, TASK-M042).
+  static const double moodRowMaxTextScale = 1.3;
+
   /// Tebal garis tepi kartu pilihan: biasa dan terpilih (Design-M CMP-M20).
   static const double borderThin = 1;
   static const double borderSelected = 2;

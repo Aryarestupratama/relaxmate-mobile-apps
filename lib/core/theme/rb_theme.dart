@@ -90,6 +90,20 @@ abstract final class RbTheme {
           foregroundColor: WidgetStatePropertyAll<Color>(colors.primary),
         ),
       ),
+      // Bingkai chip memakai warna bingkai input (kontras 3:1 ke atas) supaya pilihan yang
+      // belum dipilih tetap terlihat; yang dipilih berbingkai tebal `primary` (TASK-M042).
+      chipTheme: ChipThemeData(
+        backgroundColor: colors.card,
+        selectedColor: colors.softLavender,
+        labelStyle: text.small.copyWith(color: colors.primary),
+        side: WidgetStateBorderSide.resolveWith((states) {
+          final selected = states.contains(WidgetState.selected);
+          return BorderSide(
+            color: selected ? colors.primary : colors.inputBorder,
+            width: selected ? RbSize.borderSelected : RbSize.borderThin,
+          );
+        }),
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: colors.card,
