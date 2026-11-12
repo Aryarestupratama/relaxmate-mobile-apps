@@ -99,12 +99,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         title: const _ChatTitle(),
         actions: <Widget>[
           IconButton(
-            onPressed: () =>
-                ref.read(settingsControllerProvider.notifier).setChatViewMode(
-                      isMascotView
-                          ? ChatViewMode.conversation
-                          : ChatViewMode.mascot,
-                    ),
+            onPressed: () => ref
+                .read(settingsControllerProvider.notifier)
+                .setChatViewMode(
+                  isMascotView
+                      ? ChatViewMode.conversation
+                      : ChatViewMode.mascot,
+                ),
             tooltip: isMascotView
                 ? AppTexts.chatModeToConversation
                 : AppTexts.chatModeToMascot,
@@ -268,36 +269,36 @@ class _ChatBody extends StatelessWidget {
                       onShowConversation: onShowConversation,
                     )
                   : ListView.builder(
-                      reverse: true,
-                      padding: EdgeInsets.all(space.md),
-                      itemCount: newestFirst.length + typing,
-                      itemBuilder: (context, index) {
-                        if (typing == 1 && index == 0) {
-                          return const TypingIndicator();
-                        }
-                        final position = index - typing;
-                        final message = newestFirst[position];
-                        final bubble = ChatBubble(
-                          message: message,
-                          announce: position == 0,
-                        );
-                        final suggestion = message.suggestion;
-                        if (suggestion == null ||
-                            !suggestionIds.contains(message.id)) {
-                          return bubble;
-                        }
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            bubble,
-                            SuggestionChips(
-                              suggestion: suggestion,
-                              onDismiss: () => onDismissSuggestion(message.id),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
+                  reverse: true,
+                  padding: EdgeInsets.all(space.md),
+                  itemCount: newestFirst.length + typing,
+                  itemBuilder: (context, index) {
+                    if (typing == 1 && index == 0) {
+                      return const TypingIndicator();
+                    }
+                    final position = index - typing;
+                    final message = newestFirst[position];
+                    final bubble = ChatBubble(
+                      message: message,
+                      announce: position == 0,
+                    );
+                    final suggestion = message.suggestion;
+                    if (suggestion == null ||
+                        !suggestionIds.contains(message.id)) {
+                      return bubble;
+                    }
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        bubble,
+                        SuggestionChips(
+                          suggestion: suggestion,
+                          onDismiss: () => onDismissSuggestion(message.id),
+                        ),
+                      ],
+                    );
+                  },
+                ),
         ),
         if (error != null)
           Padding(
