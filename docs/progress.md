@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Progress
-Version: 0.36 | Status: Living document | Last updated: 2026-11-13
+Version: 0.37 | Status: Living document | Last updated: 2026-11-13
 Owner: Founder (solo developer)
 
 Dokumen ini dibaca pertama setiap mulai bekerja di proyek mobile. Perbarui di akhir setiap task atau sesi. Dokumen proyek disimpan **di luar repo kode** (RULE-M014). Task di sisi backend (repo web RelaxBoss) mengikuti `Rules.md` web dan juga dicatat di sini, dengan awalan `TASK-M`, agar satu sumber kebenaran untuk fitur mobile. Perubahan di repo web tetap mengikuti Doc Sync web (`progress.md` web diperbarui bila menyentuh perilaku web).
@@ -11,7 +11,7 @@ Dokumen ini dibaca pertama setiap mulai bekerja di proyek mobile. Perbarui di ak
 | Hal | Status terbaru |
 |---|---|
 | Tahap | Implementasi berjalan. Selesai (uji manual lolos): **TASK-M010 sampai M017** (seluruh backend MM1, repo web), **M020 sampai M034** (Flutter; M024 sampai M028 lolos 2026-11-07, M029 lolos 2026-11-09, M030, M031, M032, M033 lolos 2026-11-10, M034 lolos 2026-11-11, termasuk `flutter analyze` bersih untuk M027 dan M028; M028 juga mencakup API-M018 di repo web). **MM1 (Backend API) selesai** kecuali prasyarat rilis web. **MM3 (chat inti, krisis, saran, riwayat) selesai.** OQ-M3 diputuskan 2026-11-07 (Cek Rasa juga menulis Mood Entry). **TASK-M029** (latihan napas dan grounding 5-4-3-2-1 lokal) `Done` (uji manual lolos 2026-11-09, dipush `e658a31`). **TASK-M030** (maskot beranimasi dan Temani saja) `Done` (uji manual dan `flutter analyze` lolos 2026-11-10, dipush). **TASK-M031** (Pengaturan, Hapus akun, lapisan privasi) `Done` (uji manual dan `flutter analyze` lolos 2026-11-10, dipush). **TASK-M032** (alur izin maskot mengambang) dan **TASK-M033** (layanan dan gelembung maskot) `Done` (uji manual lolos 2026-11-10, dipush). **TASK-M034** (pengaturan overlay, sakelar jarak jauh, tawaran lanjut, perintah "Ngobrol") `Done` (`flutter analyze` dan uji manual lolos 2026-11-11, sudah di-commit founder). **MM5 (Maskot mengambang, Android) selesai** dengan satu perangkat uji: Redmi Note 10S, Android 14 (M032 sampai M034). Matriks Android 10/11, 13, 15 dan OEM lain belum diuji, dipindah ke uji pra-rilis (OQ-MA14). **MM6 dimulai:** **TASK-M040** (audit privasi perangkat) `Done` (`tool/privacy_audit.mjs` 23 dari 23 lolos, uji perangkat dan `flutter analyze` lolos 2026-11-11, sudah di-commit dan dipush founder). **TASK-M042** (aksesibilitas) `Done` (uji manual lolos 2026-11-11, dipush). **TASK-M035** (tampilan chat: maskot atau obrolan, FR-M027) `Done` (`flutter analyze` dan uji manual lolos 2026-11-11, dipush; perincian per langkah tidak dilaporkan). Dokumen mobile: PRD v0.7, Architecture v0.28, Schema v0.1 (**perlu pembaruan**, lihat Utang dokumen), Design v0.24, Rules v0.23, progress v0.33. Sejak 2026-11-06 **dokumen mengikuti kode**. |
-| Berikutnya | **TASK-M044** (aset dan berkas toko, Data Safety, deklarasi izin overlay dan foreground service), lalu M045 (internal lalu closed testing). Sebelum rilis tetap wajib: uji overlay lintas versi Android dan OEM (OQ-MA14, OQ-MA13). TASK-M041 digabung ke M053. |
+| Berikutnya | **MM5b (poles dan identitas)** atas usul founder 2026-11-13: logo, Tentang RelaxBoss, grafik mood, poles UI/UX, splash dan animasi komponen, maskot v2. TASK-M044 (berkas toko) menunggu sebagian besar MM5b karena tangkapan layar toko harus dari UI final (lihat usul urutan di bagian MM5b). Sebelum rilis tetap wajib: uji overlay lintas versi Android dan OEM (OQ-MA14, OQ-MA13). |
 | Pemblokir | Prasyarat web untuk rilis (TASK-031, OQ-3, OQ-5) **dinyatakan selesai dan divalidasi supervisor** (keterangan founder, 2026-11-13; bukti tertulisnya disimpan founder di luar repo). Sisa pemblokir rilis: kontak krisis terverifikasi menggantikan berkas kontak bawaan (TASK-M043), uji di >= 2 perangkat nyata, deklarasi toko (TASK-M044). |
 | Alur kerja | Kerja di `main`, commit lalu push, pesan commit bahasa Inggris. Dokumen di luar repo. Uji manual wajib; tanpa CI. |
 | Data | Sebelum TASK-M044, hanya data dummy bertanda jelas (akun `example.test`, kontak krisis `dummy`). Build `prod` tidak boleh memuat dummy (RULE-M048). |
@@ -33,6 +33,7 @@ Estimasi dalam minggu kerja satu orang `[Assumption]`, belum bertanggal karena m
 | MM3 | Chat inti, krisis, saran, riwayat | 3 mgg | TASK-M024 s.d. M027 |
 | MM4 | Cek Rasa, latihan, maskot dalam app, pengaturan | 2 mgg | TASK-M028 s.d. M031 |
 | MM5 | Maskot mengambang (Android) | 2-3 mgg | TASK-M032 s.d. M034 |
+| MM5b | Poles dan identitas sebelum rilis: logo, Tentang RelaxBoss, grafik mood, poles UI/UX, splash, animasi, maskot v2 (usul founder 2026-11-13) | 3-6 mgg `[Assumption]`, terbesar di maskot v2 | TASK-M070 s.d. M076 |
 | MM6 | Hardening dan rilis Fase 1 (closed testing) | 2-3 mgg | TASK-M040 s.d. M045 |
 | MM7 | Fase 2: suara | 3-4 mgg | TASK-M050 s.d. M054 |
 | MM8 | Fase 3: TTS percobaan | 1-2 mgg | TASK-M060 s.d. M061 |
@@ -104,6 +105,22 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 | TASK-M034 | Pengaturan overlay (aktif/nonaktif, snooze), deep link "Ngobrol" dan "Bicara" ke aplikasi, tanpa mikrofon/jaringan di overlay; uji di beberapa versi Android | M | FR-M023, ADR-M06 | **Done** (kode 2026-11-10; `flutter analyze` dan uji manual lolos 2026-11-11 di Redmi Note 10S, Android 14) |
 | TASK-M035 | Tampilan chat dua mode: maskot (bawaan) dan obrolan, tombol ganti di AppBar dan saklar di Pengaturan; isi, krisis, saran, dan Cek Rasa identik; tanpa suara | M | FR-M027, FR-M015, Design-M SCR-M08 | **Done** (kode 2026-11-11; analyze dan uji manual lolos 2026-11-11, dipush) |
 
+### MM5b - Poles dan identitas sebelum rilis (usul founder 2026-11-13)
+
+Latar: UI/UX belum final, logo masih bawaan, dan founder ingin orang tahu RelaxMate bagian dari RelaxBoss. Tangkapan layar dan ikon toko (TASK-M044) harus berasal dari tampilan final, maka MM5b dikerjakan dulu. Tiap task yang menyentuh perilaku atau tampilan menyinkronkan PRD (bila ada FR baru), Design, Architecture, dan Rules seperti biasa.
+
+**Usul urutan (menunggu keputusan founder):** M070, M071, M072, lalu M073 dan M074 berdampingan; M075 dan M076 jalur terpisah yang bergantung pada aset. Usulan saya: M044 menunggu **M070 sampai M074**; **M075 dan M076 tidak menghalangi** closed testing (bila aset maskot v2 belum siap, rilis dengan animasi sekarang lalu perbarui). Founder boleh menetapkan lain; keputusannya dicatat di OQ-MP2.
+
+| ID | Task | Repo | Rujukan | Status |
+|---|---|---|---|---|
+| TASK-M070 | Logo RelaxMate: ikon peluncur adaptif (maju dan latar), ikon monokrom (Android 13), ikon notifikasi overlay, penyesuaian nama dan warna; berkas sumber dari founder (SVG atau PNG >= 1024 px) | M | Design-M | Todo (menunggu berkas logo) |
+| TASK-M071 | Layar "Tentang RelaxBoss": RelaxMate adalah bagian dari RelaxBoss; tautan ke situs dan Instagram (`https://www.instagram.com/relaxboss_id`), versi aplikasi, tim bila perlu; teks dari founder, klaim hanya yang terkonfirmasi (RULE-049) | M | FR baru di PRD-M, RULE-049 | Todo (menunggu teks dari founder) |
+| TASK-M072 | Grafik mood: riwayat Cek Rasa per hari atau minggu, pilihan rentang, keadaan kosong, aksesibel (ringkasan teks, tanpa hanya warna). **Butuh endpoint baca di web:** saat ini hanya `POST /mood-entries` (API-M018); perlu `GET /mood-entries` (repo web) dan `mock_api` | W/M | FR baru di PRD-M, API baru | Todo |
+| TASK-M073 | Poles UI/UX semua layar: audit per layar (jarak, hierarki, status kosong dan galat, konsistensi komponen) memakai token; keluaran: Design-M diperbarui; tetap lolos M042 (kontras, teks 200%, target sentuh) | M | NFR-M03, Design-M | Todo |
+| TASK-M074 | Splash screen (splash native Android 12+ dengan logo, lalu layar splash Flutter bila perlu) dan animasi komponen (transisi layar, tombol, gelembung chat, kartu); hormati reduce motion; token gerak di `RbMotion` | M | Design-M, NFR-M03 | Todo |
+| TASK-M075 | Maskot v2: pemutar animasi (sprite sheet atau format lain, lihat OQ-MP3), keadaan lebih banyak (menjawab, menemani, mengambang) dan gerakan, badan penuh; **aset dihasilkan di luar repo** (seniman atau alat gambar) lalu dipasang; aplikasi memakai aset yang ada bila belum siap | M/D | FR-M027, Design-M | Todo (menunggu keputusan gaya dan aset) |
+| TASK-M076 | Pasang maskot v2 di overlay (Kotlin) dan periksa ukuran, memori, dan baterai | M | FR-M022, Architecture-M 6.4 | Todo (bergantung M075) |
+
 ### MM6 - Hardening dan rilis Fase 1
 
 | ID | Task | Repo | Rujukan | Status |
@@ -112,7 +129,7 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 | TASK-M041 | ~~Perluas `cases.json` dengan kasus transkrip suara~~ **Digabung ke TASK-M053** (2026-11-13): suara adalah Fase 2, jadi bukan bagian jalur rilis pertama | W | FR-M017, RULE-047 web | Merged (M053) |
 | TASK-M042 | Aksesibilitas: TalkBack, target >= 48dp, teks 200%, kontras, reduce motion | M | NFR-M03, Design-M 8 | **Done** (kode 2026-11-11; uji manual lolos 2026-11-11, dipush) |
 | TASK-M043 | Preflight mobile dan build rilis: keystore di luar repo, R8, `debuggable=false`, kontak bantuan terverifikasi (RULE-M048), uji di >= 2 perangkat nyata. Didahului `tool/smoke_api.mjs` terhadap backend produksi | M | Architecture-M 10, RULE-M048 | **Done** (kode 2026-11-13; build rilis dan uji di Oppo dan Xiaomi lolos menurut founder 2026-11-13, dipush) |
-| TASK-M044 | Aset dan berkas toko: ikon, tangkapan layar, deskripsi, kebijakan privasi diperbarui (web), Data Safety, deklarasi izin overlay dan foreground service; klaim publik hanya yang terkonfirmasi (RULE-049) | D/M | NFR-M07 | Todo |
+| TASK-M044 | (Menunggu MM5b, lihat OQ-MP2) Aset dan berkas toko: ikon, tangkapan layar, deskripsi, kebijakan privasi diperbarui (web), Data Safety, deklarasi izin overlay dan foreground service; klaim publik hanya yang terkonfirmasi (RULE-049) | D/M | NFR-M07 | Todo |
 | TASK-M045 | Internal testing lalu closed testing; kumpulkan masukan; keputusan lanjut produksi | M | OQ-MA5 | Todo |
 
 ### MM7 - Fase 2: suara
@@ -225,6 +242,9 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 | OQ-MA8 | **Ditutup 2026-11-06 (TASK-M014):** teks consent ada di `config/relaxboss.php` bagian `consent`; naikkan `ai_consent_version` atau `ai_training_consent_version` bila teks berubah. | - |
 | OQ-MA9 | Kontak krisis web memuat `119 ext 8`; **sementara** dipakai `tel:119,8` (jeda koma, `AppConstants.telExtensionPause`). Uji di perangkat nyata; bila ekstensi tidak terkirim, coba `,,` atau tampilkan nomor dan ekstensi terpisah | TASK-M025 (uji perangkat) |
 | OQ-MA10 | Paket ikon: Lucide (`lucide_icons_flutter`, sesuai RULE-M051) atau `Icons` bawaan Material. **Diputuskan founder 2026-11-07: Lucide.** Layar lama (auth, consent, `ErrorAlert`) masih `Icons` bawaan dan dipindahkan saat disentuh lagi | TASK-M024 |
+| OQ-MP2 | Urutan MM5b terhadap TASK-M044: usul M044 menunggu M070 sampai M074, sedangkan maskot v2 (M075, M076) tidak menghalangi closed testing | Founder memutuskan | TASK-M044 |
+| OQ-MP3 | Gaya animasi maskot v2: **pixel art** (sprite sheet, tajam, ringan) atau **animasi halus** (Rive, Lottie, atau urutan bingkai WebP). Asisten tidak dapat menghasilkan animasi berkualitas dari nol di sandbox; yang dapat dibangun adalah pemutar dan mesin keadaan, aset datang dari seniman atau alat gambar | Founder memutuskan gaya dan sumber aset | TASK-M075 |
+| OQ-MP4 | Isi layar Tentang RelaxBoss (teks, tim, tautan) dan berkas logo sumber | Founder menyediakan | TASK-M070, TASK-M071 |
 | OQ-3, OQ-5 (web) | Kontak krisis terverifikasi; telaah hukum data AI, pelatihan, dan layanan suara | **Dijawab** 2026-11-13 (keterangan founder: divalidasi supervisor). Daftar kontak terverifikasi tetap harus dimasukkan ke build (TASK-M043) |
 
 ---
@@ -362,12 +382,13 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 | 2026-11-13 (sesi deploy) | Founder melaporkan perubahan web (anggota tim, ikon Instagram, prompt RelaxMate v2026-11-12.2, perapian parser) sudah di-commit, dipush, dan di-hosting ("aman"), serta prasyarat web divalidasi supervisor. TASK-M002 `Done`, OQ-3 dan OQ-5 dijawab, TASK-M041 digabung ke M053. Ditambahkan `tool/smoke_api.mjs` (diuji terhadap server tiruan: 30 lolos, 0 gagal, 2 dilewati; **belum dijalankan terhadap backend produksi**, URL dan akun uji belum diterima). |
 | 2026-11-13 (sesi M043) | Founder menjalankan `tool/smoke_api.mjs` ke `https://relaxboss.my.id` dengan akun pribadi (`--write --crisis`): 30 lolos, 0 gagal, 0 dilewati (kontak tanpa dummy, versi kontak sama, balasan AI 1,3 detik). Founder membuat keystore `relaxmate-upload.jks` di folder `keys` di luar repo (status cadangan belum dilaporkan; sandi dipegang founder). TASK-M043 dikodekan: `build.gradle.kts` (signingConfig dari `android/key.properties`, `isDebuggable=false`, R8 dan `isShrinkResources`), `proguard-rules.pro`, kontak bawaan ditambah Lab Terapan Psikologi sesuai daftar yang disetujui, `tool/release_preflight.mjs` (17 pemeriksaan; diuji di sandbox dengan `key.properties` palsu). **Belum dijalankan:** `flutter analyze`, `flutter build` (sandbox tanpa Flutter dan Android SDK), sehingga R8 belum terbukti tidak memutus overlay. |
 | 2026-11-13 (konfirmasi M043) | Build rilis pertama gagal karena sandi keystore salah (`keystore password was incorrect`); keystore dibuat ulang dengan sandi baru (belum ada unggahan ke Play), build rilis berhasil (`app-prod-release.apk`, 56,9 MB), `tool/release_preflight.mjs` 17 dari 17 lolos. Pemeriksaan tanda tangan APK lewat `jarsigner` salah (APK hanya bertanda tangan v2/v3); diganti `apksigner` (commit `fix(tool)`). Founder melaporkan APK dipasang di Oppo dan Xiaomi dan "tidak ada kendala", sudah dipush; TASK-M043 `Done`. **Tidak dilaporkan per langkah:** versi Android kedua perangkat, hasil uji overlay, hasil `apksigner`, dan pemeriksaan email verifikasi produksi. Matriks overlay (Android 10/11, 13, 15) tetap belum tercatat. |
+| 2026-11-13 (usul MM5b) | Founder ingin memoles semua halaman, mengganti logo, menambah Tentang RelaxBoss dan grafik mood, memperkaya animasi maskot (badan penuh, mungkin pixel), animasi komponen dan splash, **sebelum** TASK-M044. Dicatat sebagai MM5b. Catatan penilaian: grafik mood butuh endpoint baca baru di web; maskot v2 adalah bagian terbesar dan paling bergantung pada aset luar, jadi diusulkan tidak menghalangi closed testing. Tidak ada kode diubah. |
 
 ---
 
 ## 9. Catatan Serah Terima
 
-1. Jalankan `tool/smoke_api.mjs` terhadap backend produksi, lalu M043 sampai M045 (MM6; MM5 selesai: M027 sampai M034 `Done`; spike M003 selesai). Uji pra-rilis overlay lintas versi dan OEM menunggu. Prasyarat web (TASK-M002) selesai per keterangan founder 2026-11-13.
+1. MM5b (M070 sampai M076, usul founder 2026-11-13) lalu M044 dan M045 (MM6; MM5 selesai: M027 sampai M034 `Done`; spike M003 selesai). Uji pra-rilis overlay lintas versi dan OEM menunggu. Prasyarat web (TASK-M002) selesai per keterangan founder 2026-11-13.
 2. Urutan kerja: MM1 (backend) dan MM2 (Flutter) boleh berselang-seling. Yang sudah ditempuh: M010 sampai M017, M020, M021, M022, M023 (uji lolos), M024, M025, M026 (uji lolos), M027 dan M028 (uji lolos), M029 (uji lolos), M030 (uji lolos), M031 (uji lolos). Yang disarankan berikutnya: M032, dan seterusnya sampai MM6. Fase 2 dan 3 dirilis sesudahnya.
 3. Spike TASK-M003 sebaiknya dikerjakan lebih awal karena overlay adalah bagian paling berisiko; bila hasilnya buruk, putuskan apakah overlay keluar dari Fase 1 (ubah PRD-M).
 4. Setiap perubahan perilaku, route, skema, atau keputusan memperbarui dokumen terkait dan progress ini di akhir task yang sama (RULE-M005).
@@ -378,6 +399,7 @@ Status: `Next`, `Todo`, `Doing`, `Done`, `Blocked`. Satu task `Doing` pada satu 
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.37 | 2026-11-13 | MM5b baru (TASK-M070 s.d. M076) atas usul founder; OQ-MP2 sampai MP4; M044 menunggu MM5b. |
 | 0.36 | 2026-11-13 | TASK-M043 `Done` (build rilis dan uji Oppo dan Xiaomi lolos menurut founder); perbaikan preflight APK; berikutnya M044. |
 | 0.35 | 2026-11-13 | TASK-M043 `Doing` (kode): tanda tangan rilis dari `key.properties`, R8, `debuggable=false`, kontak bawaan dua entri, `tool/release_preflight.mjs`. Uji asap produksi 30/30. |
 | 0.34 | 2026-11-13 | TASK-M002 `Done`, OQ-3 dan OQ-5 dijawab (keterangan founder); TASK-M041 digabung ke M053; backend di-deploy; `tool/smoke_api.mjs`; berikutnya M043. |
