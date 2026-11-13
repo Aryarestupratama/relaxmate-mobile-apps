@@ -1,8 +1,8 @@
 # Panduan Uji Manual API Mobile (TASK-M017)
 
-Version: 1.1 | Status: Draft | Last updated: 2026-11-07
+Version: 1.2 | Status: Draft | Last updated: 2026-11-13
 Koleksi: `docs/postman/RelaxMate-M017.postman_collection.json` di repo web.
-Mencakup API-M001 sampai M006, M008 sampai M013, M015, M016, dan M017 (hapus akun), plus RULE-033 (isolasi), RULE-040 (log), NFR-M01 dan NFR-M02.
+Mencakup API-M001 sampai M006, M008 sampai M013, M015, M016, dan M017 (hapus akun; API-M019 di bagian G dengan koleksi terpisah), plus RULE-033 (isolasi), RULE-040 (log), NFR-M01 dan NFR-M02.
 
 ## A. Persiapan (sekali)
 
@@ -87,9 +87,26 @@ Jalankan setelah langkah 13, dengan `laravel.log` yang sudah dikosongkan di awal
 | 403 `unverified` di folder 03 | Langkah 3 belum dijalankan | Jalankan perintah verifikasi di tinker |
 | Test merah "ID sama" di 04.2 | Lewat pukul 04.00 WIB di antara dua request | Ulangi dari 00.1 |
 
+## G. API-M019 `GET /mood-entries` (TASK-M077)
+
+Koleksi terpisah: `docs/postman/RelaxMate-M077.postman_collection.json` (12 request). Data uji dibuat oleh `docs/postman/m077-seed.php`. Tidak butuh AI, consent, atau migration baru.
+
+1. Repo web terbaru (sudah di-pull dengan kode M077). Terminal: `php artisan config:clear`, `php artisan route:list --path=api/v1/mood-entries`. Harus muncul **dua** baris: `GET|HEAD` (`mood-entries.index`) dan `POST` (`mood-entries.store`).
+2. `php artisan serve` (biarkan jalan). Terminal kedua: `php artisan tinker`, lalu jalankan `include 'docs/postman/m077-seed.php';`. Skrip membuat akun `m077-a`, `m077-b`, `m077-c` (`@example.test`) dan mencetak `tokenA`, `tokenB`, `tokenC`; keluaran terakhir harus `Entri A: 6 ... entri B: 1`.
+3. Postman: Import `RelaxMate-M077.postman_collection.json`. Di tab Variables isi `tokenA`, `tokenB`, `tokenC` dari keluaran tinker (nilai utuh, termasuk angka dan tanda `|`), pastikan `baseUrl` benar. Simpan.
+4. Runner: pilih seluruh folder 00 sampai 04, Iterations 1, **Keep variable values** tercentang, Delay 0. Hasil yang diharapkan: **12 request, semua test hijau**.
+5. Periksa mata: kirim `01.1` lewat tombol Send, lihat Body. Harus tampak tiga elemen `days` berurut naik tanggalnya, `summary`, dan `range`; **tidak ada kata `note`**.
+6. Cek tambahan di tinker (tanpa isi catatan keluar di respons): `App\Models\MoodEntry::where('user_id', App\Models\User::where('email','m077-a@example.test')->value('id'))->count();` harus `7` (6 hasil seed + 1 dari 04.1).
+7. Cek log: `grep -c "RAHASIA-M077" storage/logs/laravel.log` harus `0` (PowerShell: `Select-String -Path storage\logs\laravel.log -Pattern 'RAHASIA-M077'` tidak menampilkan apa pun).
+8. Uji ulang kapan saja: jalankan lagi `include` seed (akun lama dihapus, token baru dicetak), perbarui tiga token, ulang Runner.
+9. Pembersihan: di tinker `$ids = App\Models\User::where('email','like','m077-%@example.test')->pluck('id'); Laravel\Sanctum\PersonalAccessToken::whereIn('tokenable_id',$ids)->delete(); App\Models\User::whereIn('id',$ids)->delete();`
+
+Catatan: bila Runner dijalankan tepat di 00.00 sampai 01.00 WIB, `04.2` bisa merah karena catatan seed hari ini dibuat pukul 01.00 WIB; ulangi sesudah pukul 01.00. Isi yang diperiksa: satu titik per hari WIB, catatan terakhir menang, 7 dan 30 hari berbeda, `days` liar ditolak 422, B tidak melihat data A, belum terverifikasi 403, tanpa token 401.
+
 ## Change Log
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 1.2 | 2026-11-13 | Bagian G: uji API-M019 `GET /mood-entries` (TASK-M077), koleksi `RelaxMate-M077` terpisah. |
 | 1.1 | 2026-11-07 | Langkah Runner disesuaikan dengan Postman versi baru (Deselect All, Keep variable values, Stop run). |
 | 1.0 | 2026-11-07 | Panduan awal TASK-M017. |
