@@ -192,6 +192,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               onTap: () => _openWeb(AppConstants.termsPath),
             ),
             _LinkTile(
+              icon: LucideIcons.smile,
+              label: AppTexts.settingsAbout,
+              onTap: () => context.push<void>(AppRoutes.about),
+            ),
+            _LinkTile(
               icon: LucideIcons.phone,
               label: AppTexts.settingsHelp,
               onTap: () => context.push<void>(AppRoutes.crisisContacts),

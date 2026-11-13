@@ -1,5 +1,5 @@
 # RelaxMate Mobile - PRD
-Version: 0.7 | Status: Draft | Last updated: 2026-11-11
+Version: 0.8 | Status: Draft | Last updated: 2026-11-13
 Depends on: PRD RelaxBoss v1.8, Architecture v1.74, Rules v1.5 | Owner: Founder (solo developer)
 
 Label klaim: `[Verified]` = ada sumber yang dicek, `[Inference]` = kesimpulan dari konteks, `[Assumption]` = asumsi yang bisa diubah. Kedalaman: **Lite**.
@@ -165,6 +165,7 @@ Dokumen ini terpisah dari PRD RelaxBoss (web). Aplikasi mobile masuk daftar Won'
 | FR-M025 | Pengaturan MUST memuat: suara (input, balasan), maskot mengambang, persetujuan pelatihan, privasi, hapus akun. | Must |
 | FR-M026 | Pengingat lokal opsional SHOULD tersedia dengan teks tanpa isi sensitif dan jendela jam terbatas (mengikuti ADR-019 web: tanpa push server). | Could |
 | FR-M027 | Chat harian MUST punya dua tampilan yang bisa diganti kapan saja: **maskot** (maskot di tengah atas, balasan terakhir di bawahnya) dan **obrolan** (daftar gelembung). Bawaan maskot; pilihan disimpan di perangkat. Isi, kuota, banner krisis, saran tindakan, dan Cek Rasa identik di kedua tampilan; krisis tidak boleh tertutup animasi maskot. Tanpa suara dan tanpa panggilan AI tambahan. (keputusan founder 2026-11-11) | Should |
+| FR-M028 | Aplikasi MUST punya layar **Tentang RelaxBoss** yang menjelaskan bahwa RelaxMate bagian dari RelaxBoss: kisah awal, visi, arti nama, kolaborasi kampus, penegasan bukan diagnosis atau layanan medis dengan jalan ke Kontak bantuan, serta tautan ke situs dan Instagram RelaxBoss. Isi mengikuti halaman Tentang di situs; daftar tim dan acara cukup lewat tautan ke situs. Dibuka dari Pengaturan. (usulan founder 2026-11-13) | Should |
 
 ---
 
@@ -249,6 +250,7 @@ Dokumen ini terpisah dari PRD RelaxBoss (web). Aplikasi mobile masuk daftar Won'
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.8 | 2026-11-13 | FR-M028: layar Tentang RelaxBoss. |
 | 0.7 | 2026-11-11 | FR-M027: dua tampilan chat (maskot dan obrolan), bawaan maskot. |
 | 0.6 | 2026-11-10 | Tabel teknologi: maskot memakai WebP beranimasi, bukan Rive atau Lottie (TASK-M030). |
 | 0.5 | 2026-11-07 | OQ-M3 diputuskan: Cek Rasa juga menulis Mood Entry (FR-M013 diperbarui; non-goal Mood Tracker dipertegas). |

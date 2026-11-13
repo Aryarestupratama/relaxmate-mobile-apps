@@ -39,6 +39,10 @@ abstract final class AppRoutes {
   static const String settings = '/pengaturan';
   static const String deleteAccount = '/pengaturan/hapus-akun';
 
+  /// Tentang RelaxBoss (SCR-M21): perlu masuk dengan email terverifikasi, tanpa `ConsentGate`
+  /// karena hanya teks tetap dan tautan (TASK-M071).
+  static const String about = '/pengaturan/tentang';
+
   /// Maskot mengambang (SCR-M18), Android saja (TASK-M032).
   static const String overlaySettings = '/pengaturan/maskot';
 

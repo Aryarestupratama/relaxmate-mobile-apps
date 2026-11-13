@@ -52,6 +52,13 @@ abstract final class AppConstants {
   /// Halaman Konsultasi Profesional di website (tujuan chip saran, FR-M008).
   static const String consultationPath = '/konsultasi';
 
+  /// Halaman Tentang dan beranda situs RelaxBoss (layar Tentang, FR-M028).
+  static const String aboutWebPath = '/tentang';
+  static const String homeWebPath = '/';
+
+  /// Akun Instagram RelaxBoss (alamat publik; tanpa parameter pelacak).
+  static const String instagramUrl = 'https://www.instagram.com/relaxboss_id';
+
   /// Ritme latihan napas dalam detik: tarik, tahan, embuskan (FR-M014). `[Assumption]` 4-4-6:
   /// embusan lebih panjang dari tarikan agar terasa menenangkan; ubah angka di sini bila
   /// founder ingin ritme lain (satu putaran = jumlah ketiganya).

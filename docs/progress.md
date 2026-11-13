@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Progress
-Version: 0.39 | Status: Living document | Last updated: 2026-11-13
+Version: 0.40 | Status: Living document | Last updated: 2026-11-13
 Owner: Founder (solo developer)
 
 Dokumen ini dibaca pertama setiap mulai bekerja di proyek mobile. Perbarui di akhir setiap task atau sesi. Dokumen proyek disimpan **di luar repo kode** (RULE-M014). Task di sisi backend (repo web RelaxBoss) mengikuti `Rules.md` web dan juga dicatat di sini, dengan awalan `TASK-M`, agar satu sumber kebenaran untuk fitur mobile. Perubahan di repo web tetap mengikuti Doc Sync web (`progress.md` web diperbarui bila menyentuh perilaku web).
@@ -113,8 +113,8 @@ Latar: UI/UX belum final, logo masih bawaan, dan founder ingin orang tahu RelaxM
 
 | ID | Task | Repo | Rujukan | Status |
 |---|---|---|---|---|
-| TASK-M070 | Logo RelaxMate: ikon peluncur adaptif (maju dan latar), ikon monokrom (Android 13), ikon notifikasi overlay, ikon 512 untuk toko; sumber: logo robot 3200 px buatan founder di Canva (`design/branding/source/`), diolah oleh `design/branding/build_icons.py` | M | Design-M | **Doing** (kode dan aset selesai 2026-11-13; menunggu build dan lihat di HP) |
-| TASK-M071 | Layar "Tentang RelaxBoss": RelaxMate adalah bagian dari RelaxBoss; tautan ke situs dan Instagram (`https://www.instagram.com/relaxboss_id`), versi aplikasi, tim bila perlu; teks dari founder, klaim hanya yang terkonfirmasi (RULE-049) | M | FR baru di PRD-M, RULE-049 | Todo (bahan: halaman web `/tentang`) |
+| TASK-M070 | Logo RelaxMate: ikon peluncur adaptif (maju dan latar), ikon monokrom (Android 13), ikon notifikasi overlay, ikon 512 untuk toko; sumber: logo robot 3200 px buatan founder di Canva (`design/branding/source/`), diolah oleh `design/branding/build_icons.py` | M | Design-M | **Done** (ikon dilihat dan dipakai di perangkat, founder 2026-11-13) |
+| TASK-M071 | Layar "Tentang RelaxBoss" (SCR-M21, FR-M028): RelaxMate bagian dari RelaxBoss; kisah, visi, arti nama, kolaborasi kampus, bukan diagnosis, tautan situs dan Instagram, versi; teks dari halaman web `/tentang` | M | FR-M028, RULE-049 | **Doing** (kode selesai 2026-11-13; menunggu `flutter analyze` dan uji di perangkat) |
 | TASK-M072 | Grafik mood: riwayat Cek Rasa per hari atau minggu, pilihan rentang, keadaan kosong, aksesibel (ringkasan teks, tanpa hanya warna). **Butuh endpoint baca di web:** saat ini hanya `POST /mood-entries` (API-M018); perlu `GET /mood-entries` (repo web) dan `mock_api` | W/M | FR baru di PRD-M, API baru | Todo |
 | TASK-M073 | Poles UI/UX semua layar: audit per layar (jarak, hierarki, status kosong dan galat, konsistensi komponen) memakai token; keluaran: Design-M diperbarui; tetap lolos M042 (kontras, teks 200%, target sentuh) | M | NFR-M03, Design-M | Todo |
 | TASK-M074 | Splash screen (splash native Android 12+ dengan logo, lalu layar splash Flutter bila perlu) dan animasi komponen (transisi layar, tombol, gelembung chat, kartu); hormati reduce motion; token gerak di `RbMotion` | M | Design-M, NFR-M03 | Todo |
@@ -384,6 +384,7 @@ Latar: UI/UX belum final, logo masih bawaan, dan founder ingin orang tahu RelaxM
 | 2026-11-13 (konfirmasi M043) | Build rilis pertama gagal karena sandi keystore salah (`keystore password was incorrect`); keystore dibuat ulang dengan sandi baru (belum ada unggahan ke Play), build rilis berhasil (`app-prod-release.apk`, 56,9 MB), `tool/release_preflight.mjs` 17 dari 17 lolos. Pemeriksaan tanda tangan APK lewat `jarsigner` salah (APK hanya bertanda tangan v2/v3); diganti `apksigner` (commit `fix(tool)`). Founder melaporkan APK dipasang di Oppo dan Xiaomi dan "tidak ada kendala", sudah dipush; TASK-M043 `Done`. **Tidak dilaporkan per langkah:** versi Android kedua perangkat, hasil uji overlay, hasil `apksigner`, dan pemeriksaan email verifikasi produksi. Matriks overlay (Android 10/11, 13, 15) tetap belum tercatat. |
 | 2026-11-13 (usul MM5b) | Founder ingin memoles semua halaman, mengganti logo, menambah Tentang RelaxBoss dan grafik mood, memperkaya animasi maskot (badan penuh, mungkin pixel), animasi komponen dan splash, **sebelum** TASK-M044. Dicatat sebagai MM5b. Catatan penilaian: grafik mood butuh endpoint baca baru di web; maskot v2 adalah bagian terbesar dan paling bergantung pada aset luar, jadi diusulkan tidak menghalangi closed testing. Tidak ada kode diubah. |
 | 2026-11-13 (sesi M070) | Founder menyetujui urutan (M044 menunggu M070 sampai M074), memilih gaya animasi halus dan akan membuat aset per aksi dengan ChatGPT atau Gemini, serta mengirim logo (`chatbot-icon.png`, 256 px), lembar karakter badan penuh, dan tangkapan halaman web Tentang. TASK-M070: logo digambar ulang sebagai vektor (`design/branding/build_icons.py`, butuh `rsvg-convert`), dihasilkan ikon adaptif, monokrom, ikon penuh 512 untuk toko, dan ikon notifikasi overlay (`ic_stat_relaxmate`; sebelumnya notifikasi memakai ikon peluncur berwarna), `OverlayService` memakainya. **Belum dijalankan:** build dan lihat ikon di peluncur dan notifikasi (sandbox tanpa Flutter dan Android SDK). Versi pertama (digambar ulang vektor dari sumber 256 px) dinilai founder aneh; diganti memakai logo 3200 px buatan founder di Canva (dipakai apa adanya, hanya latarnya dibuat transparan untuk lapisan adaptif dan monokrom). |
+| 2026-11-13 (sesi M071) | Founder melaporkan ikon baru selesai dan sudah dipush (M070 `Done`) dan menyetujui usul isi Tentang. TASK-M071 dikodekan: `AboutScreen` (`lib/features/settings/ui/about_screen.dart`), rute `/pengaturan/tentang`, entri di Pengaturan, teks `about*` di `AppTexts`, `AppConstants.instagramUrl`, `aboutWebPath`, `homeWebPath`. Hanya ikon Lucide yang sudah ada di kode yang dipakai (nama ikon baru tidak bisa diverifikasi tanpa paket). **Belum dijalankan:** `flutter analyze` dan uji di perangkat (sandbox tanpa Flutter). Alamat Instagram diambil dari tautan yang founder berikan dan dibuang parameter pelacaknya. |
 
 ---
 
@@ -400,6 +401,7 @@ Latar: UI/UX belum final, logo masih bawaan, dan founder ingin orang tahu RelaxM
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.40 | 2026-11-13 | TASK-M070 `Done`; TASK-M071 `Doing` (kode): layar Tentang RelaxBoss, FR-M028, SCR-M21. |
 | 0.39 | 2026-11-13 | TASK-M070: ikon memakai logo 3200 px buatan founder (versi vektor dibuang). |
 | 0.38 | 2026-11-13 | TASK-M070 `Doing` (ikon dan aset selesai); OQ-MP2 dan MP3 ditutup, MP4 sebagian; `docs/Mascot-Asset-Brief.md`. |
 | 0.37 | 2026-11-13 | MM5b baru (TASK-M070 s.d. M076) atas usul founder; OQ-MP2 sampai MP4; M044 menunggu MM5b. |

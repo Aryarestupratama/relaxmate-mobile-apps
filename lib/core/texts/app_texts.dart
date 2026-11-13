@@ -212,6 +212,46 @@ abstract final class AppTexts {
   static const String settingsTerms = 'Ketentuan layanan';
   static const String settingsHelp = 'Kontak bantuan';
   static const String settingsDeleteAccount = 'Hapus akun';
+  static const String settingsAbout = 'Tentang RelaxBoss';
+
+  // Tentang RelaxBoss (SCR-M21, FR-M028). Isi mengikuti halaman Tentang di situs RelaxBoss.
+  static const String aboutTitle = 'Tentang RelaxBoss';
+  static const String aboutHeadline = 'RelaxMate adalah bagian dari RelaxBoss';
+  static const String aboutIntro =
+      'RelaxBoss adalah teman yang sederhana, gratis, dan ramah untuk membantu '
+      'mahasiswa mengenali dan mengelola stres lebih awal. RelaxMate adalah '
+      'teman bicara virtual berbasis AI di dalam aplikasi ini.';
+  static const String aboutStoryTitle = 'Berawal dari burnout';
+  static const String aboutStoryBody =
+      'Ide RelaxBoss muncul dari pengalaman pengembangnya sendiri: mengalami '
+      'burnout saat kuliah. Dari situ lahir pertanyaan sederhana, bagaimana '
+      'kalau mahasiswa punya tempat untuk mengenali stres lebih awal, tanpa '
+      'biaya dan tanpa rasa canggung?';
+  static const String aboutVisionTitle = 'Visi';
+  static const String aboutVisionBody =
+      'Membantu mahasiswa mengenali dan mengelola stres lebih awal, dengan cara '
+      'yang sederhana, gratis, dan ramah. Kami percaya kamu yang memegang '
+      'kendali atas kondisimu, bukan sebaliknya.';
+  static const String aboutNameTitle = 'Tentang nama';
+  static const String aboutNameRelax = 'Relax';
+  static const String aboutNameRelaxBody = 'Ajakan untuk tenang.';
+  static const String aboutNameBoss = 'Boss';
+  static const String aboutNameBossBody =
+      'Pengingat bahwa kamulah yang memegang kendali atas stresmu.';
+  static const String aboutCampusTitle = 'Dibangun bersama kampus';
+  static const String aboutCampusBody =
+      'RelaxBoss dikembangkan di lingkungan Universitas Mercu Buana, hasil '
+      'kolaborasi Fakultas Psikologi dan Fakultas Ilmu Komputer.';
+  static const String aboutSafeTitle = 'Ruang yang aman, bukan diagnosis';
+  static const String aboutSafeBody =
+      'RelaxBoss dan RelaxMate bukan psikolog atau layanan medis, dan '
+      'hasilnya bukan diagnosis. Untuk penilaian yang tepat, bicarakan dengan '
+      'profesional. Jika kamu butuh bantuan segera, buka Kontak bantuan.';
+  static const String aboutHelpButton = 'Buka Kontak bantuan';
+  static const String aboutLinksTitle = 'Kenali lebih jauh';
+  static const String aboutWebsite = 'Situs RelaxBoss';
+  static const String aboutWebsiteFull = 'Cerita lengkap dan tim di situs';
+  static const String aboutInstagram = 'Instagram @relaxboss_id';
   static String settingsVersion(String version) => 'Versi $version';
 
   static const String deleteBody =

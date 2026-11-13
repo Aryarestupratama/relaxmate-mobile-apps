@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Architecture
-Version: 0.31 | Status: Draft | Last updated: 2026-11-13
+Version: 0.32 | Status: Draft | Last updated: 2026-11-13
 Depends on: PRD RelaxMate Mobile v0.3, Architecture RelaxBoss (web), Schema RelaxBoss (web), Rules v1.5 | Owner: Founder (solo developer)
 
 Label: `[Verified]` ada sumber (sisi mobile: repo `relaxmate-mobile-apps` commit `8014c38`; sisi backend: repo `RELAXBOSS_WEBSITE` commit `9afd27c`), `[Inference]` kesimpulan, `[Assumption]` bisa diubah. **Dokumen ini mengikuti kode:** bila berbeda dari kode, kode yang benar. Kedalaman: **Lite**. Dokumen ini hanya mengatur sisi mobile dan tambahan di backend. Subsistem AI (rotasi key, `ChatbotService`, `CrisisDetector`), enkripsi, dan admin tetap di Architecture web dan tidak diulang di sini.
@@ -464,6 +464,7 @@ Alat pengembangan di luar aplikasi: Node.js untuk `tool/mock_api.mjs` (tanpa dep
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.32 | 2026-11-13 | TASK-M071: layar Tentang RelaxBoss (`AboutScreen`, `/pengaturan/tentang`, teks tetap, tautan lewat `WebLauncher`). |
 | 0.31 | 2026-11-13 | TASK-M043 diverifikasi: build rilis dengan R8 berhasil dan berjalan di dua perangkat (laporan founder); preflight APK memakai `apksigner`. |
 | 0.30 | 2026-11-13 | TASK-M043: konfigurasi build rilis (tanda tangan dari `key.properties`, R8, `debuggable=false`) dan `tool/release_preflight.mjs`. `[Verified: build rilis dan uji perangkat, founder 2026-11-13]`. |
 | 0.29 | 2026-11-13 | Urutan rilis: backend di-deploy dulu, diuji dengan `tool/smoke_api.mjs`, baru aplikasi dibangun. |
