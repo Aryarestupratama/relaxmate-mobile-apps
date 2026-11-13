@@ -1,4 +1,15 @@
 import com.android.build.api.dsl.ApplicationExtension
+import java.util.Properties
+
+// Kunci tanda tangan rilis dibaca dari android/key.properties (di luar git, RULE-M014/M048).
+// Isi: storeFile (path mutlak ke .jks), storePassword, keyAlias, keyPassword.
+val keyPropertiesFile = rootProject.file("key.properties")
+val keyProperties = Properties().apply {
+    if (keyPropertiesFile.exists()) {
+        keyPropertiesFile.inputStream().use { load(it) }
+    }
+}
+val hasReleaseKey = keyPropertiesFile.exists()
 
 plugins {
     id("com.android.application")
@@ -17,7 +28,6 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "id.my.relaxboss.relaxmate"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
@@ -31,11 +41,35 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (hasReleaseKey) {
+            create("release") {
+                storeFile = file(keyProperties.getProperty("storeFile"))
+                storePassword = keyProperties.getProperty("storePassword")
+                keyAlias = keyProperties.getProperty("keyAlias")
+                keyPassword = keyProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            isDebuggable = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+            // Tanpa key.properties build rilis jatuh ke kunci debug supaya `flutter run --release`
+            // tetap bisa dipakai untuk uji lokal. Berkas seperti itu TIDAK boleh diunggah ke toko;
+            // `node tool/release_preflight.mjs` menolaknya.
+            signingConfig = if (hasReleaseKey) {
+                signingConfigs.getByName("release")
+            } else {
+                logger.warn("key.properties tidak ada: build rilis memakai kunci debug (hanya uji lokal).")
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }

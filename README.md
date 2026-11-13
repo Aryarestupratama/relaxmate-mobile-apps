@@ -62,7 +62,7 @@ lib/
     texts/    bank teks UI
   features/<nama>/{data,state,ui} satu fitur satu folder
   shared/widgets/                 komponen UI bersama
-tool/                             alat pengembangan (bukan bagian aplikasi); `node tool/privacy_audit.mjs` = audit privasi statis
+tool/                             alat pengembangan (bukan bagian aplikasi); `node tool/privacy_audit.mjs` = audit privasi statis; `node tool/release_preflight.mjs` = preflight build rilis
 assets/
   fonts/ images/mascot/           font dan maskot
   audio/clips/ crisis/ texts/     diisi pada task fiturnya

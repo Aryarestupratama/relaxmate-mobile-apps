@@ -7,6 +7,12 @@
       "url": "https://www.healing119.id",
       "note": "Layanan konseling gratis, 24 jam.",
       "dummy": false
+    },
+    {
+      "name": "Lab Terapan Psikologi",
+      "phone": "+6285759730161",
+      "note": "Kontak konsultasi psikologi.",
+      "dummy": false
     }
   ]
 }
