@@ -35,6 +35,17 @@ node tool/mock_api.mjs auth       # alur akun; akun contoh dan pembantu dijelask
 
 Lalu jalankan aplikasi dengan `API_BASE_URL=http://10.0.2.2:8001`. Mode lain: `slow`, `error`, `unauthorized`.
 
+## Uji asap backend yang sudah di-deploy
+
+`tool/smoke_api.mjs` memeriksa backend sungguhan sebelum aplikasi dibangun (butuh Node.js). Pakai akun uji khusus yang sudah terverifikasi, bukan akun pribadi.
+
+```bash
+SMOKE_EMAIL=uji@contoh.id SMOKE_PASSWORD=... node tool/smoke_api.mjs https://alamat-backend
+# tambahan: --write (kirim pesan dan Cek Rasa), --crisis (uji pesan krisis), --allow-http, --allow-dummy
+```
+
+Keluaran LOLOS, GAGAL, atau LEWAT; kode keluar 1 bila ada yang GAGAL. Opsi `--write` menulis data ke akun uji.
+
 ## Struktur
 
 ```
