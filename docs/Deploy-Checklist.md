@@ -37,5 +37,5 @@ keyPassword=SANDI_KEYSTORE
 - [ ] `node tool/release_preflight.mjs` semua LOLOS (juga menjalankan `tool/privacy_audit.mjs`).
 - [ ] Bangun:
   `flutter build appbundle --release --flavor prod -t lib/main_prod.dart --dart-define=API_BASE_URL=https://relaxboss.my.id`
-- [ ] Periksa tanda tangan: `node tool/release_preflight.mjs --artifact build/app/outputs/bundle/prodRelease/app-prod-release.aab` (butuh `jarsigner` dari folder `bin` JDK Android Studio di PATH; bila tidak ada, hasilnya LEWAT).
+- [ ] Periksa tanda tangan: `node tool/release_preflight.mjs --artifact build/app/outputs/flutter-apk/app-prod-release.apk` (memakai `apksigner` dari Android SDK build-tools) atau `--artifact build/app/outputs/bundle/prodRelease/app-prod-release.aab` (memakai `jarsigner` dari folder `bin` JDK Android Studio di PATH). Bila alatnya tidak ditemukan, hasilnya LEWAT.
 - [ ] Uji APK rilis di >= 2 perangkat nyata: `flutter build apk --release --flavor prod -t lib/main_prod.dart --dart-define=API_BASE_URL=https://relaxboss.my.id`, pasang, lalu jalankan alur inti (daftar, masuk, chat, krisis, kontak bantuan, overlay).

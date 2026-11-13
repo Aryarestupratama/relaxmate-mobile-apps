@@ -3,12 +3,12 @@
 // tidak membangun aplikasi. Dijalankan dari akar proyek:
 //
 //   node tool/release_preflight.mjs                       # sebelum build
-//   node tool/release_preflight.mjs --artifact <berkas>   # sesudah build: periksa tanda tangan .aab/.apk
+//   node tool/release_preflight.mjs --artifact <berkas>   # sesudah build: periksa tanda tangan .apk (apksigner) atau .aab (jarsigner)
 //
 // Keluar dengan kode 1 bila ada yang GAGAL. Audit privasi (`tool/privacy_audit.mjs`) ikut dijalankan.
 import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
-import { isAbsolute, relative, resolve } from 'node:path';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { isAbsolute, join, relative, resolve } from 'node:path';
 
 const results = [];
 const add = (status, name, detail = '') => results.push({ status, name, detail });
@@ -74,17 +74,46 @@ check('kontak bawaan: tanpa entri dummy', list.every((c) => c.dummy !== true), '
 const pub = read('pubspec.yaml').match(/^version:\s*(\S+)/m);
 add('INFO', 'versi di pubspec.yaml', pub ? pub[1] : 'tidak terbaca');
 
-// 6. Opsional: tanda tangan artefak hasil build.
+// 6. Opsional: tanda tangan artefak hasil build. APK dengan minSdk >= 24 hanya memakai tanda tangan
+// v2/v3, yang tidak terbaca `jarsigner`; APK diperiksa dengan `apksigner`, AAB dengan `jarsigner`.
+const findApksigner = () => {
+  const sdks = [process.env.ANDROID_HOME, process.env.ANDROID_SDK_ROOT, process.env.LOCALAPPDATA && join(process.env.LOCALAPPDATA, 'Android', 'Sdk'), process.env.HOME && join(process.env.HOME, 'Android', 'Sdk')].filter(Boolean);
+  for (const sdk of sdks) {
+    const dir = join(sdk, 'build-tools');
+    if (!existsSync(dir)) continue;
+    const versions = readdirSync(dir).sort((x, y) => y.localeCompare(x, undefined, { numeric: true }));
+    for (const v of versions) {
+      for (const name of ['apksigner.bat', 'apksigner']) {
+        const f = join(dir, v, name);
+        if (existsSync(f)) return f;
+      }
+    }
+  }
+  return null;
+};
+
 if (artifact) {
   check('artefak ada', existsSync(artifact), artifact);
-  if (existsSync(artifact)) {
+  if (existsSync(artifact) && artifact.toLowerCase().endsWith('.apk')) {
+    const tool = findApksigner();
+    if (!tool) {
+      add('LEWAT', 'tanda tangan APK', 'apksigner tidak ditemukan (Android SDK build-tools); set ANDROID_HOME');
+    } else {
+      const r = spawnSync(tool, ['verify', '--print-certs', artifact], { encoding: 'utf8', shell: tool.endsWith('.bat') });
+      const out = `${r.stdout}\n${r.stderr}`;
+      check('APK bertanda tangan sah (apksigner verify)', r.status === 0, out.trim().split('\n').slice(0, 2).join(' | '));
+      check('APK TIDAK bertanda tangan kunci debug', r.status === 0 && !/Android Debug/i.test(out), 'build memakai kunci debug; cek key.properties');
+      const dn = out.match(/certificate DN:\s*(.+)/i);
+      add('INFO', 'penanda tangan APK', dn ? dn[1].trim() : '');
+    }
+  } else if (existsSync(artifact)) {
     const js = run('jarsigner', ['-verify', '-verbose', '-certs', artifact]);
     if (js.error) {
       add('LEWAT', 'tanda tangan artefak', 'jarsigner tidak ditemukan; pakai folder bin JDK Android Studio');
     } else {
       const out = `${js.stdout}\n${js.stderr}`;
-      check('artefak bertanda tangan', /jar verified|sm\s/.test(out), out.split('\n').slice(-3).join(' | '));
-      check('artefak TIDAK bertanda tangan kunci debug', !/Android Debug/i.test(out), 'build memakai kunci debug; cek key.properties');
+      check('artefak bertanda tangan', /jar verified/.test(out), out.split('\n').slice(-3).join(' | '));
+      check('artefak TIDAK bertanda tangan kunci debug', /jar verified/.test(out) && !/Android Debug/i.test(out), 'build memakai kunci debug; cek key.properties');
     }
   }
 }
