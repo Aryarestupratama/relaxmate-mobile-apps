@@ -1,5 +1,5 @@
 # RelaxMate Mobile - PRD
-Version: 0.8 | Status: Draft | Last updated: 2026-11-13
+Version: 0.9 | Status: Draft | Last updated: 2026-11-13
 Depends on: PRD RelaxBoss v1.8, Architecture v1.74, Rules v1.5 | Owner: Founder (solo developer)
 
 Label klaim: `[Verified]` = ada sumber yang dicek, `[Inference]` = kesimpulan dari konteks, `[Assumption]` = asumsi yang bisa diubah. Kedalaman: **Lite**.
@@ -30,7 +30,7 @@ Dokumen ini terpisah dari PRD RelaxBoss (web). Aplikasi mobile masuk daftar Won'
 - G5: Aplikasi layak dipamerkan sebagai portofolio dan lolos kebijakan toko.
 
 **Non-goals (rilis ini)**
-- Tidak ada Mood Tracker (grafik dan riwayat mood), Asesmen, dan Artikel di mobile (tetap di web). Satu-satunya titik mobile yang menulis Mood Entry adalah Cek Rasa (FR-M013).
+- Mood Tracker **lengkap** (insight, model Circumplex, catatan teks) tetap di web, begitu juga Asesmen dan Artikel. Mobile hanya punya input mood di Beranda dan grafik ringkas 7 atau 30 hari (FR-M029, FR-M030; keputusan founder 2026-11-13 yang menggantikan non-goal "tanpa grafik mood" sebelumnya). Titik mobile yang menulis Mood Entry adalah kartu mood di Beranda (FR-M013).
 - Tidak ada To-Do/Pomodoro (aplikasi dan PRD terpisah).
 - Tidak ada streaming balasan, WebSocket, push notification dari server, atau antrean (RULE-034).
 - Tidak ada kata panggil yang mendengarkan terus di latar belakang (keputusan founder 2026-11-04: cari aman). Mikrofon tidak aktif di latar belakang, termasuk saat maskot mengambang tampil; pengguna menyentuh maskot dulu, baru bicara.
@@ -135,7 +135,7 @@ Dokumen ini terpisah dari PRD RelaxBoss (web). Aplikasi mobile masuk daftar Won'
 
 | ID | Requirement | Prioritas |
 |---|---|---|
-| FR-M013 | Awal sesi harian MUST menawarkan Cek Rasa (skala 1–5). Jawaban dikirim sebagai pesan chat biasa **dan juga dicatat sebagai Mood Entry (ENT-006) lewat API-M018**, sehingga tampil di Mood Tracker web (OQ-M3, diputuskan founder 2026-11-07). Dapat dilewati. Tidak membuat tabel baru. | Must |
+| FR-M013 | Pengguna MUST dapat mencatat mood (skala 1 sampai 5) dari kartu mood di **Beranda** (FR-M029); jawaban dicatat sebagai Mood Entry (ENT-006) lewat API-M018 sehingga tampil di Mood Tracker web (OQ-M3, diputuskan founder 2026-11-07). Satu hari boleh beberapa catatan (batas `limits.mood_per_day`); grafik memakai catatan terakhir tiap hari. Kartu mood **tidak lagi** tampil di chat (keputusan founder 2026-11-13; sebelumnya jawabannya juga dikirim sebagai pesan chat). Tidak membuat tabel baru, tidak memanggil AI. | Must |
 | FR-M014 | Aplikasi MUST menyediakan latihan napas dan grounding 5-4-3-2-1 yang berjalan **lokal**, tanpa AI dan tanpa kuota, termasuk saat offline. Fase 1 berupa panduan visual dengan getar opsional; panduan suara menyusul di Fase 2 bersama klip suara (FR-M020). | Must |
 | FR-M015 | Mode “Temani saja”: maskot hadir tanpa percakapan (animasi tenang, napas pelan), tanpa panggilan AI. | Should |
 
@@ -166,6 +166,8 @@ Dokumen ini terpisah dari PRD RelaxBoss (web). Aplikasi mobile masuk daftar Won'
 | FR-M026 | Pengingat lokal opsional SHOULD tersedia dengan teks tanpa isi sensitif dan jendela jam terbatas (mengikuti ADR-019 web: tanpa push server). | Could |
 | FR-M027 | Chat harian MUST punya dua tampilan yang bisa diganti kapan saja: **maskot** (maskot di tengah atas, balasan terakhir di bawahnya) dan **obrolan** (daftar gelembung). Bawaan maskot; pilihan disimpan di perangkat. Isi, kuota, banner krisis, saran tindakan, dan Cek Rasa identik di kedua tampilan; krisis tidak boleh tertutup animasi maskot. Tanpa suara dan tanpa panggilan AI tambahan. (keputusan founder 2026-11-11) | Should |
 | FR-M028 | Aplikasi MUST punya layar **Tentang RelaxBoss** yang menjelaskan bahwa RelaxMate bagian dari RelaxBoss: kisah awal, visi, arti nama, kolaborasi kampus, penegasan bukan diagnosis atau layanan medis dengan jalan ke Kontak bantuan, serta tautan ke situs dan Instagram RelaxBoss. Isi mengikuti halaman Tentang di situs; daftar tim dan acara cukup lewat tautan ke situs. Dibuka dari Pengaturan. (usulan founder 2026-11-13) | Should |
+| FR-M029 | Layar pertama setelah masuk MUST berupa **Beranda**, bukan chat: sapaan, kartu mood hari ini (FR-M013), grafik ringkas 7 hari, tombol utama "Ngobrol dengan RelaxMate", jalan pintas Latihan napas dan Temani saja, dan tautan Kontak bantuan yang selalu terlihat. Navigasi bawah empat tab: Beranda, Ngobrol, Latihan, Mood. Pengaturan lewat ikon di Beranda. Mood Sangat sedih memunculkan kartu lembut ke Kontak bantuan tanpa memanggil AI. Beranda tidak membutuhkan consent AI; consent hanya dicek saat membuka Ngobrol (FR-M002). (keputusan founder 2026-11-13) | Must |
+| FR-M030 | Layar **Mood** MUST menampilkan grafik suasana hati 7 atau 30 hari (satu titik per hari, warna sesuai mood), ringkasan (rata-rata, hari terbaik, jumlah hari diisi), daftar catatan terakhir, keadaan kosong yang ramah, ringkasan teks untuk pembaca layar, dan penegasan bahwa ini bukan diagnosis. Data dari API-M019. (keputusan founder 2026-11-13) | Must |
 
 ---
 
@@ -250,6 +252,7 @@ Dokumen ini terpisah dari PRD RelaxBoss (web). Aplikasi mobile masuk daftar Won'
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.9 | 2026-11-13 | Konsep Beranda: FR-M029 (Beranda sebagai layar pertama, navigasi bawah), FR-M030 (grafik mood), FR-M013 dipindah ke Beranda, non-goal grafik mood dicabut. |
 | 0.8 | 2026-11-13 | FR-M028: layar Tentang RelaxBoss. |
 | 0.7 | 2026-11-11 | FR-M027: dua tampilan chat (maskot dan obrolan), bawaan maskot. |
 | 0.6 | 2026-11-10 | Tabel teknologi: maskot memakai WebP beranimasi, bukan Rive atau Lottie (TASK-M030). |

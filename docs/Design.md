@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Design System dan Spesifikasi Layar
-Version: 0.25 | Status: Draft | Last updated: 2026-11-13
+Version: 0.26 | Status: Draft | Last updated: 2026-11-13
 Depends on: PRD-Mobile v0.3, Architecture-Mobile v0.3, Design RelaxBoss (web) | Owner: Founder (solo developer)
 
 Label: `[Assumption]` bisa diubah. Kedalaman: **Lite**. Platform: Android (phone) dulu, mode terang. Tata letak layar yang tidak tertulis dibangun sederhana (fungsi dulu) memakai token dan komponen di dokumen ini (RULE-M007).
@@ -175,7 +175,7 @@ Bantuan (TASK-M025 `[Verified: uji manual founder 2026-11-07]`): semua layar tam
 | SCR-M06 | Cek email / verifikasi | Login | API-M005 |
 | SCR-M07 | Consent AI dan persetujuan pelatihan | Login | FR-M002 |
 | SCR-M08 | **RelaxMate (aliran harian)** | Login + consent | FR-M004..M009 |
-| SCR-M09 | Cek Rasa (kartu di sambutan, awal sesi) | Login + consent | FR-M013 |
+| SCR-M09 | Cek Rasa (kartu mood di Beranda; tidak lagi di chat, FR-M029) | Login | FR-M013 |
 | SCR-M10 | Mode percakapan suara | Login + consent | FR-M016..M018 (Fase 2) |
 | SCR-M11 | Latihan napas | Login | FR-M014 |
 | SCR-M12 | Grounding 5-4-3-2-1 | Login | FR-M014 |
@@ -188,6 +188,8 @@ Bantuan (TASK-M025 `[Verified: uji manual founder 2026-11-07]`): semua layar tam
 | SCR-M19 | Hapus akun | Login | FR-M003 |
 | SCR-M20 | Perbarui aplikasi | Semua | API-M007 |
 | SCR-M21 | Tentang RelaxBoss | Login | FR-M028 |
+| SCR-M22 | Beranda (layar pertama) | Login | FR-M029, FR-M013 |
+| SCR-M23 | Mood (grafik suasana hati) | Login | FR-M030 |
 | OVL-M01 | Gelembung maskot (overlay) | Android | FR-M022 |
 | OVL-M02 | Mini-panel maskot (overlay) | Android | FR-M024 |
 
@@ -225,6 +227,9 @@ Dibangun di TASK-M030 `[Verified: uji manual dan `flutter analyze` lolos, founde
 
 ### SCR-M17 Pengaturan dan SCR-M19 Hapus akun
 Dibangun di TASK-M031 `[Verified: uji manual dan `flutter analyze` lolos, founder 2026-11-10]`. **SCR-M17** (`/pengaturan`, dari menu tiga titik chat dan dari layar consent): daftar yang bisa digulir dengan bagian **Akun** (nama dan email, hanya baca), **Persetujuan pelatihan** (pertanyaan dan keterangan dari server, dua `ConsentChoiceTile` Ya/Tidak dengan pilihan tersimpan terpilih; menyimpan seketika dengan `SnackBar` "Pilihanmu disimpan."; saat memuat indikator putar, saat gagal `ErrorAlert` dan "Coba lagi"), **Latihan** (saklar "Getar halus", disimpan), **Privasi dan bantuan** (saklar "Sembunyikan layar di aplikasi terbaru", bawaan nyala, disimpan; tautan Kebijakan Privasi dan Ketentuan layanan ke web; Kontak bantuan), lalu tombol **Keluar**, tombol teks merah **Hapus akun**, dan nomor versi. Hanya perlu masuk dengan email terverifikasi, tanpa `ConsentGate`. Suara dan maskot mengambang (SCR-M18) menyusul di task fiturnya. **SCR-M19** (`/pengaturan/hapus-akun`, juga dari layar Cek email): penjelasan bahwa akun dan semua data dihapus permanen, kolom kata sandi (`PasswordField`), tombol merah "Hapus akun saya", lalu dialog konfirmasi "Hapus akunmu?" (Batal / Ya, hapus). Galat sandi tampil di bawah kolom; galat lain (mis. admin terakhir) di kartu galat. Berhasil: kembali ke layar Masuk. **Lapisan privasi:** saat aplikasi tidak di depan layar, isi layar diganti latar `pageBg` berisi `MateAvatar` besar (bila pengaturan menyala). Layar consent (SCR-M07) memuat tautan teks "Latihan napas dan grounding" dan "Pengaturan dan hapus akun" di bawah "Keluar" (OQ-MA12).
+
+### SCR-M22 Beranda dan SCR-M23 Mood (konsep, TASK-M072)
+`[Unverified: konsep disetujui founder 2026-11-13, belum dibangun]`. Rujukan visual: kanvas "Konsep Dashboard RelaxMate" (tiga layar ponsel). **Navigasi bawah** empat tab: Beranda (`/`), Ngobrol (`/ngobrol`, sebelumnya `/`), Latihan (`/latihan`), Mood (`/mood`); target sentuh >= 48dp, tab aktif tebal dan berwarna `primary`, label selalu tampil. **SCR-M22 Beranda:** header (avatar kecil, tanggal, "Halo, <nama>", ikon Pengaturan), kartu "Gimana perasaanmu hari ini?" dengan lima blob mood (`MoodBlobRow`, sudah ada) yang memakai API-M018; setelah dipilih kartu berubah menjadi konfirmasi ("Hari ini kamu merasa <mood>", jam, tautan Ubah) dan muncul ajakan "Mau cerita sedikit?" dengan tombol "Cerita ke RelaxMate" dan "Temani saja"; kartu grafik 7 hari dengan tautan "Lihat semua"; tombol utama "Ngobrol dengan RelaxMate"; dua jalan pintas (Latihan napas, Temani saja); tautan "Butuh bantuan sekarang? Kontak bantuan" selalu terlihat (prinsip 4). Mood Sangat sedih menampilkan kartu "Kalau terasa sangat berat" ke Kontak bantuan (tanpa AI, tanpa diagnosis). **SCR-M23 Mood:** pilihan rentang 7 atau 30 hari (kontrol segmen), grafik garis satu titik per hari berwarna `mood1` sampai `mood5` dengan garis rata-rata putus-putus, tiga angka ringkasan (rata-rata, terbaik, jumlah hari diisi), daftar "Catatan terakhir", dan catatan "bukan diagnosis". Grafik tidak mengandalkan warna saja (posisi vertikal dan label sumbu), punya ringkasan teks untuk pembaca layar (`Semantics`), dan keadaan kosong ("Isi mood pertamamu; grafik muncul setelah 2 hari"). Layar chat tidak lagi memuat kartu Cek Rasa.
 
 ### SCR-M21 Tentang RelaxBoss
 `AboutScreen` (`/pengaturan/tentang`, dari tautan "Tentang RelaxBoss" di Pengaturan bagian Privasi dan bantuan; perlu masuk, tanpa `ConsentGate`). Satu kolom yang bisa digulir: avatar RelaxMate, judul "RelaxMate adalah bagian dari RelaxBoss", pengantar, **Berawal dari burnout**, **Visi**, **Tentang nama** (dua kartu: Relax dan Boss), **Dibangun bersama kampus**, kotak **Ruang yang aman, bukan diagnosis** dengan tombol "Buka Kontak bantuan", lalu tautan **Situs RelaxBoss**, **Cerita lengkap dan tim di situs**, dan **Instagram @relaxboss_id** (dibuka di peramban luar; gagal buka menampilkan snackbar `webOpenFailed`), dan nomor versi. Semua teks di `AppTexts` (`about*`), tanpa jaringan. Judul bagian memakai `Semantics(header: true)`. Dibangun di TASK-M071 `[Unverified: belum dijalankan; `flutter analyze` dan uji manual di perangkat]`.
@@ -356,6 +361,7 @@ Ikon: satu set (`[Assumption]` Lucide untuk Flutter), ukuran 24dp, stroke 2. OQ-
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.26 | 2026-11-13 | Konsep Beranda (SCR-M22), Mood (SCR-M23), navigasi bawah empat tab; Cek Rasa pindah dari chat ke Beranda. |
 | 0.25 | 2026-11-13 | SCR-M21 Tentang RelaxBoss (TASK-M071). |
 | 0.24 | 2026-11-11 | TASK-M035 diverifikasi. |
 | 0.23 | 2026-11-11 | TASK-M035: tampilan maskot chat (CMP-M29), tombol ganti tampilan, bagian Tampilan di Pengaturan. |
