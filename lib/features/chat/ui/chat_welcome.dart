@@ -3,28 +3,28 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
-import 'package:relaxmate/features/checkin/state/checkin_controller.dart';
-import 'package:relaxmate/features/checkin/ui/checkin_card.dart';
+import 'package:relaxmate/features/chat/state/chat_controller.dart';
 import 'package:relaxmate/features/mascot/data/mascot_state.dart';
 import 'package:relaxmate/features/mascot/ui/mascot_view.dart';
+import 'package:relaxmate/features/mood/state/today_mood_provider.dart';
 
-/// Sambutan saat belum ada pesan hari ini (SCR-M08). Bila [canCheckin], kartu Cek Rasa
-/// (SCR-M09) ditawarkan di bawah sambutan sampai pengguna mengirim atau melewatinya.
-/// Dapat digulir agar tetap muat pada layar kecil, teks 200%, dan saat papan ketik terbuka.
+/// Sambutan saat belum ada pesan hari ini (SCR-M08). Bila mood hari ini sudah tercatat di
+/// Beranda dan batas harian belum tercapai ([canSend]), ditawarkan chip pembuka "Aku merasa
+/// (nama mood) hari ini" (OQ-MP5): dikirim hanya bila pengguna mengetuknya, tanpa panggilan AI
+/// tambahan. Dapat digulir agar tetap muat pada layar kecil, teks 200%, dan saat papan ketik
+/// terbuka.
 class ChatWelcome extends ConsumerWidget {
-  const ChatWelcome({required this.canCheckin, super.key});
+  const ChatWelcome({required this.canSend, super.key});
 
-  /// Belum ada pesan hari ini dan batas harian belum tercapai.
-  final bool canCheckin;
+  /// Batas pesan harian belum tercapai.
+  final bool canSend;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.rbColors;
     final text = context.rbText;
     final space = context.rbSpace;
-    final skipped = ref.watch(
-      checkinControllerProvider.select((state) => state.skipped),
-    );
+    final mood = ref.watch(todayMoodProvider);
 
     return Center(
       child: SingleChildScrollView(
@@ -42,9 +42,20 @@ class ChatWelcome extends ConsumerWidget {
               textAlign: TextAlign.center,
               style: text.body.copyWith(color: colors.textSecondary),
             ),
-            if (canCheckin && !skipped) ...<Widget>[
+            if (canSend && mood != null) ...<Widget>[
               SizedBox(height: space.lg),
-              const CheckinCard(),
+              Text(
+                AppTexts.chatMoodChipHint,
+                textAlign: TextAlign.center,
+                style: text.small.copyWith(color: colors.textSecondary),
+              ),
+              SizedBox(height: space.xs),
+              OutlinedButton(
+                onPressed: () => ref
+                    .read(chatControllerProvider.notifier)
+                    .send(mood.level.chatMessage),
+                child: Text(mood.level.chatMessage),
+              ),
             ],
           ],
         ),

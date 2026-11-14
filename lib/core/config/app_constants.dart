@@ -69,4 +69,22 @@ abstract final class AppConstants {
   /// Pilihan durasi latihan napas dalam menit (Design-M SCR-M11) dan pilihan awalnya.
   static const List<int> breathingMinuteChoices = <int>[1, 3, 5];
   static const int breathingDefaultMinutes = 3;
+
+  /// Selisih WIB terhadap UTC (tanpa waktu musim panas). Dipakai untuk menampilkan jam catatan
+  /// mood dalam WIB (RULE-M033); aturan "hari" tetap dihitung server.
+  static const int wibOffsetHours = 7;
+
+  /// Rentang grafik mood (API-M019 hanya menerima 7 atau 30).
+  static const int moodRangeShortDays = 7;
+  static const int moodRangeLongDays = 30;
+
+  /// Banyak baris di daftar "Catatan terakhir" layar Mood.
+  static const int moodRecentNotes = 3;
+
+  /// Pada rentang 30 hari label sumbu x dipasang tiap sekian hari, dihitung mundur dari hari ini.
+  static const int moodLongLabelStepDays = 7;
+
+  /// Mood terendah yang memunculkan kartu "Kalau terasa sangat berat" di Beranda (Sangat sedih
+  /// dan Sedih, sesuai mockup).
+  static const int moodSupportCardMaxLevel = 2;
 }

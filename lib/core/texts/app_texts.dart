@@ -138,21 +138,20 @@ abstract final class AppTexts {
   static String chatRemaining(int remaining, int perDay) =>
       'Sisa pesan hari ini: $remaining dari $perDay';
 
-  // Cek Rasa (SCR-M09, FR-M013). Label skala mengikuti web (enum `MoodLevel` server).
-  static const String checkinTitle = 'Hari ini, kamu yang mana?';
-  static const String checkinSend = 'Kirim ke RelaxMate';
-  static const String checkinSkip = 'Lewati';
-  static const String checkinNotSaved =
-      'Perasaanmu sudah terkirim ke RelaxMate, tetapi belum tercatat di Mood '
-      'Tracker. Kamu bisa mencatatnya lewat web.';
+  // Mood: label skala mengikuti web (enum `MoodLevel` server). Dicatat dari kartu mood di
+  // Beranda (SCR-M22, FR-M013).
   static const String moodVerySad = 'Sangat sedih';
   static const String moodSad = 'Sedih';
   static const String moodNeutral = 'Biasa';
   static const String moodHappy = 'Senang';
   static const String moodGreat = 'Luar biasa';
+  static const String moodNotSaved =
+      'Perasaanmu belum tercatat. Coba lagi sebentar lagi, ya.';
 
-  static String checkinMessage(String label) =>
-      'Hari ini aku merasa: ${label.toLowerCase()}';
+  /// Kalimat pembuka chat bila mood hari ini sudah tercatat (OQ-MP5); tidak dikirim otomatis.
+  static String moodChatMessage(String label) =>
+      'Aku merasa ${label.toLowerCase()} hari ini';
+  static const String chatMoodChipHint = 'Mau mulai dari perasaanmu hari ini?';
 
   // Kontak bantuan dan Crisis Response (SCR-M16, CMP-M04). Teks tetap di klien, bukan
   // keluaran AI (FR-M011). Daftar kontak sendiri dari server atau aset, bukan dari sini.
@@ -309,6 +308,7 @@ abstract final class AppTexts {
   // Tautan di layar consent bagi yang belum atau tidak menyetujui (OQ-MA12).
   static const String consentExercisesLink = 'Latihan napas dan grounding';
   static const String consentSettingsLink = 'Pengaturan dan hapus akun';
+  static const String consentHomeLink = 'Kembali ke Beranda';
 
   // Maskot dan Temani saja (SCR-M13, FR-M015). Tanpa AI dan tanpa kuota; maskot tidak
   // mengaku punya perasaan (RULE-M046).
@@ -417,4 +417,112 @@ abstract final class AppTexts {
 
   static String historyOpenDay(String date, String time) =>
       'Buka percakapan $date, $time';
+
+  // Navigasi bawah, Beranda, dan Mood (TASK-M072; SCR-M22, SCR-M23).
+  static const String navHome = 'Beranda';
+  static const String navChat = 'Ngobrol';
+  static const String navExercises = 'Latihan';
+  static const String navMood = 'Mood';
+
+  static const List<String> weekdays = <String>[
+    'Senin',
+    'Selasa',
+    'Rabu',
+    'Kamis',
+    'Jumat',
+    'Sabtu',
+    'Minggu',
+  ];
+  static const List<String> weekdaysShort = <String>[
+    'Sen',
+    'Sel',
+    'Rab',
+    'Kam',
+    'Jum',
+    'Sab',
+    'Min',
+  ];
+  static const List<String> monthsShort = <String>[
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'Mei',
+    'Jun',
+    'Jul',
+    'Agu',
+    'Sep',
+    'Okt',
+    'Nov',
+    'Des',
+  ];
+  static const String today = 'Hari ini';
+
+  static String homeGreeting(String firstName) =>
+      firstName.isEmpty ? 'Halo!' : 'Halo, $firstName';
+  static const String settingsTooltip = 'Pengaturan';
+  static const String homeMoodTitle = 'Gimana perasaanmu hari ini?';
+  static const String homeMoodHint = 'Pilih satu. Cukup sekali sehari.';
+  static const String homeMoodCancel = 'Batal';
+  static const String homeMoodSaving = 'Mencatat perasaanmu...';
+  static String homeMoodDone(String label) => 'Hari ini kamu merasa $label';
+  static String homeMoodRecordedAt(String time) =>
+      'Tercatat pukul $time. Terima kasih sudah jujur.';
+  static const String homeMoodChange = 'Ubah';
+  static const String homeInviteTitle = 'Mau cerita sedikit?';
+  static const String homeInviteLow =
+      'Kalau hari ini terasa berat, RelaxMate siap mendengarkan. Kamu juga boleh '
+      'memilih ditemani tanpa bicara.';
+  static const String homeInviteNormal =
+      'Kalau ada yang ingin kamu ceritakan, RelaxMate siap mendengarkan. Kamu '
+      'juga boleh memilih ditemani tanpa bicara.';
+  static const String homeInviteChat = 'Cerita ke RelaxMate';
+  static const String homeInviteCompanion = 'Temani saja';
+  static const String homeChartTitle = '7 hari terakhir';
+  static const String homeChartSeeAll = 'Lihat semua';
+  static const String homeChartEmpty =
+      'Isi mood pertamamu; grafik muncul setelah 2 hari.';
+  static const String homeChartOneDay =
+      'Baru satu hari terisi. Garisnya muncul setelah dua hari terisi.';
+  static const String homeChatTitle = 'Ngobrol dengan RelaxMate';
+  static const String homeChatSubtitle = 'Ceritakan apa saja, tanpa dihakimi.';
+  static const String homeBreathingTitle = 'Latihan napas';
+  static const String homeBreathingSubtitle = 'Tenang dalam beberapa menit';
+  static const String homeCompanionTitle = 'Temani saja';
+  static const String homeCompanionSubtitle = 'Tanpa harus bicara';
+  static const String homeHelpLink = 'Butuh bantuan sekarang? ';
+  static const String homeHelpLinkAction = 'Kontak bantuan';
+  static const String homeSupportTitle = 'Kalau terasa sangat berat';
+  static const String homeSupportBody =
+      'Kamu tidak sendirian. Ada orang yang siap membantumu sekarang, gratis.';
+  static const String homeSupportAction = 'Buka Kontak bantuan';
+
+  static const String homeChartAverageLead = 'Rata-rata minggu ini: ';
+  static const String homeChartBestLead = '. Hari terbaikmu: ';
+
+  static const String moodTitle = 'Suasana hatiku';
+  static const String moodBackTooltip = 'Kembali ke Beranda';
+  static const String moodRange7 = '7 hari';
+  static const String moodRange30 = '30 hari';
+  static const String moodAverage = 'Rata-rata';
+  static const String moodBest = 'Terbaik';
+  static const String moodFilled = 'Diisi';
+  static String moodFilledValue(int filled, int total) => '$filled dari $total';
+  static const String moodChartCaption =
+      'Garis putus-putus: rata-rata. Titik berwarna sesuai mood hari itu. '
+      'Hari tanpa catatan dibiarkan kosong.';
+  static const String moodRecentTitle = 'Catatan terakhir';
+  static const String moodDisclaimer =
+      'Ini gambaran perasaanmu, bukan diagnosis.';
+  static const String moodEmptyTitle = 'Belum ada catatan';
+  static const String moodEmptyBody =
+      'Isi mood pertamamu; grafik muncul setelah 2 hari.';
+  static const String moodEmptyAction = 'Isi mood hari ini';
+  static const String moodNoEntry = 'belum diisi';
+
+  static String moodChartSemantics(int total, int filled) =>
+      'Grafik suasana hati $total hari terakhir. $filled dari $total hari diisi.';
+  static String moodChartDaySemantics(String day, String label) =>
+      '$day: $label.';
+  static String moodNoteDateTime(String day, String time) => '$day, $time';
 }

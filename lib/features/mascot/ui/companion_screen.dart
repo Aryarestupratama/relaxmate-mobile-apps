@@ -18,7 +18,7 @@ class CompanionScreen extends StatelessWidget {
     if (context.canPop()) {
       context.pop();
     } else {
-      context.go(AppRoutes.chat);
+      context.go(AppRoutes.home);
     }
   }
 

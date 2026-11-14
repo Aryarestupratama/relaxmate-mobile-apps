@@ -19,6 +19,30 @@ enum MoodLevel {
   /// Gambar blob untuk tingkat ini.
   String get asset => AppAssets.moodBlob(value);
 
-  /// Pesan chat yang dikirim sebagai jawaban Cek Rasa (FR-M013).
-  String get chatMessage => AppTexts.checkinMessage(label);
+  /// Kalimat pembuka chat yang ditawarkan sebagai chip bila mood hari ini sudah tercatat
+  /// (OQ-MP5). Tidak pernah dikirim otomatis.
+  String get chatMessage => AppTexts.moodChatMessage(label);
+
+  /// Tingkat dari nilai API (1 sampai 5); `null` di luar rentang.
+  static MoodLevel? fromValue(Object? value) {
+    if (value is! num) {
+      return null;
+    }
+    final rounded = value.toInt();
+    if (rounded != value) {
+      return null;
+    }
+    for (final level in MoodLevel.values) {
+      if (level.value == rounded) {
+        return level;
+      }
+    }
+    return null;
+  }
+
+  /// Tingkat terdekat dari rata-rata (mis. 3,4 menjadi Biasa).
+  static MoodLevel fromAverage(double average) {
+    final clamped = average.round().clamp(1, 5);
+    return MoodLevel.values[clamped - 1];
+  }
 }

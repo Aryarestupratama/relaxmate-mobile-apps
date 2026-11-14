@@ -49,6 +49,13 @@
 //                   GET /__moods?email=...   lihat Mood Entry yang tercatat (JSON, untuk memeriksa hasil uji)
 //                   GET /__set-moods?email=...&n=5  atur jumlah Mood Entry hari ini (uji batas harian)
 //                   GET /__fail-mood         POST /mood-entries berikutnya dijawab 503 (sekali)
+//                 Mood 7 dan 30 hari (TASK-M072, API-M019): GET /mood-entries?days=7|30 (hari WIB, catatan terakhir
+//                 per hari, ringkasan, `range`; days selain 7 atau 30 -> 422). Menggabungkan Mood Entry hari ini
+//                 dan data lampau dari pembantu di bawah (data lampau tidak menghitung batas harian).
+//                   GET /__seed-moods?email=...&pattern=week  isi 6 hari lampau seperti mockup (3,2,2,3,4,3)
+//                   GET /__seed-moods?email=...&pattern=month isi 29 hari lampau (acak, sebagian bolong)
+//                   GET /__seed-moods?email=...&pattern=none  hapus data lampau
+//                   GET /__fail-mood-list    GET /mood-entries berikutnya dijawab 503 (sekali)
 //                 Halaman /ketentuan dan /privasi disajikan sebagai teks tiruan.
 //                 Batas tiruan: daftar 5/menit, login gagal 5/menit per email, kirim ulang 3/jam.
 //
@@ -111,6 +118,7 @@ let slowAiOnce = false;
 let closeDayOnce = false;
 let failHistoryOnce = false;
 let failMoodOnce = false;
+let failMoodListOnce = false;
 let contactsVariant = 1; // 1 = daftar awal, 2 = daftar berubah (uji penyegaran cache)
 let messageSeq = 100;
 
@@ -122,7 +130,7 @@ const MESSAGES_PER_PAGE = 30;
 const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
 function newUser(name, email, password, verified, active) {
-  return { name, email, password, verified, active, resends: [], aiGranted: false, trainingChoice: null, moods: [] };
+  return { name, email, password, verified, active, resends: [], aiGranted: false, trainingChoice: null, moods: [], moodHistory: [] };
 }
 
 function resetData() {
@@ -136,6 +144,7 @@ function resetData() {
   closeDayOnce = false;
   failHistoryOnce = false;
   failMoodOnce = false;
+  failMoodListOnce = false;
   contactsVariant = 1;
   const seed = [
     ['Akun Terverifikasi', 'verified@example.test', true, true],
@@ -657,6 +666,41 @@ async function authApi(req, res, path) {
     return res.end();
   }
 
+  if (method === 'GET' && path === '/api/v1/mood-entries') {
+    const user = authedUser(req, res);
+    if (!user) return undefined;
+    if (!user.verified) {
+      return apiError(res, 403, 'unverified', 'Verifikasi emailmu dulu, ya. Cek kotak masukmu.');
+    }
+    if (failMoodListOnce) {
+      failMoodListOnce = false;
+      return apiError(res, 503, 'server_error', 'Layanan sedang bermasalah. Coba lagi sebentar lagi.');
+    }
+    const rawDays = new URL(req.url, 'http://x').searchParams.get('days');
+    const days = rawDays === null ? 7 : Number(rawDays);
+    if (days !== 7 && days !== 30) {
+      return validation(res, { days: ['Rentang hanya boleh 7 atau 30 hari.'] });
+    }
+    const wibDate = (iso) => new Date(new Date(iso).getTime() + 7 * 3600 * 1000).toISOString().slice(0, 10);
+    const today = wibDate(new Date().toISOString());
+    const toDate = new Date(`${today}T00:00:00Z`);
+    const fromDate = new Date(toDate.getTime() - (days - 1) * 86400000);
+    const from = fromDate.toISOString().slice(0, 10);
+    const perDay = new Map();
+    for (const e of [...user.moodHistory, ...user.moods]) {
+      const d = wibDate(e.created_at);
+      if (d < from || d > today) continue;
+      const prev = perDay.get(d);
+      if (!prev || e.created_at >= prev.created_at) perDay.set(d, e);
+    }
+    const list = [...perDay.entries()].sort(([a], [b]) => (a < b ? -1 : 1)).map(([date, e]) => ({ date, mood: e.mood, logged_at: e.created_at }));
+    const values = list.map((d) => d.mood);
+    const average = values.length ? Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 100) / 100 : null;
+    let best = null;
+    for (const d of list) if (best === null || d.mood >= best.mood) best = d;
+    return send(res, 200, { data: { days: list, summary: { average, best_date: best ? best.date : null, filled_days: list.length, total_days: days }, range: { from, to: today } } });
+  }
+
   if (method === 'POST' && path === '/api/v1/mood-entries') {
     const user = authedUser(req, res);
     if (!user) return undefined;
@@ -665,6 +709,7 @@ async function authApi(req, res, path) {
     }
     if (failMoodOnce) {
       failMoodOnce = false;
+  failMoodListOnce = false;
       return apiError(res, 503, 'server_error', 'Layanan sedang bermasalah. Coba lagi sebentar lagi.');
     }
     const body = await readJson(req);
@@ -767,6 +812,38 @@ function devHelpers(req, res, url) {
       user.moods = Array.from({ length: n }, (_, i) => ({ id: i + 1, mood: 3, mood_label: 'Biasa', created_at: new Date().toISOString() }));
     }
     sendText(res, 200, `Mood Entry ${email}: ${user.moods.length}\n${JSON.stringify(user.moods)}`);
+    return true;
+  }
+  if (url.pathname === '/__fail-mood-list') {
+    failMoodListOnce = true;
+    sendText(res, 200, 'GET /mood-entries berikutnya akan dijawab 503 satu kali.');
+    return true;
+  }
+  if (url.pathname === '/__seed-moods') {
+    const email = (url.searchParams.get('email') ?? '').toLowerCase();
+    const user = users.get(email);
+    if (!user) {
+      sendText(res, 404, `Tidak ada akun ${email}`);
+      return true;
+    }
+    const pattern = url.searchParams.get('pattern') ?? 'week';
+    const labels = ['Sangat sedih', 'Sedih', 'Biasa', 'Senang', 'Luar biasa'];
+    // Jam sama dengan sekarang, mundur N hari penuh: tanggal WIB tepat N hari lalu.
+    const at = (daysAgo) => new Date(Date.now() - daysAgo * 86400000).toISOString();
+    user.moodHistory = [];
+    if (pattern === 'week') {
+      [3, 2, 2, 3, 4, 3].forEach((mood, i) => {
+        const daysAgo = 6 - i;
+        user.moodHistory.push({ id: 100 + i, mood, mood_label: labels[mood - 1], created_at: at(daysAgo) });
+      });
+    } else if (pattern === 'month') {
+      for (let daysAgo = 29; daysAgo >= 1; daysAgo--) {
+        if (daysAgo % 4 === 0) continue;
+        const mood = ((daysAgo * 7) % 5) + 1;
+        user.moodHistory.push({ id: 200 + daysAgo, mood, mood_label: labels[mood - 1], created_at: at(daysAgo) });
+      }
+    }
+    sendText(res, 200, `Data mood lampau ${email}: ${user.moodHistory.length} hari (pattern ${pattern}).`);
     return true;
   }
   if (url.pathname === '/__fail-mood') {

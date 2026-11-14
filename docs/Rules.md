@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Rules (Aturan Proyek)
-Version: 0.23 | Status: Draft | Last updated: 2026-11-11
+Version: 0.24 | Status: Draft | Last updated: 2026-11-14
 Depends on: PRD-Mobile v0.4, Architecture-Mobile v0.3, Schema-Mobile v0.1, Design-Mobile v0.4, Rules RelaxBoss (web) v1.5 | Owner: Founder (solo developer)
 
 Dokumen ini adalah panduan kerja founder sebagai pengembang tunggal untuk **repo mobile (Flutter)**; bantuan AI boleh dipakai dengan tetap mengikuti seluruh aturan, melakukan verifikasi manual, dan tidak menganggap keluaran otomatis sebagai bukti kebenaran. Untuk pekerjaan di **repo web** (task backend `TASK-M01x`), `Rules.md` web tetap berlaku penuh; aturan di sini hanya menambah. Kata MUST, MUST NOT, SHOULD dipakai secara tegas. Kedalaman: **Lite**. Prinsip: sederhana, fungsi dulu, aman dulu.
@@ -136,6 +136,7 @@ Jangan: menambah fitur di luar PRD, memanggil Groq atau layanan suara langsung d
 
 - A-R6: Pemeriksaan kode TASK-M022 terhadap aturan (2026-11-06, pencarian teks): lihat catatan hasil M022 di `progress.md`; `flutter analyze` dan `dart format` belum dijalankan (A-R2).
 - A-R11: Pemeriksaan kode TASK-M028 terhadap aturan (2026-11-07, pencarian teks): tanpa `print`, `// ignore:`, `Colors.*`/`Color(0x...)`, `dynamic`, null-bang, atau `TODO` di `lib/features/checkin` dan `chat_welcome.dart`; ukuran, jarak, dan warna hanya dari token (ditambah `RbSize.moodBlob`); teks di `AppTexts`; jalur aset di `AppAssets`; panggilan jaringan hanya lewat `MoodRepository` (RULE-M022); tombol blob `Semantics` dengan target >= 48dp (RULE-M055); `dart format` gaya Dart 3.5 bersih; `flutter analyze` bersih (dijalankan founder, 2026-11-07).
+- A-R21: Pemeriksaan TASK-M072 (2026-11-14, pencarian teks): `lib/features/home`, `lib/features/mood`, `lib/core/time`, `app_bottom_nav.dart`, `surface_card.dart`, `tab_back_scope.dart` tanpa `print`, `// ignore:`, `Colors.*`/`Color(0x...)`, `dynamic`, null-bang, atau `TODO`; teks di `AppTexts`, angka produk (rentang 7/30, jumlah catatan, selisih WIB, batas mood kartu bantuan) di `AppConstants`, ukuran grafik di `RbSize` (RULE-M026, M050); jaringan hanya lewat `MoodSeriesRepository` dan `MoodRepository` (RULE-M022); `tool/privacy_audit.mjs` 23 dari 23 lolos (tanpa kunci penyimpanan baru); `tool/mock_api.mjs` diuji dengan curl (API-M019). Belum dijalankan: `dart format`, `flutter analyze`, build, uji perangkat (sandbox tanpa Flutter dan Dart). Ikon `LucideIcons.house`, `settings`, `arrowLeft` belum diverifikasi terhadap versi paket.
 - A-R20: Pemeriksaan TASK-M035 (2026-11-11, pencarian teks): `lib/features/chat`, `lib/features/settings` yang diubah tanpa `print`, `// ignore:`, `Colors.*`, `Color(0x...)`, `dynamic`, atau null-bang; teks di `AppTexts`; ukuran di `RbSize` (`mascotChatHeight`, `mascotChatCompactHeight`), durasi di `RbMotion` (`mascotSpeaking`); kunci penyimpanan baru lolos `tool/privacy_audit.mjs` (23 dari 23). Belum dijalankan: `dart format`, `flutter analyze`, uji perangkat.
 - A-R19: Pemeriksaan TASK-M042 (2026-11-11, pencarian teks dan perhitungan): kontras token dihitung dengan rumus WCAG (hasil di Design-M bagian 8); `lib` yang diubah tanpa `print`, `// ignore:`, `Colors.*`, `Color(0x...)`, `dynamic`, atau null-bang; ukuran dari `RbSize` (ditambah `moodRowMaxTextScale`), warna dari token. Belum dijalankan: `dart format`, `flutter analyze`, TalkBack dan teks 200% di perangkat.
 - A-R18: Pemeriksaan TASK-M040 (2026-11-11): `tool/privacy_audit.mjs` memeriksa 23 hal secara statis (log, manifest, izin, cleartext, aturan ekstraksi data, SDK terlarang, penulisan berkas, kunci penyimpanan, kolom input, overlay) dan dijalankan sebelum rilis (preflight M043). Alat itu terbukti gagal pada kode sebelum M040 (7 dari 23 gagal) dan lolos sesudahnya. RULE-M040 diperluas dalam praktik: build rilis membisukan log kerangka kerja. Belum dijalankan: `dart format`, `flutter analyze`, build.
@@ -155,6 +156,7 @@ Jangan: menambah fitur di luar PRD, memanggil Groq atau layanan suara langsung d
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.24 | 2026-11-14 | A-R21 (pemeriksaan M072). |
 | 0.23 | 2026-11-11 | A-R20 (pemeriksaan M035). |
 | 0.22 | 2026-11-11 | A-R19 (pemeriksaan M042). |
 | 0.21 | 2026-11-11 | A-R18 diverifikasi (audit 23 dari 23 lolos di perangkat). |

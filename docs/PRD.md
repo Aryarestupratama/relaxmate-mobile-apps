@@ -1,5 +1,5 @@
 # RelaxMate Mobile - PRD
-Version: 0.9 | Status: Draft | Last updated: 2026-11-13
+Version: 0.10 | Status: Draft | Last updated: 2026-11-14
 Depends on: PRD RelaxBoss v1.8, Architecture v1.74, Rules v1.5 | Owner: Founder (solo developer)
 
 Label klaim: `[Verified]` = ada sumber yang dicek, `[Inference]` = kesimpulan dari konteks, `[Assumption]` = asumsi yang bisa diubah. Kedalaman: **Lite**.
@@ -166,7 +166,7 @@ Dokumen ini terpisah dari PRD RelaxBoss (web). Aplikasi mobile masuk daftar Won'
 | FR-M026 | Pengingat lokal opsional SHOULD tersedia dengan teks tanpa isi sensitif dan jendela jam terbatas (mengikuti ADR-019 web: tanpa push server). | Could |
 | FR-M027 | Chat harian MUST punya dua tampilan yang bisa diganti kapan saja: **maskot** (maskot di tengah atas, balasan terakhir di bawahnya) dan **obrolan** (daftar gelembung). Bawaan maskot; pilihan disimpan di perangkat. Isi, kuota, banner krisis, saran tindakan, dan Cek Rasa identik di kedua tampilan; krisis tidak boleh tertutup animasi maskot. Tanpa suara dan tanpa panggilan AI tambahan. (keputusan founder 2026-11-11) | Should |
 | FR-M028 | Aplikasi MUST punya layar **Tentang RelaxBoss** yang menjelaskan bahwa RelaxMate bagian dari RelaxBoss: kisah awal, visi, arti nama, kolaborasi kampus, penegasan bukan diagnosis atau layanan medis dengan jalan ke Kontak bantuan, serta tautan ke situs dan Instagram RelaxBoss. Isi mengikuti halaman Tentang di situs; daftar tim dan acara cukup lewat tautan ke situs. Dibuka dari Pengaturan. (usulan founder 2026-11-13) | Should |
-| FR-M029 | Layar pertama setelah masuk MUST berupa **Beranda**, bukan chat: sapaan, kartu mood hari ini (FR-M013), grafik ringkas 7 hari, tombol utama "Ngobrol dengan RelaxMate", jalan pintas Latihan napas dan Temani saja, dan tautan Kontak bantuan yang selalu terlihat. Navigasi bawah empat tab: Beranda, Ngobrol, Latihan, Mood. Pengaturan lewat ikon di Beranda. Mood Sangat sedih memunculkan kartu lembut ke Kontak bantuan tanpa memanggil AI. Beranda tidak membutuhkan consent AI; consent hanya dicek saat membuka Ngobrol (FR-M002). (keputusan founder 2026-11-13) | Must |
+| FR-M029 | Layar pertama setelah masuk MUST berupa **Beranda**, bukan chat: sapaan, kartu mood hari ini (FR-M013), grafik ringkas 7 hari, tombol utama "Ngobrol dengan RelaxMate", jalan pintas Latihan napas dan Temani saja, dan tautan Kontak bantuan yang selalu terlihat. Navigasi bawah empat tab: Beranda, Ngobrol, Latihan, Mood. Pengaturan lewat ikon di Beranda. Mood Sedih atau Sangat sedih memunculkan kartu lembut ke Kontak bantuan tanpa memanggil AI (batas diperluas dari Sangat sedih saja mengikuti mockup founder, 2026-11-14). Beranda tidak membutuhkan consent AI; consent hanya dicek saat membuka Ngobrol (FR-M002). (keputusan founder 2026-11-13) | Must |
 | FR-M030 | Layar **Mood** MUST menampilkan grafik suasana hati 7 atau 30 hari (satu titik per hari, warna sesuai mood), ringkasan (rata-rata, hari terbaik, jumlah hari diisi), daftar catatan terakhir, keadaan kosong yang ramah, ringkasan teks untuk pembaca layar, dan penegasan bahwa ini bukan diagnosis. Data dari API-M019. (keputusan founder 2026-11-13) | Must |
 
 ---
@@ -252,6 +252,7 @@ Dokumen ini terpisah dari PRD RelaxBoss (web). Aplikasi mobile masuk daftar Won'
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.10 | 2026-11-14 | TASK-M072 dibangun: FR-M029 kartu bantuan lembut untuk Sedih dan Sangat sedih (mengikuti mockup); mood dicatat dengan satu ketukan, tanpa pesan chat. |
 | 0.9 | 2026-11-13 | Konsep Beranda: FR-M029 (Beranda sebagai layar pertama, navigasi bawah), FR-M030 (grafik mood), FR-M013 dipindah ke Beranda, non-goal grafik mood dicabut. |
 | 0.8 | 2026-11-13 | FR-M028: layar Tentang RelaxBoss. |
 | 0.7 | 2026-11-11 | FR-M027: dua tampilan chat (maskot dan obrolan), bawaan maskot. |

@@ -120,8 +120,7 @@ class _MascotChatPaneState extends State<MascotChatPane> {
       return const SizedBox.shrink();
     }
     final compact = MediaQuery.viewInsetsOf(context).bottom > 0 ||
-        MediaQuery.textScalerOf(context).scale(1) >
-            RbSize.moodRowMaxTextScale;
+        MediaQuery.textScalerOf(context).scale(1) > RbSize.moodRowMaxTextScale;
     // Saran mendesak pada pesan lama tetap tampil (aturan sama dengan tampilan obrolan).
     final withSuggestions = ready.messages
         .where((message) => widget.suggestionIds.contains(message.id))

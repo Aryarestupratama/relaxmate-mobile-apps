@@ -1,7 +1,14 @@
 /// Jalur rute. Satu tempat agar tidak ada string jalur tersebar di widget.
 abstract final class AppRoutes {
-  /// Rumah aplikasi: aliran harian RelaxMate (SCR-M08).
-  static const String chat = '/';
+  /// Beranda (SCR-M22): layar pertama setelah masuk (FR-M029).
+  static const String home = '/';
+
+  /// Chat harian RelaxMate (SCR-M08), di balik `ConsentGate`. Dulu `/`; overlay dan notifikasi
+  /// membuka rute ini.
+  static const String chat = '/ngobrol';
+
+  /// Mood: grafik suasana hati 7 atau 30 hari (SCR-M23, FR-M030).
+  static const String mood = '/mood';
 
   /// Peralihan saat token tersimpan sedang diperiksa (SCR-M01).
   static const String restoring = '/memuat';

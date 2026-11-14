@@ -36,5 +36,5 @@ String? _authenticatedRedirect(UserSummary user, String location) {
 
   final leaving = AppRoutes.guestOnly.contains(location) ||
       AppRoutes.transitional.contains(location);
-  return leaving ? AppRoutes.chat : null;
+  return leaving ? AppRoutes.home : null;
 }

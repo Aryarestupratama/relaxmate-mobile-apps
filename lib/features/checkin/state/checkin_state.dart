@@ -1,30 +1,43 @@
-/// Keadaan Cek Rasa di layar chat (SCR-M09). Hanya di memori.
+import 'package:relaxmate/features/checkin/data/mood_level.dart';
+import 'package:relaxmate/features/mood/data/mood_today.dart';
+
+/// Keadaan kartu mood di Beranda (SCR-M22, FR-M013). Hanya di memori.
 class CheckinState {
   const CheckinState({
-    this.skipped = false,
-    this.submitting = false,
-    this.notice,
+    this.submittingLevel,
+    this.editing = false,
+    this.recorded,
+    this.error,
   });
 
-  /// Pengguna menekan "Lewati": kartu tidak ditawarkan lagi selama layar chat terbuka.
-  final bool skipped;
+  /// Tingkat yang sedang dikirim (tombol dinonaktifkan, blob tampil terpilih).
+  final MoodLevel? submittingLevel;
 
-  /// Jawaban sedang dikirim (tombol dinonaktifkan).
-  final bool submitting;
+  /// Pengguna menekan "Ubah": kartu menampilkan pilihan lagi.
+  final bool editing;
 
-  /// Pesan ramah satu kali, mis. mood belum tercatat padahal pesan sudah terkirim.
-  final String? notice;
+  /// Catatan yang baru dibuat sesi ini; lebih cepat tampil daripada menunggu deret dimuat ulang.
+  final MoodToday? recorded;
+
+  /// Pesan ramah satu kali di kartu, mis. batas harian atau gagal terhubung.
+  final String? error;
+
+  bool get submitting => submittingLevel != null;
 
   CheckinState copyWith({
-    bool? skipped,
-    bool? submitting,
-    String? notice,
-    bool clearNotice = false,
+    MoodLevel? submittingLevel,
+    bool clearSubmitting = false,
+    bool? editing,
+    MoodToday? recorded,
+    String? error,
+    bool clearError = false,
   }) {
     return CheckinState(
-      skipped: skipped ?? this.skipped,
-      submitting: submitting ?? this.submitting,
-      notice: clearNotice ? null : (notice ?? this.notice),
+      submittingLevel:
+          clearSubmitting ? null : (submittingLevel ?? this.submittingLevel),
+      editing: editing ?? this.editing,
+      recorded: recorded ?? this.recorded,
+      error: clearError ? null : (error ?? this.error),
     );
   }
 }

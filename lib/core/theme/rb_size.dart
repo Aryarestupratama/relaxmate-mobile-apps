@@ -53,4 +53,24 @@ abstract final class RbSize {
 
   /// Seberapa tinggi titik naik pada puncak geraknya.
   static const double typingDotLift = 5;
+
+  /// Navigasi bawah, Beranda dan layar Mood (TASK-M072).
+  static const double homeRowMaxTextScale = 1.3;
+  static const double moodNoteBlob = 36;
+  static const double homeButtonAvatar = 40;
+
+  /// Grafik mood (`MoodChart`): tinggi area gambar, jari-jari titik, garis, dan lebar label.
+  static const double moodChartCompactHeight = 120;
+  static const double moodChartHeight = 180;
+  static const double moodChartPointRadius = 7;
+  static const double moodChartPointRadiusSmall = 4;
+  static const double moodChartTodayExtra = 3;
+  static const double moodChartLineStroke = 2;
+  static const double moodChartGridStroke = 1;
+  static const double moodChartDash = 5;
+  static const double moodChartDashGap = 4;
+  static const double moodChartAxisWidth = 64;
+  static const double moodChartLabelWidth = 52;
+  static const double moodChartLabelHeight = 20;
+  static const double moodChartMaxLabelScale = 1.3;
 }

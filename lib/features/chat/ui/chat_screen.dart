@@ -16,7 +16,6 @@ import 'package:relaxmate/features/chat/ui/chat_welcome.dart';
 import 'package:relaxmate/features/chat/ui/mascot_chat_pane.dart';
 import 'package:relaxmate/features/chat/ui/suggestion_chips.dart';
 import 'package:relaxmate/features/chat/ui/typing_indicator.dart';
-import 'package:relaxmate/features/checkin/state/checkin_controller.dart';
 import 'package:relaxmate/features/overlay/ui/overlay_resume_banner.dart';
 import 'package:relaxmate/features/crisis/ui/crisis_banner.dart';
 import 'package:relaxmate/shared/widgets/error_alert.dart';
@@ -24,11 +23,14 @@ import 'package:relaxmate/shared/widgets/mate_avatar.dart';
 import 'package:relaxmate/features/settings/data/chat_view_mode.dart';
 import 'package:relaxmate/features/settings/state/settings_controller.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar_size.dart';
+import 'package:relaxmate/shared/widgets/app_bottom_nav.dart';
+import 'package:relaxmate/shared/widgets/tab_back_scope.dart';
 
 /// Pilihan di menu bilah atas chat. Ikon telepon (kontak bantuan) sengaja di luar menu.
-enum _ChatMenuAction { history, exercises, companion, settings }
+enum _ChatMenuAction { history, companion, settings }
 
-/// SCR-M08: aliran chat harian (FR-M004, M006, M007). Dibungkus `ConsentGate` di router.
+/// SCR-M08: aliran chat harian (FR-M004, M006, M007), tab Ngobrol. Dibungkus `ConsentGate` di
+/// router; Latihan kini tab sendiri di navigasi bawah, jadi tidak ada lagi di menu tiga titik.
 /// Tampilan sengaja sederhana sampai desain final tersedia.
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
@@ -80,106 +82,88 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
     final isMascotView = viewMode == ChatViewMode.mascot;
 
-    // Pesan Cek Rasa terkirim tetapi Mood Entry belum tercatat: beri tahu sekali (FR-M013).
-    ref.listen<String?>(
-      checkinControllerProvider.select((state) => state.notice),
-      (previous, next) {
-        if (next == null) {
-          return;
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next)),
-        );
-        ref.read(checkinControllerProvider.notifier).clearNotice();
-      },
-    );
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const _ChatTitle(),
-        actions: <Widget>[
-          IconButton(
-            onPressed: () => ref
-                .read(settingsControllerProvider.notifier)
-                .setChatViewMode(
-                  isMascotView
-                      ? ChatViewMode.conversation
-                      : ChatViewMode.mascot,
-                ),
-            tooltip: isMascotView
-                ? AppTexts.chatModeToConversation
-                : AppTexts.chatModeToMascot,
-            icon: Icon(
-              isMascotView ? LucideIcons.messageCircle : LucideIcons.smile,
+    return TabBackScope(
+      child: Scaffold(
+        bottomNavigationBar: const AppBottomNav(current: AppTab.chat),
+        appBar: AppBar(
+          title: const _ChatTitle(),
+          actions: <Widget>[
+            IconButton(
+              onPressed: () =>
+                  ref.read(settingsControllerProvider.notifier).setChatViewMode(
+                        isMascotView
+                            ? ChatViewMode.conversation
+                            : ChatViewMode.mascot,
+                      ),
+              tooltip: isMascotView
+                  ? AppTexts.chatModeToConversation
+                  : AppTexts.chatModeToMascot,
+              icon: Icon(
+                isMascotView ? LucideIcons.messageCircle : LucideIcons.smile,
+              ),
             ),
-          ),
-          // Jalur ke bantuan nyata selalu terlihat, tidak tersembunyi di menu (Design-M
-          // prinsip 4).
-          IconButton(
-            onPressed: () => context.push(AppRoutes.crisisContacts),
-            tooltip: AppTexts.crisisMenuTooltip,
-            icon: const Icon(LucideIcons.phone),
-          ),
-          PopupMenuButton<_ChatMenuAction>(
-            tooltip: AppTexts.chatMenuTooltip,
-            onSelected: (action) {
-              switch (action) {
-                case _ChatMenuAction.history:
-                  context.push<void>(AppRoutes.history);
-                case _ChatMenuAction.exercises:
-                  context.push<void>(AppRoutes.exercises);
-                case _ChatMenuAction.companion:
-                  context.push<void>(AppRoutes.companion);
-                case _ChatMenuAction.settings:
-                  context.push<void>(AppRoutes.settings);
-              }
-            },
-            itemBuilder: (context) => const <PopupMenuEntry<_ChatMenuAction>>[
-              PopupMenuItem<_ChatMenuAction>(
-                value: _ChatMenuAction.history,
-                child: Text(AppTexts.historyTooltip),
-              ),
-              PopupMenuItem<_ChatMenuAction>(
-                value: _ChatMenuAction.exercises,
-                child: Text(AppTexts.exercisesTitle),
-              ),
-              PopupMenuItem<_ChatMenuAction>(
-                value: _ChatMenuAction.companion,
-                child: Text(AppTexts.companionMenu),
-              ),
-              PopupMenuItem<_ChatMenuAction>(
-                value: _ChatMenuAction.settings,
-                child: Text(AppTexts.settingsTitle),
-              ),
-            ],
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: switch (chat) {
-          ChatLoading() => const Center(child: CircularProgressIndicator()),
-          ChatLoadFailed(:final error) => Center(
-              child: Padding(
-                padding: EdgeInsets.all(space.lg),
-                child: ErrorAlert(
-                  message: error.message,
-                  onRetry: controller.load,
+            // Jalur ke bantuan nyata selalu terlihat, tidak tersembunyi di menu (Design-M
+            // prinsip 4).
+            IconButton(
+              onPressed: () => context.push(AppRoutes.crisisContacts),
+              tooltip: AppTexts.crisisMenuTooltip,
+              icon: const Icon(LucideIcons.phone),
+            ),
+            PopupMenuButton<_ChatMenuAction>(
+              tooltip: AppTexts.chatMenuTooltip,
+              onSelected: (action) {
+                switch (action) {
+                  case _ChatMenuAction.history:
+                    context.push<void>(AppRoutes.history);
+                  case _ChatMenuAction.companion:
+                    context.push<void>(AppRoutes.companion);
+                  case _ChatMenuAction.settings:
+                    context.push<void>(AppRoutes.settings);
+                }
+              },
+              itemBuilder: (context) => const <PopupMenuEntry<_ChatMenuAction>>[
+                PopupMenuItem<_ChatMenuAction>(
+                  value: _ChatMenuAction.history,
+                  child: Text(AppTexts.historyTooltip),
+                ),
+                PopupMenuItem<_ChatMenuAction>(
+                  value: _ChatMenuAction.companion,
+                  child: Text(AppTexts.companionMenu),
+                ),
+                PopupMenuItem<_ChatMenuAction>(
+                  value: _ChatMenuAction.settings,
+                  child: Text(AppTexts.settingsTitle),
+                ),
+              ],
+            ),
+          ],
+        ),
+        body: SafeArea(
+          child: switch (chat) {
+            ChatLoading() => const Center(child: CircularProgressIndicator()),
+            ChatLoadFailed(:final error) => Center(
+                child: Padding(
+                  padding: EdgeInsets.all(space.lg),
+                  child: ErrorAlert(
+                    message: error.message,
+                    onRetry: controller.load,
+                  ),
                 ),
               ),
-            ),
-          final ChatReady ready => _ChatBody(
-              ready: ready,
-              viewMode: viewMode,
-              onShowConversation: () => ref
-                  .read(settingsControllerProvider.notifier)
-                  .setChatViewMode(ChatViewMode.conversation),
-              input: _input,
-              onSend: _send,
-              onRetry: controller.retry,
-              dismissedSuggestions: _dismissedSuggestions,
-              onDismissSuggestion: _dismissSuggestion,
-            ),
-        },
+            final ChatReady ready => _ChatBody(
+                ready: ready,
+                viewMode: viewMode,
+                onShowConversation: () => ref
+                    .read(settingsControllerProvider.notifier)
+                    .setChatViewMode(ChatViewMode.conversation),
+                input: _input,
+                onSend: _send,
+                onRetry: controller.retry,
+                dismissedSuggestions: _dismissedSuggestions,
+                onDismissSuggestion: _dismissSuggestion,
+              ),
+          },
+        ),
       ),
     );
   }
@@ -260,7 +244,7 @@ class _ChatBody extends StatelessWidget {
         const OverlayResumeBanner(),
         Expanded(
           child: newestFirst.isEmpty
-              ? ChatWelcome(canCheckin: !ready.limitReached)
+              ? ChatWelcome(canSend: !ready.limitReached)
               : viewMode == ChatViewMode.mascot
                   ? MascotChatPane(
                       ready: ready,
@@ -269,36 +253,36 @@ class _ChatBody extends StatelessWidget {
                       onShowConversation: onShowConversation,
                     )
                   : ListView.builder(
-                  reverse: true,
-                  padding: EdgeInsets.all(space.md),
-                  itemCount: newestFirst.length + typing,
-                  itemBuilder: (context, index) {
-                    if (typing == 1 && index == 0) {
-                      return const TypingIndicator();
-                    }
-                    final position = index - typing;
-                    final message = newestFirst[position];
-                    final bubble = ChatBubble(
-                      message: message,
-                      announce: position == 0,
-                    );
-                    final suggestion = message.suggestion;
-                    if (suggestion == null ||
-                        !suggestionIds.contains(message.id)) {
-                      return bubble;
-                    }
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        bubble,
-                        SuggestionChips(
-                          suggestion: suggestion,
-                          onDismiss: () => onDismissSuggestion(message.id),
-                        ),
-                      ],
-                    );
-                  },
-                ),
+                      reverse: true,
+                      padding: EdgeInsets.all(space.md),
+                      itemCount: newestFirst.length + typing,
+                      itemBuilder: (context, index) {
+                        if (typing == 1 && index == 0) {
+                          return const TypingIndicator();
+                        }
+                        final position = index - typing;
+                        final message = newestFirst[position];
+                        final bubble = ChatBubble(
+                          message: message,
+                          announce: position == 0,
+                        );
+                        final suggestion = message.suggestion;
+                        if (suggestion == null ||
+                            !suggestionIds.contains(message.id)) {
+                          return bubble;
+                        }
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            bubble,
+                            SuggestionChips(
+                              suggestion: suggestion,
+                              onDismiss: () => onDismissSuggestion(message.id),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
         ),
         if (error != null)
           Padding(

@@ -150,6 +150,10 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
         // Jalan keluar bagi yang belum atau tidak menyetujui (OQ-MA12): latihan lokal dan
         // Pengaturan (hapus akun). Kontak bantuan sudah ada di kerangka layar.
         TextButton(
+          onPressed: enabled ? () => context.go(AppRoutes.home) : null,
+          child: const Text(AppTexts.consentHomeLink),
+        ),
+        TextButton(
           onPressed:
               enabled ? () => context.push<void>(AppRoutes.exercises) : null,
           child: const Text(AppTexts.consentExercisesLink),

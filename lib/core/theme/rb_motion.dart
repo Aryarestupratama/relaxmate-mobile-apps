@@ -6,6 +6,7 @@ abstract final class RbMotion {
   static const Duration feedback = Duration(milliseconds: 150);
   static const Duration screen = Duration(milliseconds: 250);
   static const Duration mascotBreath = Duration(milliseconds: 3500);
+
   /// Lama maskot tampil "bicara" setelah balasan baru muncul di tampilan maskot chat.
   static const Duration mascotSpeaking = Duration(seconds: 4);
   static const Curve curve = Curves.easeOut;

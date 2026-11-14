@@ -17,8 +17,10 @@ import 'package:relaxmate/features/exercises/ui/breathing_screen.dart';
 import 'package:relaxmate/features/exercises/ui/exercises_screen.dart';
 import 'package:relaxmate/features/exercises/ui/grounding_screen.dart';
 import 'package:relaxmate/features/history/ui/conversation_screen.dart';
+import 'package:relaxmate/features/home/ui/home_screen.dart';
 import 'package:relaxmate/features/history/ui/history_screen.dart';
 import 'package:relaxmate/features/mascot/ui/companion_screen.dart';
+import 'package:relaxmate/features/mood/ui/mood_screen.dart';
 import 'package:relaxmate/features/overlay/ui/overlay_settings_screen.dart';
 import 'package:relaxmate/features/settings/ui/about_screen.dart';
 import 'package:relaxmate/features/settings/ui/delete_account_screen.dart';
@@ -40,7 +42,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
   );
 
   final router = GoRouter(
-    initialLocation: AppRoutes.chat,
+    initialLocation: AppRoutes.home,
     refreshListenable: refresh,
     redirect: (context, state) => authRedirect(
       ref.read(authControllerProvider),
@@ -75,6 +77,16 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.crisisContacts,
         builder: (context, state) => const CrisisContactsScreen(),
       ),
+      // Beranda dan Mood: perlu masuk, tanpa ConsentGate (tanpa AI, FR-M029, FR-M030).
+      GoRoute(
+        path: AppRoutes.home,
+        builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.mood,
+        builder: (context, state) => const MoodScreen(),
+      ),
+      // Consent AI hanya diperiksa saat membuka Ngobrol (FR-M002, FR-M029).
       GoRoute(
         path: AppRoutes.chat,
         builder: (context, state) => const ConsentGate(child: ChatScreen()),
