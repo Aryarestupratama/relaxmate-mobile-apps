@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:relaxmate/core/theme/rb_motion.dart';
 import 'package:relaxmate/core/theme/rb_radius.dart';
 import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/features/checkin/data/mood_level.dart';
+import 'package:relaxmate/features/checkin/ui/mood_level_color.dart';
+import 'package:relaxmate/features/checkin/ui/mood_ripple.dart';
 
 /// CMP-M10: lima blob mood dengan label teks di bawahnya (warna bukan satu-satunya pembawa
-/// makna). Satu pilihan; yang terpilih diberi cincin `primary`. Tanpa nilai awal: pengguna
-/// memilih sendiri.
+/// makna). Satu pilihan; yang terpilih diberi cincin `primary`, membesar sebentar, dan
+/// dikelilingi cincin riak berwarna mood itu (TASK-M074; diam bila gerak dikurangi). Tanpa
+/// nilai awal: pengguna memilih sendiri.
 class MoodBlobRow extends StatelessWidget {
   const MoodBlobRow({
     required this.selected,
@@ -74,7 +79,9 @@ class _MoodBlob extends StatelessWidget {
     final text = context.rbText;
     final space = context.rbSpace;
 
-    final blob = SizedBox(
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
+
+    final Widget picture = SizedBox(
       width: RbSize.moodBlob,
       height: RbSize.moodBlob,
       child: DecoratedBox(
@@ -96,6 +103,21 @@ class _MoodBlob extends StatelessWidget {
           ),
         ),
       ),
+    );
+    final Widget blob = Stack(
+      alignment: Alignment.center,
+      clipBehavior: Clip.none,
+      children: <Widget>[
+        if (isSelected) MoodRipple(color: level.colorOf(colors)),
+        reduceMotion
+            ? picture
+            : picture.animate(target: isSelected ? 1 : 0).scaleXY(
+                  begin: 1,
+                  end: RbMotion.popPeak,
+                  duration: RbMotion.pop,
+                  curve: RbMotion.curve,
+                ),
+      ],
     );
     final label = Text(
       level.label,

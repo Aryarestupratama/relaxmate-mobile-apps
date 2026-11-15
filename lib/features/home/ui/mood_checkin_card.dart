@@ -1,24 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:relaxmate/core/config/app_constants.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
+import 'package:relaxmate/core/theme/rb_motion.dart';
 import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/core/time/wib.dart';
 import 'package:relaxmate/features/checkin/state/checkin_controller.dart';
 import 'package:relaxmate/features/checkin/ui/mood_blob_row.dart';
+import 'package:relaxmate/features/checkin/ui/mood_level_color.dart';
+import 'package:relaxmate/features/checkin/ui/mood_ripple.dart';
 import 'package:relaxmate/features/mood/state/mood_series_controller.dart';
 import 'package:relaxmate/features/mood/state/mood_series_state.dart';
 import 'package:relaxmate/features/mood/state/today_mood_provider.dart';
 import 'package:relaxmate/shared/widgets/error_alert.dart';
-import 'package:relaxmate/shared/widgets/surface_card.dart';
+import 'package:relaxmate/shared/widgets/floating_card.dart';
 
 /// SCR-M22, kartu mood di Beranda (FR-M013, FR-M029). Tiga keadaan:
 /// - belum ada mood hari ini (atau "Ubah" ditekan): lima blob, satu ketukan mencatat;
 /// - sudah tercatat: konfirmasi (label, jam WIB, "Ubah");
 /// - deret sedang dimuat: penanda memuat, supaya pilihan tidak berkedip lalu hilang bagi
 ///   yang sudah mengisi.
-/// Blob memakai `MoodBlobRow` yang sudah ada; tidak memanggil AI.
+/// Blob memakai `MoodBlobRow` yang sudah ada; tidak memanggil AI. Kartu melayang (TASK-M074):
+/// pilihan di atas putih, konfirmasi berwarna pastel sesuai mood dengan blob yang muncul
+/// lembut dan satu cincin riak.
 class MoodCheckinCard extends ConsumerWidget {
   const MoodCheckinCard({super.key});
 
@@ -35,7 +41,7 @@ class MoodCheckinCard extends ConsumerWidget {
     );
 
     if (today == null && series is MoodSeriesLoading && !state.submitting) {
-      return const SurfaceCard(
+      return const FloatingCard(
         child: SizedBox(
           height: RbSize.moodBlob,
           child: Center(child: CircularProgressIndicator()),
@@ -44,14 +50,37 @@ class MoodCheckinCard extends ConsumerWidget {
     }
 
     if (today != null && !state.editing) {
-      return SurfaceCard(
+      final reduceMotion = MediaQuery.disableAnimationsOf(context);
+      final Widget blob = Image.asset(
+        today.level.asset,
+        width: RbSize.moodBlob,
+        height: RbSize.moodBlob,
+        excludeFromSemantics: true,
+      );
+      return FloatingCard(
+        tint: today.level.colorOf(colors),
         child: Row(
           children: <Widget>[
-            Image.asset(
-              today.level.asset,
-              width: RbSize.moodBlob,
-              height: RbSize.moodBlob,
-              excludeFromSemantics: true,
+            Stack(
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
+              children: <Widget>[
+                MoodRipple(color: today.level.colorOf(colors)),
+                reduceMotion
+                    ? blob
+                    : blob
+                        .animate()
+                        .scaleXY(
+                          begin: RbMotion.popFrom,
+                          end: 1,
+                          duration: RbMotion.pop,
+                          curve: RbMotion.curve,
+                        )
+                        .fadeIn(
+                          duration: RbMotion.pop,
+                          curve: RbMotion.curve,
+                        ),
+              ],
             ),
             SizedBox(width: space.md),
             Expanded(
@@ -91,7 +120,7 @@ class MoodCheckinCard extends ConsumerWidget {
       );
     }
 
-    return SurfaceCard(
+    return FloatingCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[

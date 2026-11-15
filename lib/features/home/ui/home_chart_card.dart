@@ -12,10 +12,11 @@ import 'package:relaxmate/features/mood/state/mood_series_controller.dart';
 import 'package:relaxmate/features/mood/state/mood_series_state.dart';
 import 'package:relaxmate/features/mood/ui/mood_chart.dart';
 import 'package:relaxmate/shared/widgets/error_alert.dart';
-import 'package:relaxmate/shared/widgets/surface_card.dart';
+import 'package:relaxmate/shared/widgets/floating_card.dart';
 
-/// SCR-M22, kartu "7 hari terakhir" (FR-M029): grafik ringkas, ringkasan satu kalimat, dan
-/// tautan "Lihat semua" ke Mood. Gagal memuat tidak menghalangi bagian Beranda lainnya.
+/// SCR-M22, kartu "7 hari terakhir" (FR-M029): grafik ringkas yang tergambar saat muncul
+/// (TASK-M074), ringkasan satu kalimat, dan tautan "Lihat semua" ke Mood. Gagal memuat tidak
+/// menghalangi bagian Beranda lainnya.
 class HomeChartCard extends ConsumerWidget {
   const HomeChartCard({super.key});
 
@@ -45,14 +46,14 @@ class HomeChartCard extends ConsumerWidget {
       MoodSeriesReady(:final series) => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            MoodChart(series: series, compact: true),
+            MoodChart(series: series, compact: true, animated: true),
             SizedBox(height: space.xs),
             _Summary(series: series),
           ],
         ),
     };
 
-    return SurfaceCard(
+    return FloatingCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[

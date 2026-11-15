@@ -1,13 +1,16 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_colors.dart';
+import 'package:relaxmate/core/theme/rb_motion.dart';
 import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/core/time/wib.dart';
 import 'package:relaxmate/core/config/app_constants.dart';
 import 'package:relaxmate/features/checkin/data/mood_level.dart';
+import 'package:relaxmate/features/checkin/ui/mood_level_color.dart';
 import 'package:relaxmate/features/mood/data/mood_day.dart';
 import 'package:relaxmate/features/mood/data/mood_series.dart';
 
@@ -20,11 +23,21 @@ import 'package:relaxmate/features/mood/data/mood_series.dart';
 ///
 /// Hari tanpa catatan tidak digambar dan memutus garis; hari ini yang belum diisi diberi
 /// lingkaran putus-putus.
+///
+/// [animated] (TASK-M074, `flutter_animate`): garis "tergambar" selama [RbMotion.chartLine],
+/// lalu titiknya muncul satu per satu dalam [RbMotion.chartDots]; sekali per kemunculan.
+/// Gambar langsung utuh bila gerak dikurangi (`MediaQuery.disableAnimations`).
 class MoodChart extends StatelessWidget {
-  const MoodChart({required this.series, this.compact = false, super.key});
+  const MoodChart({
+    required this.series,
+    this.compact = false,
+    this.animated = false,
+    super.key,
+  });
 
   final MoodSeries series;
   final bool compact;
+  final bool animated;
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +54,16 @@ class MoodChart extends StatelessWidget {
       fontWeight: FontWeight.w700,
     );
 
+    final play = animated && !MediaQuery.disableAnimationsOf(context);
+    Widget canvas(double progress) => CustomPaint(
+          painter: _MoodChartPainter(
+            series: series,
+            colors: colors,
+            compact: compact,
+            progress: progress,
+          ),
+        );
+
     final plot = LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
@@ -50,13 +73,15 @@ class MoodChart extends StatelessWidget {
             SizedBox(
               width: width,
               height: height,
-              child: CustomPaint(
-                painter: _MoodChartPainter(
-                  series: series,
-                  colors: colors,
-                  compact: compact,
-                ),
-              ),
+              child: play
+                  ? const SizedBox.shrink()
+                      .animate(delay: RbMotion.enter)
+                      .custom(
+                        duration: RbMotion.chartLine + RbMotion.chartDots,
+                        curve: Curves.linear,
+                        builder: (context, value, _) => canvas(value),
+                      )
+                  : canvas(1),
             ),
             SizedBox(
               width: width,
@@ -207,19 +232,22 @@ class _MoodChartPainter extends CustomPainter {
     required this.series,
     required this.colors,
     required this.compact,
+    required this.progress,
   });
 
   final MoodSeries series;
   final RbColors colors;
   final bool compact;
 
-  Color _moodColor(MoodLevel level) => switch (level) {
-        MoodLevel.verySad => colors.mood1,
-        MoodLevel.sad => colors.mood2,
-        MoodLevel.neutral => colors.mood3,
-        MoodLevel.happy => colors.mood4,
-        MoodLevel.great => colors.mood5,
-      };
+  /// 0 sampai 1 sepanjang gerak gambar; 1 = gambar utuh.
+  final double progress;
+
+  /// Bagian awal gerak yang dipakai menggambar garis; sisanya untuk titik.
+  static final double _lineFraction = RbMotion.chartLine.inMilliseconds /
+      (RbMotion.chartLine + RbMotion.chartDots).inMilliseconds;
+
+  /// Separuh waktu titik dipakai untuk jeda antartitik, sisanya untuk membesarnya satu titik.
+  static const double _dotStaggerShare = 0.5;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -271,25 +299,46 @@ class _MoodChartPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = RbSize.moodChartLineStroke
       ..strokeCap = StrokeCap.round;
+    final lineProgress =
+        RbMotion.curve.transform((progress / _lineFraction).clamp(0.0, 1.0));
+    final sorted = points.keys.toList()..sort();
+    final reachX = sorted.isEmpty
+        ? 0.0
+        : x(sorted.first) + (x(sorted.last) - x(sorted.first)) * lineProgress;
     for (var i = 0; i < total - 1; i++) {
       final a = points[i];
       final b = points[i + 1];
-      if (a != null && b != null) {
-        canvas.drawLine(a, b, line);
-      }
-    }
-
-    for (final item in points.entries) {
-      final isToday = item.key == total - 1;
-      final level = byDate[series.dateAt(item.key)]?.level;
-      if (level == null) {
+      if (a == null || b == null || a.dx >= reachX) {
         continue;
       }
-      final r = isToday ? radius + RbSize.moodChartTodayExtra : radius;
+      final end = b.dx <= reachX
+          ? b
+          : Offset.lerp(a, b, (reachX - a.dx) / (b.dx - a.dx)) ?? b;
+      canvas.drawLine(a, end, line);
+    }
+
+    final count = sorted.length;
+    final stagger = (1 - _lineFraction) * _dotStaggerShare;
+    final dotSpan = (1 - _lineFraction) - stagger * (count - 1) / count;
+    for (var rank = 0; rank < count; rank++) {
+      final index = sorted[rank];
+      final center = points[index];
+      final level = byDate[series.dateAt(index)]?.level;
+      if (center == null || level == null) {
+        continue;
+      }
+      final start = _lineFraction + stagger * rank / count;
+      final grow = RbMotion.curve
+          .transform(((progress - start) / dotSpan).clamp(0.0, 1.0));
+      if (grow <= 0) {
+        continue;
+      }
+      final isToday = index == total - 1;
+      final r = (isToday ? radius + RbSize.moodChartTodayExtra : radius) * grow;
       canvas
-        ..drawCircle(item.value, r, Paint()..color = _moodColor(level))
+        ..drawCircle(center, r, Paint()..color = level.colorOf(colors))
         ..drawCircle(
-          item.value,
+          center,
           r,
           Paint()
             ..color = colors.primary
@@ -329,5 +378,8 @@ class _MoodChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_MoodChartPainter old) =>
-      old.series != series || old.colors != colors || old.compact != compact;
+      old.series != series ||
+      old.colors != colors ||
+      old.compact != compact ||
+      old.progress != progress;
 }

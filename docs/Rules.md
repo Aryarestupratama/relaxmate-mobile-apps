@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Rules (Aturan Proyek)
-Version: 0.25 | Status: Draft | Last updated: 2026-11-15
+Version: 0.26 | Status: Draft | Last updated: 2026-11-15
 Depends on: PRD-Mobile v0.4, Architecture-Mobile v0.3, Schema-Mobile v0.1, Design-Mobile v0.4, Rules RelaxBoss (web) v1.5 | Owner: Founder (solo developer)
 
 Dokumen ini adalah panduan kerja founder sebagai pengembang tunggal untuk **repo mobile (Flutter)**; bantuan AI boleh dipakai dengan tetap mengikuti seluruh aturan, melakukan verifikasi manual, dan tidak menganggap keluaran otomatis sebagai bukti kebenaran. Untuk pekerjaan di **repo web** (task backend `TASK-M01x`), `Rules.md` web tetap berlaku penuh; aturan di sini hanya menambah. Kata MUST, MUST NOT, SHOULD dipakai secara tegas. Kedalaman: **Lite**. Prinsip: sederhana, fungsi dulu, aman dulu.
@@ -83,7 +83,7 @@ Dokumen ini adalah panduan kerja founder sebagai pengembang tunggal untuk **repo
 | ID | Aturan |
 |---|---|
 | RULE-M050 | Warna, ukuran teks, radius, dan bayangan hanya dari token di `core/theme` (`RbColors`, `RbText`, `RbSpace` sebagai ThemeExtension; `RbRadius`, `RbSize`, `RbShadow`, `RbMotion` sebagai kelas konstanta). Dilarang nilai heksadesimal, `Color(0x...)`, `Colors.*`, dan angka ukuran/jarak lepas di widget; warna transparan diturunkan dari token (`withValues`/`Color.alphaBlend`), bukan angka terpisah. **Nilai token mengikuti kode website (`app.css`)**, bukan tabel di dokumen Design web yang belum sinkron. Widget mengakses token lewat `context.rbColors`, `context.rbText`, dan `context.rbSpace` (`RbThemeContext`). |
-| RULE-M051 | Satu set ikon (`[Assumption]` Lucide untuk Flutter) dan satu cara animasi maskot (sejak M030: WebP beranimasi bawaan Flutter, tanpa library; Rive tidak dipakai); menambah library lain dicatat di Architecture-M bagian 12. OQ-MA10 diputuskan 2026-11-07: Lucide (`lucide_icons_flutter`); `Icons` bawaan yang sudah ada dipindahkan saat layarnya disentuh lagi. |
+| RULE-M051 | Satu set ikon (`[Assumption]` Lucide untuk Flutter), satu cara animasi maskot (sejak M030: WebP beranimasi bawaan Flutter, tanpa library; Rive tidak dipakai), dan satu cara animasi komponen (sejak M074: `flutter_animate`, Dart murni; Lottie, konfeti, dan `BackdropFilter` di dalam daftar dilarang); menambah library lain dicatat di Architecture-M bagian 12. OQ-MA10 diputuskan 2026-11-07: Lucide (`lucide_icons_flutter`); `Icons` bawaan yang sudah ada dipindahkan saat layarnya disentuh lagi. |
 | RULE-M052 | Teks pada permukaan pastel MUST memakai token teks navy; jangan mengandalkan warna saja untuk status atau makna (selalu ada label atau ikon). |
 | RULE-M053 | Setiap layar punya status memuat, kosong, galat, sukses, dan offline (Design-M bagian 4). |
 | RULE-M054 | Teks UI pendek diambil dari bank teks Design-M yang diwujudkan di `core/texts/app_texts.dart` (`AppTexts`); teks panjang (privasi, ketentuan) dari `assets/texts`; teks baru mengikuti nada yang sama ("kamu", hangat, tidak menggurui). |
@@ -157,6 +157,7 @@ Jangan: menambah fitur di luar PRD, memanggil Groq atau layanan suara langsung d
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.26 | 2026-11-15 | RULE-M051 mencakup `flutter_animate` untuk animasi komponen (TASK-M074). |
 | 0.25 | 2026-11-15 | A-R22 (pemeriksaan M073 bagian 1). |
 | 0.24 | 2026-11-14 | A-R21 (pemeriksaan M072). |
 | 0.23 | 2026-11-11 | A-R20 (pemeriksaan M035). |

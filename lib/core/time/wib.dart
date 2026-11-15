@@ -18,6 +18,24 @@ DateTime wibDate(DateTime instant) {
 /// memberi tanggal (`range.to` di API-M019 lebih diutamakan).
 DateTime wibToday() => wibDate(DateTime.now());
 
+/// Bagian hari menurut WIB untuk sapaan di Beranda.
+enum DayPeriod { morning, noon, afternoon, evening }
+
+/// Pagi 04.00-10.59, siang 11.00-14.59, sore 15.00-17.59, malam 18.00-03.59 (WIB).
+DayPeriod dayPeriodOf(DateTime instant) {
+  final hour = toWib(instant).hour;
+  if (hour >= 4 && hour < 11) {
+    return DayPeriod.morning;
+  }
+  if (hour >= 11 && hour < 15) {
+    return DayPeriod.noon;
+  }
+  if (hour >= 15 && hour < 18) {
+    return DayPeriod.afternoon;
+  }
+  return DayPeriod.evening;
+}
+
 /// `YYYY-MM-DD` menjadi tanggal; `null` bila bentuknya salah.
 DateTime? parseDateKey(Object? value) {
   if (value is! String) {

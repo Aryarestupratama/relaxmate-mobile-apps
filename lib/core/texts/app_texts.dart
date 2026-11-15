@@ -481,8 +481,16 @@ abstract final class AppTexts {
   ];
   static const String today = 'Hari ini';
 
-  static String homeGreeting(String firstName) =>
-      firstName.isEmpty ? 'Halo!' : 'Halo, $firstName';
+  static const String greetMorning = 'Selamat pagi';
+  static const String greetNoon = 'Selamat siang';
+  static const String greetAfternoon = 'Selamat sore';
+  static const String greetEvening = 'Selamat malam';
+  static String homeGreeting(String salutation, String firstName) =>
+      firstName.isEmpty ? salutation : '$salutation, $firstName';
+  static const String homeGreetingSub =
+      'Pelan-pelan saja. Di sini kamu boleh jujur.';
+  static const String homeGreetingSubDone =
+      'Terima kasih sudah mampir hari ini.';
   static const String settingsTooltip = 'Pengaturan';
   static const String homeMoodTitle = 'Gimana perasaanmu hari ini?';
   static const String homeMoodHint = 'Pilih satu. Cukup sekali sehari.';
@@ -493,12 +501,9 @@ abstract final class AppTexts {
       'Tercatat pukul $time. Terima kasih sudah jujur.';
   static const String homeMoodChange = 'Ubah';
   static const String homeInviteTitle = 'Mau cerita sedikit?';
-  static const String homeInviteLow =
-      'Kalau hari ini terasa berat, RelaxMate siap mendengarkan. Kamu juga boleh '
-      'memilih ditemani tanpa bicara.';
-  static const String homeInviteNormal =
-      'Kalau ada yang ingin kamu ceritakan, RelaxMate siap mendengarkan. Kamu '
-      'juga boleh memilih ditemani tanpa bicara.';
+  static const String homeInviteBubble = 'Hari ini terasa seperti apa?';
+  static const String homeInviteBubbleLow =
+      'Aku di sini. Mau cerita pelan-pelan?';
   static const String homeInviteChat = 'Cerita ke RelaxMate';
   static const String homeInviteCompanion = 'Temani saja';
   static const String homeChartTitle = '7 hari terakhir';
@@ -519,6 +524,19 @@ abstract final class AppTexts {
   static const String homeSupportBody =
       'Kamu tidak sendirian. Ada orang yang siap membantumu sekarang, gratis.';
   static const String homeSupportAction = 'Buka Kontak bantuan';
+
+  static const String homeWeekTitle = 'Moodmu minggu ini';
+  static const String homeWeekTone1 =
+      'Minggu ini terasa berat. Pelan-pelan saja.';
+  static const String homeWeekTone2 = 'Minggu ini cenderung sendu.';
+  static const String homeWeekTone3 = 'Minggu ini cenderung biasa saja.';
+  static const String homeWeekTone4 = 'Minggu ini cenderung tenang.';
+  static const String homeWeekTone5 = 'Minggu ini cenderung cerah.';
+  static String homeWeekFilled(int filled, int total) =>
+      '$filled dari $total hari terisi';
+  static const String homeWeekEmpty =
+      'Isi mood-mu dulu. Ringkasan minggu ini muncul setelah 2 hari terisi.';
+  static const String homeWeekAction = 'Lihat suasana hatiku';
 
   static const String homeChartAverageLead = 'Rata-rata minggu ini: ';
   static const String homeChartBestLead = '. Hari terbaikmu: ';

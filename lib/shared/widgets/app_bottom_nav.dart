@@ -4,6 +4,7 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -46,7 +47,9 @@ AppTab? _lastShownTab;
 /// CMP-M30: dock navigasi bawah melayang, empat tab. Tab aktif berupa pil yang memuat ikon
 /// dan label; tab lain hanya ikon. Warna pil mengikuti mood hari ini (token `mood1` sampai
 /// `mood5`), `softLavender` bila belum diisi. Pil meluncur dari tab sebelumnya selama
-/// [RbMotion.screen] (langsung pindah bila animasi dikurangi). Dipasang di
+/// [RbMotion.screen] (langsung pindah bila animasi dikurangi), dan ikon tab yang baru aktif
+/// membesar lembut dari [RbMotion.popFrom] lewat `flutter_animate` (TASK-M074). Pil tetap
+/// memakai `AnimationController` sendiri karena lebarnya diinterpolasi antartab. Dipasang di
 /// `bottomNavigationBar` tiap layar tab (ADR-M16). Berpindah tab memakai `go`.
 class AppBottomNav extends ConsumerStatefulWidget {
   const AppBottomNav({required this.current, super.key});
@@ -259,6 +262,7 @@ class _AppBottomNavState extends ConsumerState<AppBottomNav>
                         ? to.labelWidth
                         : (tab == _from ? from.labelWidth : 0),
                     labelStyle: labelStyle,
+                    pop: moving && tab == current,
                     onTap: () => _select(tab),
                   ),
                 ),
@@ -297,6 +301,7 @@ class _DockItem extends StatelessWidget {
     required this.labelOpacity,
     required this.labelWidth,
     required this.labelStyle,
+    required this.pop,
     required this.onTap,
   });
 
@@ -305,6 +310,9 @@ class _DockItem extends StatelessWidget {
   final double labelOpacity;
   final double labelWidth;
   final TextStyle labelStyle;
+
+  /// Ikon membesar lembut sekali saat tab ini baru menjadi aktif.
+  final bool pop;
   final VoidCallback onTap;
 
   @override
@@ -313,6 +321,7 @@ class _DockItem extends StatelessWidget {
     final space = context.rbSpace;
     final iconColor =
         Color.lerp(colors.textSecondary, colors.primary, labelOpacity);
+    final Widget icon = Icon(tab.icon, size: RbSize.icon, color: iconColor);
 
     final item = InkWell(
       onTap: selected ? null : onTap,
@@ -325,7 +334,14 @@ class _DockItem extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Icon(tab.icon, size: RbSize.icon, color: iconColor),
+              pop && !MediaQuery.disableAnimationsOf(context)
+                  ? icon.animate(delay: RbMotion.feedback).scaleXY(
+                        begin: RbMotion.popFrom,
+                        end: 1,
+                        duration: RbMotion.pop,
+                        curve: RbMotion.curve,
+                      )
+                  : icon,
               if (labelOpacity > 0) ...<Widget>[
                 SizedBox(width: space.xxs),
                 Opacity(

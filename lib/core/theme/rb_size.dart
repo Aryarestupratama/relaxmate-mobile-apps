@@ -88,6 +88,15 @@ abstract final class RbSize {
   /// di layar lebar atau lanskap.
   static const double authMaxContentWidth = 440;
 
+  /// Beranda yang dipoles (TASK-M074): jarak geser masuk kartu, blob besar kartu mingguan, dan
+  /// maskot yang mengintip dari sudut kartu undangan (lebar disisihkan sesuai rasio gambar;
+  /// sebagian bawahnya sengaja terpotong tepi kartu).
+  static const double motionShift = 12;
+  static const double weekBlob = 88;
+  static const double mascotPeekHeight = 128;
+  static const double mascotPeekWidth = 96;
+  static const double mascotPeekHiddenFraction = 0.3;
+
   /// Dock navigasi bawah (CMP-M30): lebar maksimum dan tinggi pil tab. Lebar tab aktif dihitung
   /// dari panjang label dan skala teks, tab lain tidak pernah di bawah [minTouch].
   static const double navDockMaxWidth = 440;

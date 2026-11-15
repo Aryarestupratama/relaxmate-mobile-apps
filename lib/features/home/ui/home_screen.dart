@@ -6,25 +6,30 @@ import 'package:relaxmate/core/config/app_constants.dart';
 import 'package:relaxmate/core/router/app_routes.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_radius.dart';
+import 'package:relaxmate/core/theme/rb_shadow.dart';
 import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
-import 'package:relaxmate/core/time/wib.dart';
-import 'package:relaxmate/features/auth/state/auth_controller.dart';
-import 'package:relaxmate/features/auth/state/auth_state.dart';
 import 'package:relaxmate/features/checkin/state/checkin_controller.dart';
 import 'package:relaxmate/features/home/ui/home_chart_card.dart';
+import 'package:relaxmate/features/home/ui/home_header.dart';
+import 'package:relaxmate/features/home/ui/home_invite_card.dart';
+import 'package:relaxmate/features/home/ui/home_week_card.dart';
 import 'package:relaxmate/features/home/ui/mood_checkin_card.dart';
 import 'package:relaxmate/features/mood/state/today_mood_provider.dart';
 import 'package:relaxmate/shared/widgets/app_bottom_nav.dart';
+import 'package:relaxmate/shared/widgets/floating_card.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar_size.dart';
-import 'package:relaxmate/shared/widgets/surface_card.dart';
+import 'package:relaxmate/shared/widgets/rb_entrance.dart';
+import 'package:relaxmate/shared/widgets/soft_gradient_background.dart';
 
-/// SCR-M22: Beranda, layar pertama setelah masuk (FR-M029). Sapaan, kartu mood, grafik 7 hari,
-/// jalan ke Ngobrol, Latihan napas, Temani saja, dan tautan Kontak bantuan yang selalu ada.
-/// Tanpa `ConsentGate` dan tanpa AI: consent hanya dicek saat membuka Ngobrol. Setelah mood
-/// tercatat, tata letak mengikuti mockup: konfirmasi, ajakan bercerita, grafik, lalu kartu
-/// bantuan lembut bila mood rendah.
+/// SCR-M22: Beranda, layar pertama setelah masuk (FR-M029). Latar gradien lembut seperti
+/// layar Masuk dengan kartu putih melayang (TASK-M074). Sapaan sadar waktu, kartu mood, kartu
+/// ringkasan mingguan, grafik 7 hari, undangan bercerita, jalan ke Ngobrol, Latihan napas,
+/// Temani saja, dan tautan Kontak bantuan yang selalu ada. Tanpa `ConsentGate` dan tanpa AI:
+/// consent hanya dicek saat membuka Ngobrol. Kartu masuk berurutan (`RbEntrance`); gerak
+/// berulang hanya napas maskot di kartu undangan. Setelah mood tercatat: konfirmasi, ajakan
+/// bercerita, ringkasan, grafik, lalu kartu bantuan lembut bila mood rendah.
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -40,128 +45,62 @@ class HomeScreen extends ConsumerWidget {
         today.level.value <= AppConstants.moodSupportCardMaxLevel;
 
     return Scaffold(
-      backgroundColor: colors.surfaceAlt,
+      backgroundColor: colors.pageBg,
       bottomNavigationBar: const AppBottomNav(current: AppTab.home),
-      body: SafeArea(
-        child: ListView(
-          padding: EdgeInsets.all(space.md),
-          children: <Widget>[
-            const _HomeHeader(),
-            SizedBox(height: space.md),
-            const MoodCheckinCard(),
-            SizedBox(height: space.sm),
-            if (done) ...<Widget>[
-              _InviteCard(low: low),
-              SizedBox(height: space.sm),
-            ],
-            const HomeChartCard(),
-            SizedBox(height: space.sm),
-            if (!done) ...<Widget>[
-              const _ChatButton(),
-              SizedBox(height: space.sm),
-              const _Shortcuts(),
-            ],
-            SizedBox(height: space.md),
-            if (done && low) const _SupportCard() else const _HelpLink(),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _HomeHeader extends ConsumerWidget {
-  const _HomeHeader();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colors = context.rbColors;
-    final text = context.rbText;
-    final space = context.rbSpace;
-    final auth = ref.watch(authControllerProvider);
-    final fullName = auth is AuthAuthenticated ? auth.user.name.trim() : '';
-    final firstName = fullName.split(RegExp(r'\s+')).first;
-
-    return Row(
-      children: <Widget>[
-        const MateAvatar(size: MateAvatarSize.small),
-        SizedBox(width: space.sm),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      body: SoftGradientBackground(
+        child: SafeArea(
+          child: ListView(
+            padding: EdgeInsets.all(space.md),
             children: <Widget>[
-              Text(
-                longDateLabel(wibToday()),
-                style: text.small.copyWith(color: colors.textSecondary),
+              const RbEntrance(
+                key: ValueKey<String>('header'),
+                child: HomeHeader(),
               ),
-              Semantics(
-                header: true,
-                child: Text(
-                  AppTexts.homeGreeting(firstName),
-                  style: text.h2,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              SizedBox(height: space.md),
+              const RbEntrance(
+                key: ValueKey<String>('mood'),
+                index: 1,
+                child: MoodCheckinCard(),
+              ),
+              SizedBox(height: space.sm),
+              if (done) ...<Widget>[
+                RbEntrance(
+                  key: const ValueKey<String>('invite'),
+                  index: 2,
+                  child: HomeInviteCard(low: low),
                 ),
+                SizedBox(height: space.sm),
+              ],
+              const RbEntrance(
+                key: ValueKey<String>('week'),
+                index: 3,
+                child: HomeWeekCard(),
               ),
+              SizedBox(height: space.sm),
+              const RbEntrance(
+                key: ValueKey<String>('chart'),
+                index: 4,
+                child: HomeChartCard(),
+              ),
+              SizedBox(height: space.sm),
+              if (!done) ...<Widget>[
+                const RbEntrance(
+                  key: ValueKey<String>('chat'),
+                  index: 5,
+                  child: _ChatButton(),
+                ),
+                SizedBox(height: space.sm),
+                const RbEntrance(
+                  key: ValueKey<String>('shortcuts'),
+                  index: 6,
+                  child: _Shortcuts(),
+                ),
+              ],
+              SizedBox(height: space.md),
+              if (done && low) const _SupportCard() else const _HelpLink(),
             ],
           ),
         ),
-        IconButton.outlined(
-          onPressed: () => context.push<void>(AppRoutes.settings),
-          tooltip: AppTexts.settingsTooltip,
-          icon: const Icon(LucideIcons.settings),
-          style: IconButton.styleFrom(
-            side: BorderSide(color: colors.border),
-            backgroundColor: colors.card,
-            minimumSize: const Size.square(RbSize.minTouch),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _InviteCard extends StatelessWidget {
-  const _InviteCard({required this.low});
-
-  final bool low;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.rbColors;
-    final text = context.rbText;
-    final space = context.rbSpace;
-
-    return SurfaceCard(
-      color: colors.softLavender,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Semantics(
-            header: true,
-            child: Text(AppTexts.homeInviteTitle, style: text.h3),
-          ),
-          SizedBox(height: space.xxs),
-          Text(
-            low ? AppTexts.homeInviteLow : AppTexts.homeInviteNormal,
-            style: text.small.copyWith(color: colors.textSecondary),
-          ),
-          SizedBox(height: space.sm),
-          Wrap(
-            spacing: space.xs,
-            runSpacing: space.xs,
-            children: <Widget>[
-              FilledButton(
-                onPressed: () => context.go(AppRoutes.chat),
-                child: const Text(AppTexts.homeInviteChat),
-              ),
-              OutlinedButton(
-                onPressed: () => context.push<void>(AppRoutes.companion),
-                child: const Text(AppTexts.homeInviteCompanion),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
@@ -180,38 +119,44 @@ class _ChatButton extends StatelessWidget {
       button: true,
       excludeSemantics: true,
       label: '${AppTexts.homeChatTitle}. ${AppTexts.homeChatSubtitle}',
-      child: Material(
-        color: colors.primary,
-        borderRadius: RbRadius.cardBorder,
-        child: InkWell(
-          onTap: () => context.go(AppRoutes.chat),
-          borderRadius: RbRadius.cardBorder,
-          child: Padding(
-            padding: EdgeInsets.all(space.md),
-            child: Row(
-              children: <Widget>[
-                const MateAvatar(size: MateAvatarSize.small),
-                SizedBox(width: space.sm),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        AppTexts.homeChatTitle,
-                        style: text.body.copyWith(
-                          color: colors.onPrimary,
-                          fontWeight: FontWeight.w800,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: RbRadius.sheetBorder,
+          boxShadow: RbShadow.card(colors),
+        ),
+        child: Material(
+          color: colors.primary,
+          borderRadius: RbRadius.sheetBorder,
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () => context.go(AppRoutes.chat),
+            child: Padding(
+              padding: EdgeInsets.all(space.md),
+              child: Row(
+                children: <Widget>[
+                  const MateAvatar(size: MateAvatarSize.small),
+                  SizedBox(width: space.sm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          AppTexts.homeChatTitle,
+                          style: text.body.copyWith(
+                            color: colors.onPrimary,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
-                      ),
-                      Text(
-                        AppTexts.homeChatSubtitle,
-                        style: text.small.copyWith(color: colors.onPrimary),
-                      ),
-                    ],
+                        Text(
+                          AppTexts.homeChatSubtitle,
+                          style: text.small.copyWith(color: colors.onPrimary),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Icon(LucideIcons.chevronRight, color: colors.onPrimary),
-              ],
+                  Icon(LucideIcons.chevronRight, color: colors.onPrimary),
+                ],
+              ),
             ),
           ),
         ),
@@ -225,6 +170,7 @@ class _Shortcuts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.rbColors;
     final space = context.rbSpace;
     final stacked =
         MediaQuery.textScalerOf(context).scale(1) > RbSize.homeRowMaxTextScale;
@@ -232,11 +178,13 @@ class _Shortcuts extends StatelessWidget {
     final breathing = _ShortcutTile(
       title: AppTexts.homeBreathingTitle,
       subtitle: AppTexts.homeBreathingSubtitle,
+      tint: colors.mood2,
       onTap: () => context.push<void>(AppRoutes.breathing),
     );
     final companion = _ShortcutTile(
       title: AppTexts.homeCompanionTitle,
       subtitle: AppTexts.homeCompanionSubtitle,
+      tint: colors.mood1,
       onTap: () => context.push<void>(AppRoutes.companion),
     );
 
@@ -262,42 +210,54 @@ class _Shortcuts extends StatelessWidget {
   }
 }
 
+/// Ubin pastel (token `mood2` dan `mood1`) berisi judul dan satu baris keterangan.
 class _ShortcutTile extends StatelessWidget {
   const _ShortcutTile({
     required this.title,
     required this.subtitle,
+    required this.tint,
     required this.onTap,
   });
 
   final String title;
   final String subtitle;
+  final Color tint;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.rbColors;
     final text = context.rbText;
+    final space = context.rbSpace;
 
     return Semantics(
       button: true,
       excludeSemantics: true,
       label: '$title. $subtitle',
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: RbRadius.cardBorder,
-        child: SurfaceCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                title,
-                style: text.small.copyWith(fontWeight: FontWeight.w800),
+      child: FloatingCard(
+        tint: tint,
+        padding: EdgeInsets.zero,
+        clip: Clip.antiAlias,
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: EdgeInsets.all(space.md),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    title,
+                    style: text.small.copyWith(fontWeight: FontWeight.w800),
+                  ),
+                  Text(
+                    subtitle,
+                    style: text.caption.copyWith(color: colors.textSecondary),
+                  ),
+                ],
               ),
-              Text(
-                subtitle,
-                style: text.caption.copyWith(color: colors.textSecondary),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -313,7 +273,7 @@ class _SupportCard extends StatelessWidget {
     final colors = context.rbColors;
     final text = context.rbText;
 
-    return SurfaceCard(
+    return FloatingCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
