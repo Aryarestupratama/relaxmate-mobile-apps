@@ -531,8 +531,6 @@ abstract final class AppTexts {
   static const String homeBreathingSubtitle = 'Tenang dalam beberapa menit';
   static const String homeCompanionTitle = 'Temani saja';
   static const String homeCompanionSubtitle = 'Tanpa harus bicara';
-  static const String homeHelpLink = 'Butuh bantuan sekarang? ';
-  static const String homeHelpLinkAction = 'Kontak bantuan';
   static const String homeSupportTitle = 'Kalau terasa sangat berat';
   static const String homeSupportBody =
       'Kamu tidak sendirian. Ada orang yang siap membantumu sekarang, gratis.';

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:relaxmate/core/router/app_routes.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/features/chat/ui/chat_bubble.dart';
+import 'package:relaxmate/features/crisis/ui/sos_button.dart';
 import 'package:relaxmate/features/history/state/conversation_controller.dart';
 import 'package:relaxmate/features/history/state/conversation_state.dart';
 import 'package:relaxmate/features/history/ui/history_load_more.dart';
@@ -33,14 +31,8 @@ class ConversationScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(title, overflow: TextOverflow.ellipsis),
-        actions: <Widget>[
-          // Jalur ke bantuan nyata selalu terlihat (Design-M prinsip 4).
-          IconButton(
-            onPressed: () => context.push(AppRoutes.crisisContacts),
-            tooltip: AppTexts.crisisMenuTooltip,
-            icon: const Icon(LucideIcons.phone),
-          ),
-        ],
+        // Jalur ke bantuan nyata selalu terlihat (Design-M prinsip 4).
+        actions: const <Widget>[SosAppBarAction()],
       ),
       body: SafeArea(
         child: switch (conversation) {

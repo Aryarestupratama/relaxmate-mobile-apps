@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:relaxmate/core/config/app_constants.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
+import 'package:relaxmate/features/crisis/ui/sos_button.dart';
 import 'package:relaxmate/features/exercises/state/breathing_controller.dart';
 import 'package:relaxmate/features/exercises/state/breathing_state.dart';
 import 'package:relaxmate/features/exercises/ui/breathing_guide.dart';
@@ -21,7 +22,10 @@ class BreathingScreen extends ConsumerWidget {
     final controller = ref.read(breathingControllerProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(title: const Text(AppTexts.breathingTitle)),
+      appBar: AppBar(
+        title: const Text(AppTexts.breathingTitle),
+        actions: const <Widget>[SosAppBarAction()],
+      ),
       body: SafeArea(
         child: switch (state.stage) {
           BreathingStage.choosing => _BreathingChoice(

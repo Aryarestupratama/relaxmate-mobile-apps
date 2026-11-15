@@ -13,8 +13,19 @@ import 'package:relaxmate/core/theme/rb_theme_context.dart';
 /// internet (RULE-M034). Cincin di belakangnya berdenyut pelan agar terlihat tanpa
 /// berteriak; bila gerak dikurangi (RULE-M055) cincin diam. Warna dan kontras dari token
 /// krisis. Target sentuh >= 48dp.
+///
+/// Sejak revisi 2026-11-15 tombol ini juga menggantikan semua teks "Butuh bantuan sekarang"
+/// di layar sesudah masuk: bentuk [compact] (hanya tulisan SOS, tanpa ikon telepon) dipasang
+/// di bilah atas lewat [SosAppBarAction] dan di kepala Beranda. Cincin berdenyut ([pulse])
+/// hanya dipakai saat krisis terdeteksi.
 class SosButton extends StatefulWidget {
-  const SosButton({super.key});
+  const SosButton({this.compact = false, this.pulse = true, super.key});
+
+  /// Hanya tulisan SOS, tanpa ikon telepon, dengan jarak samping lebih kecil.
+  final bool compact;
+
+  /// Cincin di belakang tombol berdenyut pelan (diam bila gerak dikurangi).
+  final bool pulse;
 
   @override
   State<SosButton> createState() => _SosButtonState();
@@ -30,7 +41,17 @@ class _SosButtonState extends State<SosButton>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (MediaQuery.disableAnimationsOf(context)) {
+    _syncPulse();
+  }
+
+  @override
+  void didUpdateWidget(SosButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _syncPulse();
+  }
+
+  void _syncPulse() {
+    if (!widget.pulse || MediaQuery.disableAnimationsOf(context)) {
       _pulse.stop();
     } else if (!_pulse.isAnimating) {
       _pulse.repeat();
@@ -52,7 +73,8 @@ class _SosButtonState extends State<SosButton>
     return Semantics(
       container: true,
       button: true,
-      liveRegion: true,
+      // Diumumkan otomatis hanya saat krisis (cincin berdenyut), bukan di tiap layar.
+      liveRegion: widget.pulse,
       label: AppTexts.sosSemantics,
       excludeSemantics: true,
       onTap: () => context.push<void>(AppRoutes.crisisContacts),
@@ -65,30 +87,31 @@ class _SosButtonState extends State<SosButton>
             alignment: Alignment.center,
             clipBehavior: Clip.none,
             children: <Widget>[
-              Positioned.fill(
-                child: IgnorePointer(
-                  child: AnimatedBuilder(
-                    animation: _pulse,
-                    builder: (context, _) {
-                      final t = RbMotion.curve.transform(_pulse.value);
-                      return Opacity(
-                        opacity: (1 - t) * 0.45,
-                        child: Transform.scale(
-                          scale: 1 + (RbSize.sosRingScale - 1) * t,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(
-                                RbSize.sosHeight,
+              if (widget.pulse)
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: AnimatedBuilder(
+                      animation: _pulse,
+                      builder: (context, _) {
+                        final t = RbMotion.curve.transform(_pulse.value);
+                        return Opacity(
+                          opacity: (1 - t) * 0.45,
+                          child: Transform.scale(
+                            scale: 1 + (RbSize.sosRingScale - 1) * t,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(
+                                  RbSize.sosHeight,
+                                ),
+                                color: colors.crisisText,
                               ),
-                              color: colors.crisisText,
                             ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
                 ),
-              ),
               Material(
                 color: colors.crisisText,
                 shape: const StadiumBorder(),
@@ -98,18 +121,24 @@ class _SosButtonState extends State<SosButton>
                   customBorder: const StadiumBorder(),
                   onTap: () => context.push<void>(AppRoutes.crisisContacts),
                   child: Container(
-                    height: RbSize.sosHeight,
-                    padding: EdgeInsets.symmetric(horizontal: space.md),
+                    height: widget.compact
+                        ? RbSize.sosCompactHeight
+                        : RbSize.sosHeight,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: widget.compact ? space.sm : space.md,
+                    ),
                     alignment: Alignment.center,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        Icon(
-                          LucideIcons.phone,
-                          size: RbSize.modeSwitchIcon,
-                          color: colors.crisisBg,
-                        ),
-                        SizedBox(width: space.xs),
+                        if (!widget.compact) ...<Widget>[
+                          Icon(
+                            LucideIcons.phone,
+                            size: RbSize.modeSwitchIcon,
+                            color: colors.crisisBg,
+                          ),
+                          SizedBox(width: space.xs),
+                        ],
                         Text(
                           AppTexts.sosLabel,
                           style: text.button.copyWith(
@@ -127,6 +156,23 @@ class _SosButtonState extends State<SosButton>
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Tombol SOS untuk `AppBar.actions` di semua layar sesudah masuk: tombol [SosButton]
+/// bentuk ringkas dengan jarak ke tepi layar. [pulse] menyalakan cincin berdenyut (chat,
+/// saat krisis terdeteksi).
+class SosAppBarAction extends StatelessWidget {
+  const SosAppBarAction({this.pulse = false, super.key});
+
+  final bool pulse;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsetsDirectional.only(end: context.rbSpace.sm),
+      child: SosButton(compact: true, pulse: pulse),
     );
   }
 }

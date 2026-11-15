@@ -10,12 +10,13 @@ import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/core/time/wib.dart';
 import 'package:relaxmate/features/auth/state/auth_controller.dart';
 import 'package:relaxmate/features/auth/state/auth_state.dart';
+import 'package:relaxmate/features/crisis/ui/sos_button.dart';
 import 'package:relaxmate/features/mood/state/today_mood_provider.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar_size.dart';
 
-/// SCR-M22, kepala Beranda (TASK-M074): avatar di kiri, Pengaturan di kanan sebagai tombol
-/// bulat putih berbayang, lalu sapaan dua baris yang besar dan sadar waktu ("Selamat sore,
+/// SCR-M22, kepala Beranda (TASK-M074): avatar di kiri; di kanan tombol SOS merah ringkas (jalur bantuan
+/// yang selalu terlihat) lalu Pengaturan sebagai tombol bulat putih berbayang, lalu sapaan dua baris yang besar dan sadar waktu ("Selamat sore,
 /// Arya") dengan satu kalimat hangat di bawahnya. Kalimat hangat hilang setelah mood hari
 /// ini tercatat. Tanpa skor atau angka (RULE-M046).
 class HomeHeader extends ConsumerWidget {
@@ -46,6 +47,8 @@ class HomeHeader extends ConsumerWidget {
           children: <Widget>[
             const MateAvatar(size: MateAvatarSize.small),
             const Spacer(),
+            const SosButton(compact: true, pulse: false),
+            SizedBox(width: space.xs),
             DecoratedBox(
               decoration: BoxDecoration(
                 color: colors.card,

@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Architecture
-Version: 0.44 | Status: Draft | Last updated: 2026-11-15
+Version: 0.45 | Status: Draft | Last updated: 2026-11-15
 Depends on: PRD RelaxMate Mobile v0.3, Architecture RelaxBoss (web), Schema RelaxBoss (web), Rules v1.5 | Owner: Founder (solo developer)
 
 Label: `[Verified]` ada sumber (sisi mobile: repo `relaxmate-mobile-apps` commit `8014c38`; sisi backend: repo `RELAXBOSS_WEBSITE` commit `9afd27c`), `[Inference]` kesimpulan, `[Assumption]` bisa diubah. **Dokumen ini mengikuti kode:** bila berbeda dari kode, kode yang benar. Kedalaman: **Lite**. Dokumen ini hanya mengatur sisi mobile dan tambahan di backend. Subsistem AI (rotasi key, `ChatbotService`, `CrisisDetector`), enkripsi, dan admin tetap di Architecture web dan tidak diulang di sini.
@@ -490,6 +490,7 @@ Alat pengembangan di luar aplikasi: Node.js untuk `tool/mock_api.mjs` (tanpa dep
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.45 | 2026-11-15 | `SosButton` mendapat parameter `compact` dan `pulse`, widget baru `SosAppBarAction` (`features/crisis/ui/sos_button.dart`) dipasang di AppBar semua layar sesudah masuk; `ChatBackdrop` tanpa bulatan; `MascotChatPane` tidak lagi memasang SOS; `RbSize.sosCompactHeight`; teks `homeHelpLink*` dihapus. Tanpa perubahan state, paket, atau backend. |
 | 0.44 | 2026-11-15 | TASK-M073 (bagian 8): tampilan maskot chat dipoles (panggung, gelembung balasan di samping kepala, SOS, tombol Tenangkan diri, pengalih tampilan, aset berbingkai gelap); lencana "AI" dan ikon telepon dihapus dari chat. |
 | 0.40 | 2026-11-15 | TASK-M073 (bagian 6) dan TASK-M074 (sebagian): paket `flutter_animate`, Beranda dipoles, `FloatingCard`, `RbEntrance`, `MoodRipple`, kartu undangan, ringkasan mingguan, token gerak dan ukuran. |
 | 0.39 | 2026-11-15 | TASK-M073 (bagian 5): dock navigasi melayang (`AppBottomNav` dirombak), `MoodLevelColor`, token `navDockMaxWidth` dan `navItemHeight`; keputusan `shared` mengimpor `features`. |

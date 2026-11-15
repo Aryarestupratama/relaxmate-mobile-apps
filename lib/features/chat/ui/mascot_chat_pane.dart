@@ -14,7 +14,6 @@ import 'package:relaxmate/features/chat/ui/mascot_aura.dart';
 import 'package:relaxmate/features/chat/ui/mascot_reply_bubble.dart';
 import 'package:relaxmate/features/chat/ui/mascot_user_bubble.dart';
 import 'package:relaxmate/features/chat/ui/suggestion_chips.dart';
-import 'package:relaxmate/features/crisis/ui/sos_button.dart';
 import 'package:relaxmate/features/mascot/data/mascot_state.dart';
 import 'package:relaxmate/features/mascot/ui/mascot_view.dart';
 import 'package:relaxmate/features/mood/state/today_mood_provider.dart';
@@ -30,8 +29,8 @@ const bool _mascotIsHalfBody = true;
 /// belakangnya; balasan RelaxMate berbentuk gelembung chat di atas kepalanya, ekornya
 /// menunjuk ke bawah (tiga titik selagi menulis, lalu teks yang "diketik"). Di bawah
 /// panggung, di tengah, pesan terakhir pengguna. Saran tindakan tampil di kaki gelembung
-/// balasan. Saat krisis terdeteksi hari itu, tombol SOS tampil di pojok kanan atas panggung
-/// (menggantikan `CrisisBanner` pada tampilan ini) dan gelembung dimulai di bawahnya.
+/// balasan. Tombol SOS kini ada di bilah atas semua layar (`SosAppBarAction`, berdenyut saat
+/// krisis terdeteksi hari itu), jadi panggung tidak lagi memasangnya sendiri.
 /// Banner krisis, kolom ketik, kuota, dan galat tetap dipasang `ChatScreen`.
 ///
 /// Keadaan maskot: berpikir selama menunggu balasan; bicara selama balasan baru diketik;
@@ -118,10 +117,8 @@ class MascotChatPane extends ConsumerWidget {
               final mascotWidth = mascotHeight * RbSize.mascotFrameAspect;
               final left = (width - mascotWidth) / 2;
               // Gelembung di atas maskot: zona dari atas panggung sampai sedikit masuk ke
-              // bingkai maskot, supaya ekornya menyentuh kepala. Saat SOS tampil (pojok kanan
-              // atas), zona dimulai di bawahnya supaya tidak tertimpa.
-              final zoneTop =
-                  ready.hasCrisis ? RbSize.minTouch + space.sm : space.xs;
+              // bingkai maskot, supaya ekornya menyentuh kepala.
+              final zoneTop = space.xs;
               final zoneBottom =
                   height - mascotHeight * (1 - RbSize.mascotReplyOverlapFactor);
               final zoneHeight = math.max(zoneBottom - zoneTop, 0).toDouble();
@@ -195,12 +192,6 @@ class MascotChatPane extends ConsumerWidget {
                                 child: bubble,
                               ),
                       ),
-                    ),
-                  if (ready.hasCrisis)
-                    Positioned(
-                      top: space.xs,
-                      right: space.md,
-                      child: const SosButton(),
                     ),
                 ],
               );

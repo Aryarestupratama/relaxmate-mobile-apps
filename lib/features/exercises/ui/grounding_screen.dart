@@ -4,6 +4,7 @@ import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_motion.dart';
 import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
+import 'package:relaxmate/features/crisis/ui/sos_button.dart';
 import 'package:relaxmate/features/exercises/data/grounding_step.dart';
 import 'package:relaxmate/features/exercises/state/grounding_controller.dart';
 import 'package:relaxmate/features/exercises/state/grounding_state.dart';
@@ -21,7 +22,10 @@ class GroundingScreen extends ConsumerWidget {
     final controller = ref.read(groundingControllerProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(title: const Text(AppTexts.groundingTitle)),
+      appBar: AppBar(
+        title: const Text(AppTexts.groundingTitle),
+        actions: const <Widget>[SosAppBarAction()],
+      ),
       body: SafeArea(
         child: state.finished
             ? ExerciseDoneView(

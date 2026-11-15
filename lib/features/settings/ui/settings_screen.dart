@@ -16,6 +16,7 @@ import 'package:relaxmate/features/auth/state/auth_state.dart';
 import 'package:relaxmate/features/consent/data/consent_prompt.dart';
 import 'package:relaxmate/features/consent/data/training_choice.dart';
 import 'package:relaxmate/features/consent/ui/consent_choice_tile.dart';
+import 'package:relaxmate/features/crisis/ui/sos_button.dart';
 import 'package:relaxmate/features/overlay/state/overlay_feature_provider.dart';
 import 'package:relaxmate/features/settings/data/chat_view_mode.dart';
 import 'package:relaxmate/features/settings/state/settings_controller.dart';
@@ -89,7 +90,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final training = ref.watch(trainingConsentControllerProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text(AppTexts.settingsTitle)),
+      appBar: AppBar(
+        title: const Text(AppTexts.settingsTitle),
+        actions: const <Widget>[SosAppBarAction()],
+      ),
       body: SafeArea(
         child: ListView(
           padding: EdgeInsets.all(space.lg),

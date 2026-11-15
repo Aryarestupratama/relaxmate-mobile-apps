@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:relaxmate/core/router/app_routes.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
+import 'package:relaxmate/features/crisis/ui/sos_button.dart';
 import 'package:relaxmate/features/exercises/ui/exercise_disclaimer.dart';
 import 'package:relaxmate/features/exercises/ui/exercise_tile.dart';
 import 'package:relaxmate/shared/widgets/app_bottom_nav.dart';
@@ -24,7 +25,10 @@ class ExercisesScreen extends StatelessWidget {
     return TabBackScope(
       child: Scaffold(
         bottomNavigationBar: const AppBottomNav(current: AppTab.exercises),
-        appBar: AppBar(title: const Text(AppTexts.exercisesTitle)),
+        appBar: AppBar(
+          title: const Text(AppTexts.exercisesTitle),
+          actions: const <Widget>[SosAppBarAction()],
+        ),
         body: SafeArea(
           child: ListView(
             padding: EdgeInsets.all(space.lg),

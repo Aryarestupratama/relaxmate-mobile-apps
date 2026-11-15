@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
+import 'package:relaxmate/features/crisis/ui/sos_button.dart';
 import 'package:relaxmate/features/overlay/data/overlay_permissions.dart';
 import 'package:relaxmate/features/overlay/data/overlay_platform.dart';
 import 'package:relaxmate/features/overlay/state/overlay_home_provider.dart';
@@ -215,7 +216,10 @@ class _OverlaySettingsScreenState extends ConsumerState<OverlaySettingsScreen>
     final restUntil = ref.watch(overlayRestProvider).value;
 
     return Scaffold(
-      appBar: AppBar(title: const Text(AppTexts.overlayTitle)),
+      appBar: AppBar(
+        title: const Text(AppTexts.overlayTitle),
+        actions: const <Widget>[SosAppBarAction()],
+      ),
       body: SafeArea(
         child: ListView(
           padding: EdgeInsets.all(space.lg),

@@ -7,6 +7,7 @@ import 'package:relaxmate/core/router/app_routes.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
+import 'package:relaxmate/features/crisis/ui/sos_button.dart';
 import 'package:relaxmate/features/mood/data/mood_series.dart';
 import 'package:relaxmate/features/mood/state/mood_series_controller.dart';
 import 'package:relaxmate/features/mood/state/mood_series_state.dart';
@@ -53,6 +54,7 @@ class _MoodScreenState extends ConsumerState<MoodScreen> {
             header: true,
             child: const Text(AppTexts.moodTitle),
           ),
+          actions: const <Widget>[SosAppBarAction()],
         ),
         bottomNavigationBar: const AppBottomNav(current: AppTab.mood),
         body: SafeArea(

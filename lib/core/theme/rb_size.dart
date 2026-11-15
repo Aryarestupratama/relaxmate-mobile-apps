@@ -84,6 +84,7 @@ abstract final class RbSize {
   static const double modeSwitchHeight = 40;
   static const double modeSwitchIcon = 18;
   static const double sosHeight = 40;
+  static const double sosCompactHeight = 34;
   static const double sosRingScale = 1.3;
 
   /// Cahaya lembut di belakang maskot: diameter sebagai kelipatan lebar maskot.

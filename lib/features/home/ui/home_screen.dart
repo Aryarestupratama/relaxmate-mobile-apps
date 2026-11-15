@@ -26,7 +26,7 @@ import 'package:relaxmate/shared/widgets/soft_gradient_background.dart';
 /// SCR-M22: Beranda, layar pertama setelah masuk (FR-M029). Latar gradien lembut seperti
 /// layar Masuk dengan kartu putih melayang (TASK-M074). Sapaan sadar waktu, kartu mood, kartu
 /// ringkasan mingguan, grafik 7 hari, undangan bercerita, jalan ke Ngobrol, Latihan napas,
-/// Temani saja, dan tautan Kontak bantuan yang selalu ada. Tanpa `ConsentGate` dan tanpa AI:
+/// Temani saja; jalan ke Kontak bantuan selalu ada lewat tombol SOS di kepala. Tanpa `ConsentGate` dan tanpa AI:
 /// consent hanya dicek saat membuka Ngobrol. Kartu masuk berurutan (`RbEntrance`); gerak
 /// berulang hanya napas maskot di kartu undangan. Setelah mood tercatat: konfirmasi, ajakan
 /// bercerita, ringkasan, grafik, lalu kartu bantuan lembut bila mood rendah.
@@ -96,8 +96,10 @@ class HomeScreen extends ConsumerWidget {
                   child: _Shortcuts(),
                 ),
               ],
-              SizedBox(height: space.md),
-              if (done && low) const _SupportCard() else const _HelpLink(),
+              if (done && low) ...<Widget>[
+                SizedBox(height: space.md),
+                const _SupportCard(),
+              ],
             ],
           ),
         ),
@@ -303,33 +305,6 @@ class _SupportCard extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Tautan bantuan yang selalu terlihat di Beranda (FR-M029, Design-M prinsip 4); diganti
-/// `_SupportCard` yang memuat tautan yang sama bila mood rendah.
-class _HelpLink extends StatelessWidget {
-  const _HelpLink();
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.rbColors;
-    final text = context.rbText;
-
-    return Center(
-      child: TextButton(
-        onPressed: () => context.push<void>(AppRoutes.crisisContacts),
-        child: Text(
-          AppTexts.homeHelpLink + AppTexts.homeHelpLinkAction,
-          textAlign: TextAlign.center,
-          style: text.small.copyWith(
-            color: colors.crisisText,
-            fontWeight: FontWeight.w700,
-            decoration: TextDecoration.underline,
-          ),
-        ),
       ),
     );
   }

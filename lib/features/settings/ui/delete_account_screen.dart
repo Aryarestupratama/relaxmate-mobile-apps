@@ -5,6 +5,7 @@ import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/features/auth/state/auth_controller.dart';
 import 'package:relaxmate/features/auth/ui/password_field.dart';
+import 'package:relaxmate/features/crisis/ui/sos_button.dart';
 import 'package:relaxmate/shared/widgets/error_alert.dart';
 
 /// SCR-M19: Hapus akun (FR-M003). Meminta kata sandi, lalu satu konfirmasi terakhir sebelum
@@ -105,7 +106,10 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
     final error = _error;
 
     return Scaffold(
-      appBar: AppBar(title: const Text(AppTexts.settingsDeleteAccount)),
+      appBar: AppBar(
+        title: const Text(AppTexts.settingsDeleteAccount),
+        actions: const <Widget>[SosAppBarAction()],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(space.lg),

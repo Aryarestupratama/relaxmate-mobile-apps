@@ -21,6 +21,7 @@ import 'package:relaxmate/features/chat/ui/chat_mode_switch.dart';
 import 'package:relaxmate/features/chat/ui/chat_typing_row.dart';
 import 'package:relaxmate/features/chat/ui/chat_welcome.dart';
 import 'package:relaxmate/features/chat/ui/mascot_chat_pane.dart';
+import 'package:relaxmate/features/crisis/ui/sos_button.dart';
 import 'package:relaxmate/features/chat/ui/suggestion_chips.dart';
 import 'package:relaxmate/features/overlay/ui/overlay_resume_banner.dart';
 import 'package:relaxmate/features/crisis/ui/crisis_banner.dart';
@@ -39,7 +40,7 @@ enum _ChatMenuAction { history, companion, settings }
 
 /// SCR-M08: aliran chat harian (FR-M004, M006, M007), tab Ngobrol. Dibungkus `ConsentGate` di
 /// router; Latihan kini tab sendiri di navigasi bawah, jadi tidak ada lagi di menu tiga titik.
-/// Tampilan obrolan dipoles di TASK-M073 bagian 7: latar bulatan warna-warni tipis (`ChatBackdrop`),
+/// Tampilan obrolan dipoles di TASK-M073 bagian 7: latar gradien polos (`ChatBackdrop`, bulatan dihapus 2026-11-15),
 /// avatar dan nama RelaxMate di balasan, penanda tanggal, balasan yang "diketik", dan kolom
 /// ketik berbentuk kapsul.
 class ChatScreen extends ConsumerStatefulWidget {
@@ -106,9 +107,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     return TabBackScope(
       child: Stack(
         children: <Widget>[
-          Positioned.fill(
-            child: ChatBackdrop(dots: viewMode != ChatViewMode.mascot),
-          ),
+          const Positioned.fill(child: ChatBackdrop()),
           Scaffold(
             backgroundColor: Colors.transparent,
             bottomNavigationBar: const AppBottomNav(current: AppTab.chat),
@@ -116,6 +115,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               backgroundColor: Colors.transparent,
               title: const _ChatTitle(),
               actions: <Widget>[
+                // Jalur bantuan selalu terlihat; cincinnya berdenyut saat krisis terdeteksi.
+                SosAppBarAction(pulse: chat is ChatReady && chat.hasCrisis),
                 ChatModeSwitch(
                   mode: viewMode,
                   onChanged: (mode) => ref

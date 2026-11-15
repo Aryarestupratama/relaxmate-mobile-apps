@@ -10,6 +10,7 @@ import 'package:relaxmate/core/router/app_routes.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_radius.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
+import 'package:relaxmate/features/crisis/ui/sos_button.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar_size.dart';
 
@@ -38,7 +39,10 @@ class AboutScreen extends ConsumerWidget {
     final version = ref.watch(appVersionProvider).value;
 
     return Scaffold(
-      appBar: AppBar(title: const Text(AppTexts.aboutTitle)),
+      appBar: AppBar(
+        title: const Text(AppTexts.aboutTitle),
+        actions: const <Widget>[SosAppBarAction()],
+      ),
       body: SafeArea(
         child: ListView(
           padding: EdgeInsets.all(space.lg),
