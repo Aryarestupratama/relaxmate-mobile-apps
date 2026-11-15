@@ -4,19 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:relaxmate/core/config/app_assets.dart';
 import 'package:relaxmate/core/router/app_routes.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
-import 'package:relaxmate/features/mascot/data/mascot_state.dart';
-import 'package:relaxmate/features/mascot/ui/mascot_view.dart';
 import 'package:relaxmate/features/onboarding/state/onboarding_controller.dart';
 import 'package:relaxmate/features/onboarding/ui/welcome_decor.dart';
 import 'package:relaxmate/shared/widgets/auth_switch_row.dart';
 import 'package:relaxmate/shared/widgets/soft_gradient_background.dart';
 
 /// SCR-M02: Sambutan (onboarding). Tampil sekali untuk tamu pada pembukaan pertama: judul,
-/// satu kalimat, maskot di antara hiasan, tombol "Mulai" (ke Daftar) dan "Sudah punya akun?
+/// satu kalimat, ilustrasi RelaxMate di antara hiasan, tombol "Mulai" (ke Daftar) dan "Sudah punya akun?
 /// Masuk". Memilih salah satunya menandai sambutan sudah dilihat, jadi pembukaan berikutnya
 /// langsung ke Masuk. Tautan Kontak bantuan selalu ada (Design-M prinsip 4). Lokal: tanpa
 /// jaringan dan tanpa AI. Bisa digulir agar utuh pada teks 200% dan layar pendek (RULE-M055).
@@ -40,11 +39,11 @@ class WelcomeScreen extends ConsumerWidget {
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final mascotHeight =
-                  (constraints.maxHeight * RbSize.onboardingMascotFactor)
+              final heroSize =
+                  (constraints.maxHeight * RbSize.onboardingHeroFactor)
                       .clamp(
-                        RbSize.onboardingMascotMin,
-                        RbSize.onboardingMascotMax,
+                        RbSize.onboardingHeroMin,
+                        RbSize.onboardingHeroMax,
                       )
                       .toDouble();
 
@@ -79,7 +78,7 @@ class WelcomeScreen extends ConsumerWidget {
                               ),
                             ),
                             SizedBox(height: space.lg),
-                            _MascotStage(height: mascotHeight),
+                            _HeroStage(size: heroSize),
                             SizedBox(height: space.lg),
                             FilledButton(
                               onPressed: () =>
@@ -127,20 +126,21 @@ class WelcomeScreen extends ConsumerWidget {
   }
 }
 
-/// Maskot `idle` di atas lingkaran lembut, dikelilingi hiasan. Tinggi area sedikit lebih
-/// besar dari maskot agar hiasan punya ruang.
-class _MascotStage extends StatelessWidget {
-  const _MascotStage({required this.height});
+/// Ilustrasi sambutan (RelaxMate memegang lima blob mood) di atas lingkaran lembut,
+/// dikelilingi hiasan. Gambar diam, jadi tidak perlu cabang gerak dikurangi. Tinggi area
+/// sedikit lebih besar dari ilustrasi agar hiasan punya ruang.
+class _HeroStage extends StatelessWidget {
+  const _HeroStage({required this.size});
 
-  final double height;
+  final double size;
 
-  /// Seberapa pekat lingkaran lembut di belakang maskot (turunan token `card`).
+  /// Seberapa pekat lingkaran lembut di belakang ilustrasi (turunan token `card`).
   static const double _backdropAlpha = 0.6;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.rbColors;
-    final backdrop = height * RbSize.onboardingBackdropFactor;
+    final backdrop = size * RbSize.onboardingBackdropFactor;
 
     return SizedBox(
       height: backdrop,
@@ -156,7 +156,18 @@ class _MascotStage extends StatelessWidget {
               shape: BoxShape.circle,
             ),
           ),
-          MascotView(state: MascotState.idle, height: height),
+          Semantics(
+            image: true,
+            label: AppTexts.welcomeHeroLabel,
+            child: ExcludeSemantics(
+              child: Image.asset(
+                AppAssets.welcomeHero,
+                width: size,
+                height: size,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
         ],
       ),
     );

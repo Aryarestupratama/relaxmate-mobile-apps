@@ -9,6 +9,10 @@ abstract final class AppAssets {
   static String mascotAnim(String name) =>
       'assets/images/mascot/anim/$name.webp';
 
+  /// Ilustrasi sambutan (SCR-M02): RelaxMate memegang lima blob mood. PNG persegi 1:1,
+  /// latar transparan, dibuat di luar repo (lihat `docs/Welcome-Illustration-Brief.md`).
+  static const String welcomeHero = 'assets/images/welcome/welcome-hero.png';
+
   /// Blob mood tingkat 1 sampai 5 (Cek Rasa, `MoodBlobRow`); gambar yang sama dengan web.
   static String moodBlob(int level) => 'assets/images/mood/mood-$level.webp';
 

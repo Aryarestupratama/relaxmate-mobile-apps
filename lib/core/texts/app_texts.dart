@@ -76,6 +76,8 @@ abstract final class AppTexts {
       'Rasakan dukungan setiap hari bersama RelaxMate';
   static const String welcomeBody =
       'Catat suasana hati, bercerita, dan menenangkan diri dengan lembut.';
+  static const String welcomeHeroLabel =
+      'Ilustrasi RelaxMate memegang lima ekspresi suasana hati';
   static const String welcomeStart = 'Mulai';
   static const String welcomeHaveAccount = 'Sudah punya akun?';
 

@@ -31,6 +31,7 @@ flutter:
     - assets/images/mascot/
     - assets/images/mascot/anim/
     - assets/images/mood/
+    - assets/images/welcome/
     - assets/crisis/
 
   fonts:
