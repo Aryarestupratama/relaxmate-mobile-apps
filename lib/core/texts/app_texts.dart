@@ -97,10 +97,13 @@ abstract final class AppTexts {
   static const String registerAction = 'Daftar';
   static const String registerHaveAccount = 'Sudah punya akun?';
   static const String registerToLogin = 'Masuk';
-  static const String termsAccept =
-      'Aku sudah membaca dan menyetujui Ketentuan dan Kebijakan Privasi.';
-  static const String termsLink = 'Baca Ketentuan';
-  static const String privacyLink = 'Baca Kebijakan Privasi';
+  // Kalimat centang Daftar dipecah agar "Ketentuan" dan "Kebijakan Privasi" bisa
+  // menjadi tautan di dalam kalimat (tanpa tombol baca terpisah).
+  static const String termsAcceptPrefix = 'Aku sudah membaca dan menyetujui ';
+  static const String termsAcceptTerms = 'Ketentuan';
+  static const String termsAcceptAnd = ' dan ';
+  static const String termsAcceptPrivacy = 'Kebijakan Privasi';
+  static const String termsAcceptSuffix = '.';
 
   // Lupa kata sandi (SCR-M05).
   static const String forgotTitle = 'Lupa kata sandi';

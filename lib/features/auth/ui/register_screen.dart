@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -42,6 +43,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final FocusNode _passwordFocus = FocusNode();
   final FocusNode _confirmFocus = FocusNode();
 
+  // Pengenal ketukan untuk tautan di kalimat centang; dibuang di `dispose`.
+  late final TapGestureRecognizer _termsTap = TapGestureRecognizer()
+    ..onTap = () => _openWeb(AppConstants.termsPath);
+  late final TapGestureRecognizer _privacyTap = TapGestureRecognizer()
+    ..onTap = () => _openWeb(AppConstants.privacyPath);
+
   Map<String, String> _errors = const <String, String>{};
   String? _formError;
   bool _termsAccepted = false;
@@ -49,6 +56,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   void dispose() {
+    _termsTap.dispose();
+    _privacyTap.dispose();
     _name.dispose();
     _email.dispose();
     _password.dispose();
@@ -160,6 +169,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final space = context.rbSpace;
     final formError = _formError;
     final termsError = _errors['terms'];
+    final linkStyle = text.small.copyWith(
+      color: colors.primary,
+      fontWeight: FontWeight.w700,
+      decoration: TextDecoration.underline,
+      decorationColor: colors.primary,
+    );
 
     return AuthScaffold(
       alignStart: true,
@@ -238,7 +253,26 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   }),
           controlAffinity: ListTileControlAffinity.leading,
           contentPadding: EdgeInsets.zero,
-          title: Text(AppTexts.termsAccept, style: text.small),
+          title: Text.rich(
+            TextSpan(
+              style: text.small,
+              children: <InlineSpan>[
+                const TextSpan(text: AppTexts.termsAcceptPrefix),
+                TextSpan(
+                  text: AppTexts.termsAcceptTerms,
+                  style: linkStyle,
+                  recognizer: _termsTap,
+                ),
+                const TextSpan(text: AppTexts.termsAcceptAnd),
+                TextSpan(
+                  text: AppTexts.termsAcceptPrivacy,
+                  style: linkStyle,
+                  recognizer: _privacyTap,
+                ),
+                const TextSpan(text: AppTexts.termsAcceptSuffix),
+              ],
+            ),
+          ),
         ),
         if (termsError != null)
           Padding(
@@ -251,19 +285,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               ),
             ),
           ),
-        Wrap(
-          spacing: space.xs,
-          children: <Widget>[
-            TextButton(
-              onPressed: () => _openWeb(AppConstants.termsPath),
-              child: const Text(AppTexts.termsLink),
-            ),
-            TextButton(
-              onPressed: () => _openWeb(AppConstants.privacyPath),
-              child: const Text(AppTexts.privacyLink),
-            ),
-          ],
-        ),
         if (formError != null) ...<Widget>[
           SizedBox(height: space.md),
           ErrorAlert(message: formError),
