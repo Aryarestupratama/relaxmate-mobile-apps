@@ -106,7 +106,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     return TabBackScope(
       child: Stack(
         children: <Widget>[
-          const Positioned.fill(child: ChatBackdrop()),
+          Positioned.fill(
+            child: ChatBackdrop(dots: viewMode != ChatViewMode.mascot),
+          ),
           Scaffold(
             backgroundColor: Colors.transparent,
             bottomNavigationBar: const AppBottomNav(current: AppTab.chat),

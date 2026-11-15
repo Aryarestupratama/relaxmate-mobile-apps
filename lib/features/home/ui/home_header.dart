@@ -16,7 +16,7 @@ import 'package:relaxmate/shared/widgets/mate_avatar_size.dart';
 
 /// SCR-M22, kepala Beranda (TASK-M074): avatar di kiri, Pengaturan di kanan sebagai tombol
 /// bulat putih berbayang, lalu sapaan dua baris yang besar dan sadar waktu ("Selamat sore,
-/// Arya") dengan satu kalimat hangat di bawahnya. Kalimat hangat berganti setelah mood hari
+/// Arya") dengan satu kalimat hangat di bawahnya. Kalimat hangat hilang setelah mood hari
 /// ini tercatat. Tanpa skor atau angka (RULE-M046).
 class HomeHeader extends ConsumerWidget {
   const HomeHeader({super.key});
@@ -72,11 +72,13 @@ class HomeHeader extends ConsumerWidget {
             style: text.h1,
           ),
         ),
-        SizedBox(height: space.xxs),
-        Text(
-          done ? AppTexts.homeGreetingSubDone : AppTexts.homeGreetingSub,
-          style: text.body.copyWith(color: colors.textSecondary),
-        ),
+        if (!done) ...<Widget>[
+          SizedBox(height: space.xxs),
+          Text(
+            AppTexts.homeGreetingSub,
+            style: text.body.copyWith(color: colors.textSecondary),
+          ),
+        ],
       ],
     );
   }

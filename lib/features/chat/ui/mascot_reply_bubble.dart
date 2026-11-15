@@ -1,6 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
-import 'package:relaxmate/core/theme/rb_radius.dart';
 import 'package:relaxmate/core/theme/rb_shadow.dart';
 import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
@@ -9,8 +10,8 @@ import 'package:relaxmate/features/chat/ui/suggestion_chips.dart';
 import 'package:relaxmate/features/chat/ui/typewriter_text.dart';
 import 'package:relaxmate/features/chat/ui/typing_indicator.dart';
 
-/// CMP-M44: gelembung balasan RelaxMate di samping kanan kepala maskot (tampilan maskot chat).
-/// Putih berbayang dengan ekor kecil yang menunjuk ke kepala. Tiga isi: tiga titik selagi
+/// CMP-M44: gelembung balasan RelaxMate di atas kepala maskot (tampilan maskot chat). Putih
+/// berbayang selebar panggung dengan ekor kecil di bawah tengah yang menunjuk ke kepala. Tiga isi: tiga titik selagi
 /// balasan ditulis ([typing]), teks yang "diketik" ([typewriter], balasan baru), atau teks
 /// biasa. Balasan krisis ([crisis]) memakai warna krisis dan tidak diketik. Teks panjang
 /// digulir di dalam gelembung (tinggi maksimum [maxHeight]); selama mengetik gulirannya
@@ -99,29 +100,22 @@ class _MascotReplyBubbleState extends State<MascotReplyBubble> {
       label: widget.typing
           ? AppTexts.chatTyping
           : '${AppTexts.chatMateSaid}: $content',
-      child: Row(
+      child: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(top: RbSize.replyTailTop),
-            child: CustomPaint(
-              size: const Size(RbSize.replyTailWidth, RbSize.replyTailHeight),
-              painter: _TailPainter(fill),
-            ),
-          ),
           Flexible(
             child: ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: widget.maxHeight),
+              constraints: BoxConstraints(
+                maxHeight: math.max(
+                  widget.maxHeight - RbSize.replyTailHeight,
+                  0,
+                ),
+              ),
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: fill,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(RbRadius.bubbleTail),
-                    topRight: Radius.circular(RbSize.mascotReplyRadius),
-                    bottomLeft: Radius.circular(RbSize.mascotReplyRadius),
-                    bottomRight: Radius.circular(RbSize.mascotReplyRadius),
-                  ),
+                  borderRadius: BorderRadius.circular(RbSize.mascotReplyRadius),
                   boxShadow: RbShadow.panel(colors),
                 ),
                 child: Padding(
@@ -156,13 +150,19 @@ class _MascotReplyBubbleState extends State<MascotReplyBubble> {
               ),
             ),
           ),
+          Align(
+            child: CustomPaint(
+              size: const Size(RbSize.replyTailWidth, RbSize.replyTailHeight),
+              painter: _TailPainter(fill),
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-/// Segitiga kecil di kiri gelembung yang runcingnya menghadap kepala maskot.
+/// Segitiga kecil di bawah gelembung yang runcingnya menghadap ke bawah, ke kepala maskot.
 class _TailPainter extends CustomPainter {
   const _TailPainter(this.color);
 
@@ -171,9 +171,9 @@ class _TailPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final path = Path()
-      ..moveTo(size.width, 0)
-      ..lineTo(0, size.height / 2)
-      ..lineTo(size.width, size.height)
+      ..moveTo(0, 0)
+      ..lineTo(size.width, 0)
+      ..lineTo(size.width / 2, size.height)
       ..close();
     canvas.drawPath(path, Paint()..color = color);
   }

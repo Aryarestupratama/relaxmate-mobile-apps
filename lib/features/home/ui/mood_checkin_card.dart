@@ -131,10 +131,6 @@ class MoodCheckinCard extends ConsumerWidget {
             header: true,
             child: Text(AppTexts.homeMoodTitle, style: text.h3),
           ),
-          Text(
-            AppTexts.homeMoodHint,
-            style: text.small.copyWith(color: colors.textSecondary),
-          ),
           SizedBox(height: space.sm),
           MoodBlobRow(
             selected: state.submittingLevel,

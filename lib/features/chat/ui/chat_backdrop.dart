@@ -6,20 +6,24 @@ import 'package:relaxmate/core/theme/rb_theme_context.dart';
 
 /// CMP-M39: latar layar obrolan (TASK-M073 bagian 7). Gradien putih ke lavender sangat tipis dengan
 /// belasan bulatan warna-warni transparan (token `mood1` sampai `mood5`, `brandSoft`) supaya
-/// obrolan tidak polos. Statis (tanpa gerak berulang), digambar sekali lewat `CustomPainter`
+/// obrolan tidak polos (bulatan dimatikan di tampilan maskot lewat [dots]). Statis (tanpa gerak berulang), digambar sekali lewat `CustomPainter`
 /// di dalam `RepaintBoundary`, jadi gulir daftar pesan tidak menggambar ulang latar. Hanya
 /// dekorasi: tidak menerima sentuhan dan tanpa semantik. Alpha dijaga rendah agar teks navy
 /// tetap terbaca (RULE-M052); teks pesan selalu berada di atas gelembung, bukan di atas
 /// bulatan. Memudar masuk sekali; bila gerak dikurangi langsung tampil.
 class ChatBackdrop extends StatelessWidget {
-  const ChatBackdrop({super.key});
+  const ChatBackdrop({this.dots = true, super.key});
+
+  /// Menggambar bulatan warna-warni. `false` (tampilan maskot): hanya gradien polos, karena
+  /// bulatan terbaca seperti polkadot di belakang maskot.
+  final bool dots;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.rbColors;
     final Widget paint = RepaintBoundary(
       child: CustomPaint(
-        painter: _BackdropPainter(colors),
+        painter: _BackdropPainter(colors, dots: dots),
         size: Size.infinite,
       ),
     );
@@ -49,9 +53,10 @@ class _Dot {
 }
 
 class _BackdropPainter extends CustomPainter {
-  const _BackdropPainter(this.colors);
+  const _BackdropPainter(this.colors, {required this.dots});
 
   final RbColors colors;
+  final bool dots;
 
   /// Seberapa kuat lavender dicampur ke dasar gradien di bagian bawah.
   static const double _washStrength = 0.35;
@@ -88,6 +93,9 @@ class _BackdropPainter extends CustomPainter {
           ],
         ).createShader(rect),
     );
+    if (!dots) {
+      return;
+    }
     final base = size.shortestSide;
     for (final dot in _dots) {
       canvas.drawCircle(
@@ -100,5 +108,5 @@ class _BackdropPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_BackdropPainter oldDelegate) =>
-      !identical(oldDelegate.colors, colors);
+      !identical(oldDelegate.colors, colors) || oldDelegate.dots != dots;
 }

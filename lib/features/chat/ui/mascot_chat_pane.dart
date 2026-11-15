@@ -26,11 +26,12 @@ const bool _mascotIsHalfBody = true;
 
 /// Isi tengah SCR-M08 pada tampilan maskot (FR-M027, dipoles di TASK-M073 bagian 8).
 ///
-/// Panggung: maskot besar berbingkai gelap agak ke kiri dengan cahaya lembut di belakangnya;
-/// balasan RelaxMate berbentuk gelembung chat di samping kanan kepalanya (tiga titik selagi
-/// menulis, lalu teks yang "diketik"). Di bawah panggung, di tengah, pesan terakhir pengguna.
-/// Saran tindakan tampil di kaki gelembung balasan. Saat krisis terdeteksi hari itu, tombol
-/// SOS tampil di pojok kanan atas panggung (menggantikan `CrisisBanner` pada tampilan ini).
+/// Panggung: maskot besar berbingkai gelap di tengah bawah dengan cahaya lembut di
+/// belakangnya; balasan RelaxMate berbentuk gelembung chat di atas kepalanya, ekornya
+/// menunjuk ke bawah (tiga titik selagi menulis, lalu teks yang "diketik"). Di bawah
+/// panggung, di tengah, pesan terakhir pengguna. Saran tindakan tampil di kaki gelembung
+/// balasan. Saat krisis terdeteksi hari itu, tombol SOS tampil di pojok kanan atas panggung
+/// (menggantikan `CrisisBanner` pada tampilan ini) dan gelembung dimulai di bawahnya.
 /// Banner krisis, kolom ketik, kuota, dan galat tetap dipasang `ChatScreen`.
 ///
 /// Keadaan maskot: berpikir selama menunggu balasan; bicara selama balasan baru diketik;
@@ -109,23 +110,21 @@ class MascotChatPane extends ConsumerWidget {
               final width = constraints.maxWidth;
               final height = constraints.maxHeight;
               final mascotHeight = math.min(
-                height,
+                height * RbSize.mascotStageHeightFactor,
                 width *
                     RbSize.mascotStageWidthFactor /
                     RbSize.mascotFrameAspect,
               );
               final mascotWidth = mascotHeight * RbSize.mascotFrameAspect;
-              final left = width * RbSize.mascotStageLeftFactor;
-              final bubbleLeft =
-                  left + mascotWidth * RbSize.mascotHeadRightFactor - space.xxs;
-              final bubbleTopBase = (height - mascotHeight) +
-                  mascotHeight * RbSize.mascotReplyTopFactor;
-              // Saat SOS tampil, gelembung turun supaya tidak tertimpa tombolnya.
-              final bubbleTop = ready.hasCrisis
-                  ? math.max(bubbleTopBase, RbSize.minTouch + space.sm)
-                  : bubbleTopBase;
-              final bubbleMaxHeight =
-                  math.max(height - bubbleTop - space.xs, 0).toDouble();
+              final left = (width - mascotWidth) / 2;
+              // Gelembung di atas maskot: zona dari atas panggung sampai sedikit masuk ke
+              // bingkai maskot, supaya ekornya menyentuh kepala. Saat SOS tampil (pojok kanan
+              // atas), zona dimulai di bawahnya supaya tidak tertimpa.
+              final zoneTop =
+                  ready.hasCrisis ? RbSize.minTouch + space.sm : space.xs;
+              final zoneBottom =
+                  height - mascotHeight * (1 - RbSize.mascotReplyOverlapFactor);
+              final zoneHeight = math.max(zoneBottom - zoneTop, 0).toDouble();
               final auraDiameter = mascotWidth * RbSize.mascotAuraFactor;
               final centerX = left + mascotWidth / 2;
               final centerY = height - mascotHeight * 0.6;
@@ -134,7 +133,7 @@ class MascotChatPane extends ConsumerWidget {
                 reply: reply,
                 empty: empty,
                 fresh: fresh,
-                maxHeight: bubbleMaxHeight,
+                maxHeight: zoneHeight,
                 suggestion: replySuggestion,
               );
 
@@ -160,18 +159,22 @@ class MascotChatPane extends ConsumerWidget {
                   ),
                   if (bubble != null)
                     Positioned(
-                      left: bubbleLeft,
-                      top: bubbleTop,
+                      left: space.md,
                       right: space.md,
+                      top: zoneTop,
+                      height: zoneHeight,
+                      // Menempel di dasar zona: gelembung tumbuh ke atas dan ekornya selalu
+                      // dekat kepala maskot. Teks diketik dengan ruang penuh sejak awal,
+                      // jadi tinggi gelembung tidak melonjak selagi mengetik.
                       child: Align(
-                        alignment: Alignment.topLeft,
+                        alignment: Alignment.bottomCenter,
                         child: MediaQuery.disableAnimationsOf(context)
                             ? bubble
                             : AnimatedSwitcher(
                                 duration: RbMotion.bubbleSwap,
                                 switchInCurve: RbMotion.curve,
                                 layoutBuilder: (current, previous) => Stack(
-                                  alignment: Alignment.topLeft,
+                                  alignment: Alignment.bottomCenter,
                                   children: <Widget>[
                                     ...previous,
                                     if (current != null) current,
@@ -185,7 +188,7 @@ class MascotChatPane extends ConsumerWidget {
                                       begin: RbMotion.popFrom,
                                       end: 1,
                                     ).animate(animation),
-                                    alignment: Alignment.centerLeft,
+                                    alignment: Alignment.bottomCenter,
                                     child: child,
                                   ),
                                 ),

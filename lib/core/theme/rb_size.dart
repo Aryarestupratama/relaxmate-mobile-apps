@@ -51,28 +51,27 @@ abstract final class RbSize {
   static const double mascotWelcomeHeight = 140;
   static const double mascotCompanionHeight = 280;
 
-  /// Tampilan maskot chat (FR-M027, SCR-M08). Tinggi maskot dihitung dari ruang panggung:
-  /// lebar maskot paling banyak [mascotStageWidthFactor] kali lebar layar dan tingginya tidak
-  /// melebihi panggung, jadi ia mengecil sendiri saat papan ketik terbuka. Ganti
-  /// [mascotFrameAspect] (lebar : tinggi bingkai berkas `outlined/`, 376 : 499) dan
-  /// [mascotStageWidthFactor] bila aset badan penuh dipasang (M075).
+  /// Tampilan maskot chat (FR-M027, SCR-M08). Maskot di tengah bawah, gelembung balasan di
+  /// atasnya. Tinggi maskot dihitung dari ruang panggung: lebar maskot paling banyak
+  /// [mascotStageWidthFactor] kali lebar layar dan tingginya paling banyak
+  /// [mascotStageHeightFactor] kali tinggi panggung (sisanya untuk gelembung), jadi ia
+  /// mengecil sendiri saat papan ketik terbuka. Ganti [mascotFrameAspect] (lebar : tinggi
+  /// bingkai berkas `outlined/`, 376 : 499) dan [mascotStageWidthFactor] bila aset badan
+  /// penuh dipasang (M075).
   static const double mascotStageWidthFactor = 0.56;
-  static const double mascotStageLeftFactor = 0.02;
+  static const double mascotStageHeightFactor = 0.52;
   static const double mascotFrameAspect = 376 / 499;
 
-  /// Ujung kanan kepala (telinga) di bingkai sebagai bagian dari lebar maskot: gelembung
-  /// balasan dimulai di sana. Atas gelembung turun sejauh [mascotReplyTopFactor] kali tinggi
-  /// maskot dari atas maskot.
-  static const double mascotHeadRightFactor = 0.9;
-  static const double mascotReplyTopFactor = 0.1;
+  /// Gelembung balasan sedikit menjorok ke bingkai maskot (bagian atas bingkai kosong) supaya
+  /// ekornya menyentuh kepala; sebagai bagian dari tinggi maskot.
+  static const double mascotReplyOverlapFactor = 0.06;
 
   /// Bagian bawah maskot yang memudar (setengah badan terpotong di tepi bawah).
   static const double mascotFadeFraction = 0.14;
 
-  /// Ekor gelembung balasan (menunjuk kepala maskot): lebar, tinggi, dan jarak dari atas.
-  static const double replyTailWidth = 10;
-  static const double replyTailHeight = 16;
-  static const double replyTailTop = 20;
+  /// Ekor gelembung balasan (menunjuk ke bawah, ke kepala maskot): lebar dan tinggi.
+  static const double replyTailWidth = 20;
+  static const double replyTailHeight = 10;
 
   /// Gelembung pesan pengguna di bawah maskot: tinggi maksimum sebelum isinya digulir, dan
   /// lebar maksimum sebagai bagian dari lebar layar.
