@@ -31,8 +31,11 @@ abstract final class RbMotion {
   static const double popPeak = 1.12;
   static const double rippleEnd = 1.6;
 
-  /// Lama maskot tampil "bicara" setelah balasan baru muncul di tampilan maskot chat.
-  static const Duration mascotSpeaking = Duration(seconds: 4);
+  /// Pergantian isi gelembung balasan di tampilan maskot chat (titik mengetik ke teks).
+  static const Duration bubbleSwap = Duration(milliseconds: 300);
+
+  /// Denyut cincin tombol SOS.
+  static const Duration sosPulse = Duration(milliseconds: 1800);
   static const Curve curve = Curves.easeOut;
 
   /// Lingkaran napas: awal dan akhir yang lembut agar terasa seperti bernapas.

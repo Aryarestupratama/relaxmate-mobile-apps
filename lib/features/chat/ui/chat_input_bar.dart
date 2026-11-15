@@ -20,6 +20,7 @@ class ChatInputBar extends StatefulWidget {
     required this.sendEnabled,
     required this.maxLength,
     required this.onSend,
+    this.leading,
     super.key,
   });
 
@@ -27,6 +28,9 @@ class ChatInputBar extends StatefulWidget {
   final bool sendEnabled;
   final int maxLength;
   final VoidCallback onSend;
+
+  /// Tombol bulat di kiri kolom (tampilan maskot: Tenangkan diri); `null` bila tidak ada.
+  final Widget? leading;
 
   @override
   State<ChatInputBar> createState() => _ChatInputBarState();
@@ -53,6 +57,10 @@ class _ChatInputBarState extends State<ChatInputBar> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: <Widget>[
+          if (widget.leading case final leading?) ...<Widget>[
+            leading,
+            SizedBox(width: space.xs),
+          ],
           Expanded(
             child: ListenableBuilder(
               listenable: _focus,

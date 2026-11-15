@@ -6,7 +6,7 @@ import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 
 /// Tiga titik yang naik turun bergantian (bagian dalam CMP-M03). Dipakai `TypingIndicator`
-/// (Beranda, tampilan maskot) dan `ChatTypingRow` (tampilan obrolan). Bila pengguna
+/// (Beranda) dan `ChatTypingRow` (tampilan obrolan). Bila pengguna
 /// mengurangi gerak, titik diam. Tanpa semantik; pembungkusnya yang memberi label.
 class TypingDots extends StatefulWidget {
   const TypingDots({super.key});

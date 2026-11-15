@@ -148,7 +148,6 @@ abstract final class AppTexts {
       'internetmu aktif, lalu coba lagi.';
 
   // Chat harian (SCR-M08). Pesan galat dan batas berasal dari server.
-  static const String aiBadge = 'AI';
   static const String chatInputHint = 'Ketik pesanmu...';
   static const String chatSend = 'Kirim';
   static const String chatTyping = 'RelaxMate sedang menulis...';
@@ -213,9 +212,22 @@ abstract final class AppTexts {
 
   // Menu di bilah atas chat (SCR-M08).
   static const String chatMenuTooltip = 'Menu';
-  static const String chatModeToConversation = 'Tampilkan sebagai obrolan';
-  static const String chatModeToMascot = 'Tampilkan dengan maskot';
-  static const String chatSeeConversation = 'Lihat percakapan';
+  static const String chatModeMascot = 'Maskot';
+  static const String chatModeConversation = 'Obrolan';
+
+  /// Label pembaca layar untuk pengalih tampilan; [current] nama tampilan yang sedang dipakai.
+  static String chatModeSemantics(String current) =>
+      'Tampilan chat: $current. Ketuk untuk mengganti.';
+
+  // Tampilan maskot chat (FR-M027): SOS saat krisis dan tombol Tenangkan diri di kolom ketik.
+  static const String sosLabel = 'SOS';
+  static const String sosSemantics = 'SOS, buka kontak bantuan';
+  static const String calmTooltip = 'Tenangkan diri';
+  static const String calmSheetTitle = 'Mau tenang sebentar?';
+  static const String calmSheetBody =
+      'Dua latihan singkat yang berjalan di perangkatmu, tanpa kuota.';
+  static const String calmBreathingHint = 'Napas pelan, sekitar dua menit';
+  static const String calmGroundingHint = 'Kenali sekitarmu lewat lima indra';
 
   // Pengaturan (SCR-M17) dan Hapus akun (SCR-M19), FR-M003, FR-M025.
   static const String settingsTitle = 'Pengaturan';

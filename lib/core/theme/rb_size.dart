@@ -51,10 +51,44 @@ abstract final class RbSize {
   static const double mascotWelcomeHeight = 140;
   static const double mascotCompanionHeight = 280;
 
-  /// Maskot di tampilan maskot chat (FR-M027): ukuran biasa, dan ukuran kecil saat papan ketik
-  /// terbuka atau teks sistem besar supaya balasan tetap punya ruang.
-  static const double mascotChatHeight = 200;
-  static const double mascotChatCompactHeight = 96;
+  /// Tampilan maskot chat (FR-M027, SCR-M08). Tinggi maskot dihitung dari ruang panggung:
+  /// lebar maskot paling banyak [mascotStageWidthFactor] kali lebar layar dan tingginya tidak
+  /// melebihi panggung, jadi ia mengecil sendiri saat papan ketik terbuka. Ganti
+  /// [mascotFrameAspect] (lebar : tinggi bingkai berkas `outlined/`, 376 : 499) dan
+  /// [mascotStageWidthFactor] bila aset badan penuh dipasang (M075).
+  static const double mascotStageWidthFactor = 0.56;
+  static const double mascotStageLeftFactor = 0.02;
+  static const double mascotFrameAspect = 376 / 499;
+
+  /// Ujung kanan kepala (telinga) di bingkai sebagai bagian dari lebar maskot: gelembung
+  /// balasan dimulai di sana. Atas gelembung turun sejauh [mascotReplyTopFactor] kali tinggi
+  /// maskot dari atas maskot.
+  static const double mascotHeadRightFactor = 0.9;
+  static const double mascotReplyTopFactor = 0.1;
+
+  /// Bagian bawah maskot yang memudar (setengah badan terpotong di tepi bawah).
+  static const double mascotFadeFraction = 0.14;
+
+  /// Ekor gelembung balasan (menunjuk kepala maskot): lebar, tinggi, dan jarak dari atas.
+  static const double replyTailWidth = 10;
+  static const double replyTailHeight = 16;
+  static const double replyTailTop = 20;
+
+  /// Gelembung pesan pengguna di bawah maskot: tinggi maksimum sebelum isinya digulir, dan
+  /// lebar maksimum sebagai bagian dari lebar layar.
+  static const double mascotUserRadius = 24;
+  static const double mascotReplyRadius = 22;
+  static const double userBubbleMaxHeight = 104;
+  static const double userBubbleMaxWidthFactor = 0.84;
+
+  /// Pengalih tampilan di bilah atas chat (CMP-M46) dan tombol SOS (CMP-M47).
+  static const double modeSwitchHeight = 40;
+  static const double modeSwitchIcon = 18;
+  static const double sosHeight = 40;
+  static const double sosRingScale = 1.3;
+
+  /// Cahaya lembut di belakang maskot: diameter sebagai kelipatan lebar maskot.
+  static const double mascotAuraFactor = 1.7;
 
   /// Titik pada `TypingIndicator` (CMP-M03) dan jarak antarnya.
   static const double typingDot = 8;

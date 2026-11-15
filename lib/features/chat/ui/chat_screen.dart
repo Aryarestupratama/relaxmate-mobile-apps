@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:relaxmate/core/router/app_routes.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_motion.dart';
-import 'package:relaxmate/core/theme/rb_radius.dart';
 import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/features/chat/data/suggestion_visibility.dart';
@@ -17,7 +15,9 @@ import 'package:relaxmate/features/chat/ui/chat_backdrop.dart';
 import 'package:relaxmate/features/chat/ui/chat_bubble.dart';
 import 'package:relaxmate/features/chat/ui/chat_date_chip.dart';
 import 'package:relaxmate/features/chat/ui/chat_entrance.dart';
+import 'package:relaxmate/features/chat/ui/calm_actions_button.dart';
 import 'package:relaxmate/features/chat/ui/chat_input_bar.dart';
+import 'package:relaxmate/features/chat/ui/chat_mode_switch.dart';
 import 'package:relaxmate/features/chat/ui/chat_typing_row.dart';
 import 'package:relaxmate/features/chat/ui/chat_welcome.dart';
 import 'package:relaxmate/features/chat/ui/mascot_chat_pane.dart';
@@ -32,7 +32,9 @@ import 'package:relaxmate/shared/widgets/mate_avatar_size.dart';
 import 'package:relaxmate/shared/widgets/app_bottom_nav.dart';
 import 'package:relaxmate/shared/widgets/tab_back_scope.dart';
 
-/// Pilihan di menu bilah atas chat. Ikon telepon (kontak bantuan) sengaja di luar menu.
+/// Pilihan di menu bilah atas chat. Ikon telepon (kontak bantuan) sudah tidak ada di bilah atas
+/// (keputusan founder 2026-11-15): jalur krisis lewat tombol SOS (tampilan maskot), banner
+/// krisis (tampilan obrolan), saran AI, dan tautan saat kuota habis.
 enum _ChatMenuAction { history, companion, settings }
 
 /// SCR-M08: aliran chat harian (FR-M004, M006, M007), tab Ngobrol. Dibungkus `ConsentGate` di
@@ -113,30 +115,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               backgroundColor: Colors.transparent,
               title: const _ChatTitle(),
               actions: <Widget>[
-                IconButton(
-                  onPressed: () => ref
+                ChatModeSwitch(
+                  mode: viewMode,
+                  onChanged: (mode) => ref
                       .read(settingsControllerProvider.notifier)
-                      .setChatViewMode(
-                        isMascotView
-                            ? ChatViewMode.conversation
-                            : ChatViewMode.mascot,
-                      ),
-                  tooltip: isMascotView
-                      ? AppTexts.chatModeToConversation
-                      : AppTexts.chatModeToMascot,
-                  icon: Icon(
-                    isMascotView
-                        ? LucideIcons.messageCircle
-                        : LucideIcons.smile,
-                  ),
+                      .setChatViewMode(mode),
                 ),
-                // Jalur ke bantuan nyata selalu terlihat, tidak tersembunyi di menu (Design-M
-                // prinsip 4).
-                IconButton(
-                  onPressed: () => context.push(AppRoutes.crisisContacts),
-                  tooltip: AppTexts.crisisMenuTooltip,
-                  icon: const Icon(LucideIcons.phone),
-                ),
+                SizedBox(width: space.xxs),
                 PopupMenuButton<_ChatMenuAction>(
                   tooltip: AppTexts.chatMenuTooltip,
                   onSelected: (action) {
@@ -183,9 +168,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 final ChatReady ready => _ChatBody(
                     ready: ready,
                     viewMode: viewMode,
-                    onShowConversation: () => ref
-                        .read(settingsControllerProvider.notifier)
-                        .setChatViewMode(ChatViewMode.conversation),
                     input: _input,
                     onSend: _send,
                     onRetry: controller.retry,
@@ -234,15 +216,6 @@ class _ChatTitle extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  SizedBox(width: space.xs),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: space.xs),
-                    decoration: BoxDecoration(
-                      color: colors.softLavender,
-                      borderRadius: RbRadius.pillBorder,
-                    ),
-                    child: Text(AppTexts.aiBadge, style: text.caption),
-                  ),
                 ],
               ),
               if (showSubtitle)
@@ -264,7 +237,6 @@ class _ChatBody extends StatelessWidget {
   const _ChatBody({
     required this.ready,
     required this.viewMode,
-    required this.onShowConversation,
     required this.input,
     required this.onSend,
     required this.onRetry,
@@ -276,7 +248,6 @@ class _ChatBody extends StatelessWidget {
 
   final ChatReady ready;
   final ChatViewMode viewMode;
-  final VoidCallback onShowConversation;
   final TextEditingController input;
   final VoidCallback onSend;
   final VoidCallback onRetry;
@@ -304,18 +275,20 @@ class _ChatBody extends StatelessWidget {
 
     return Column(
       children: <Widget>[
-        if (ready.hasCrisis) const CrisisBanner(),
+        // Tampilan maskot memakai tombol SOS di panggung, bukan banner yang memakan ruang.
+        if (ready.hasCrisis && viewMode != ChatViewMode.mascot)
+          const CrisisBanner(),
         const OverlayResumeBanner(),
         Expanded(
-          child: newestFirst.isEmpty
-              ? ChatWelcome(canSend: !ready.limitReached)
-              : viewMode == ChatViewMode.mascot
-                  ? MascotChatPane(
-                      ready: ready,
-                      suggestionIds: suggestionIds,
-                      onDismissSuggestion: onDismissSuggestion,
-                      onShowConversation: onShowConversation,
-                    )
+          child: viewMode == ChatViewMode.mascot
+              ? MascotChatPane(
+                  ready: ready,
+                  suggestionIds: suggestionIds,
+                  onDismissSuggestion: onDismissSuggestion,
+                  onReplyTyped: onReplyTyped,
+                )
+              : newestFirst.isEmpty
+                  ? ChatWelcome(canSend: !ready.limitReached)
                   : ListView.builder(
                       reverse: true,
                       padding: EdgeInsets.all(space.md),
@@ -429,6 +402,9 @@ class _ChatBody extends StatelessWidget {
             sendEnabled: !ready.sending,
             maxLength: ready.limits.messageMaxChars,
             onSend: onSend,
+            leading: viewMode == ChatViewMode.mascot
+                ? const CalmActionsButton()
+                : null,
           ),
           Padding(
             padding: EdgeInsets.only(bottom: space.xs),

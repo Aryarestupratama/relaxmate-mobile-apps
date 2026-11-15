@@ -6,18 +6,21 @@ import 'package:flutter/material.dart';
 /// [_msPerChar] per huruf, dibatasi antara [_minDuration] dan [_maxDuration] supaya balasan
 /// panjang tidak membuat pengguna menunggu. Bila pengguna mengurangi gerak
 /// (`MediaQuery.disableAnimations`, RULE-M055) teks langsung utuh. [onDone] dipanggil sekali
-/// setelah seluruh teks tampil.
+/// setelah seluruh teks tampil. [onProgress] (0 sampai 1) dipanggil tiap bingkai selama
+/// mengetik, dipakai gelembung balasan maskot untuk menggulir mengikuti teks.
 class TypewriterText extends StatefulWidget {
   const TypewriterText({
     required this.text,
     required this.style,
     this.onDone,
+    this.onProgress,
     super.key,
   });
 
   final String text;
   final TextStyle style;
   final VoidCallback? onDone;
+  final ValueChanged<double>? onProgress;
 
   @override
   State<TypewriterText> createState() => _TypewriterTextState();
@@ -52,6 +55,7 @@ class _TypewriterTextState extends State<TypewriterText>
       WidgetsBinding.instance.addPostFrameCallback((_) => _finish());
       return;
     }
+    _controller.addListener(() => widget.onProgress?.call(_controller.value));
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         _finish();

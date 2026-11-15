@@ -182,27 +182,12 @@ class ChatBubble extends StatelessWidget {
                       left: space.xxs,
                       bottom: space.xxs,
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text(
-                          AppTexts.appName,
-                          style: text.caption.copyWith(
-                            color: colors.textSecondary,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        SizedBox(width: space.xxs),
-                        Container(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: space.xxs + 2),
-                          decoration: BoxDecoration(
-                            color: colors.softLavender,
-                            borderRadius: RbRadius.pillBorder,
-                          ),
-                          child: Text(AppTexts.aiBadge, style: text.caption),
-                        ),
-                      ],
+                    child: Text(
+                      AppTexts.appName,
+                      style: text.caption.copyWith(
+                        color: colors.textSecondary,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                   bubble,

@@ -18,6 +18,10 @@ enum MascotState {
 
   String get asset => AppAssets.mascotAnim(name);
 
+  /// Animasi berbingkai gelap; hanya ada untuk keadaan yang dipakai tampilan maskot chat
+  /// (`idle`, `thinking`, `speaking`).
+  String get outlinedAsset => AppAssets.mascotAnimOutlined(name);
+
   /// Label untuk pembaca layar.
   String get label => switch (this) {
         MascotState.idle => AppTexts.mascotStateIdle,
