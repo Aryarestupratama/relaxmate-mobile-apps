@@ -40,47 +40,46 @@ class ChatModeSwitch extends StatelessWidget {
         MediaQuery.textScalerOf(context).scale(1) <= RbSize.homeRowMaxTextScale;
 
     return PopupMenuButton<ChatViewMode>(
-        // Tooltip ikut dibaca pembaca layar sebagai label tombol.
-        tooltip: AppTexts.chatModeSemantics(_label(mode)),
-        position: PopupMenuPosition.under,
-        offset: Offset(0, space.xxs),
-        shape: const RoundedRectangleBorder(
-          borderRadius: RbRadius.cardBorder,
-        ),
-        color: colors.card,
-        elevation: 6,
-        onSelected: (selected) {
-          if (selected != mode) {
-            onChanged(selected);
-          }
-        },
-        itemBuilder: (context) => <PopupMenuEntry<ChatViewMode>>[
-          for (final option in ChatViewMode.values)
-            PopupMenuItem<ChatViewMode>(
-              value: option,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Icon(
-                    _icon(option),
-                    size: RbSize.modeSwitchIcon,
-                    color:
-                        option == mode ? colors.primary : colors.textSecondary,
+      // Tooltip ikut dibaca pembaca layar sebagai label tombol.
+      tooltip: AppTexts.chatModeSemantics(_label(mode)),
+      position: PopupMenuPosition.under,
+      offset: Offset(0, space.xxs),
+      shape: const RoundedRectangleBorder(
+        borderRadius: RbRadius.cardBorder,
+      ),
+      color: colors.card,
+      elevation: 6,
+      onSelected: (selected) {
+        if (selected != mode) {
+          onChanged(selected);
+        }
+      },
+      itemBuilder: (context) => <PopupMenuEntry<ChatViewMode>>[
+        for (final option in ChatViewMode.values)
+          PopupMenuItem<ChatViewMode>(
+            value: option,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Icon(
+                  _icon(option),
+                  size: RbSize.modeSwitchIcon,
+                  color: option == mode ? colors.primary : colors.textSecondary,
+                ),
+                SizedBox(width: space.sm),
+                Text(
+                  _label(option),
+                  style: text.body.copyWith(
+                    fontWeight:
+                        option == mode ? FontWeight.w800 : FontWeight.w500,
                   ),
-                  SizedBox(width: space.sm),
-                  Text(
-                    _label(option),
-                    style: text.body.copyWith(
-                      fontWeight:
-                          option == mode ? FontWeight.w800 : FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-        ],
-        child: ExcludeSemantics(
-          child: Container(
+          ),
+      ],
+      child: ExcludeSemantics(
+        child: Container(
           height: RbSize.modeSwitchHeight,
           padding: EdgeInsets.symmetric(horizontal: space.sm),
           decoration: BoxDecoration(
@@ -114,7 +113,6 @@ class ChatModeSwitch extends StatelessWidget {
           ),
         ),
       ),
-      ),
-    )
+    );
   }
 }

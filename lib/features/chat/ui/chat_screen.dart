@@ -96,7 +96,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final viewMode = ref.watch(
       settingsControllerProvider.select((settings) => settings.chatViewMode),
     );
-    final isMascotView = viewMode == ChatViewMode.mascot;
     if (chat is ChatReady && !_seeded) {
       _seeded = true;
       _entered.addAll(
