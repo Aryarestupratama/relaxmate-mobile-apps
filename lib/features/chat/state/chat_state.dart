@@ -28,6 +28,7 @@ class ChatReady extends ChatState {
     this.hasCrisis = false,
     this.sending = false,
     this.error,
+    this.freshAssistantId,
   });
 
   factory ChatReady.fromDay(ChatDay day, {String? error}) {
@@ -60,6 +61,11 @@ class ChatReady extends ChatState {
   /// Pesan galat ramah (aman ditampilkan); `null` bila tidak ada.
   final String? error;
 
+  /// Balasan RelaxMate yang baru tiba di sesi ini dan belum selesai "diketik" di layar
+  /// (animasi mengetik). `null` untuk balasan lama, balasan krisis (tampil langsung), dan
+  /// setelah animasinya selesai.
+  final int? freshAssistantId;
+
   bool get limitReached => limits.remainingToday <= 0;
 
   ChatReady copyWith({
@@ -70,6 +76,8 @@ class ChatReady extends ChatState {
     bool? sending,
     String? error,
     bool clearError = false,
+    int? freshAssistantId,
+    bool clearFresh = false,
   }) {
     return ChatReady(
       conversationId: conversationId,
@@ -79,6 +87,8 @@ class ChatReady extends ChatState {
       hasCrisis: hasCrisis ?? this.hasCrisis,
       sending: sending ?? this.sending,
       error: clearError ? null : (error ?? this.error),
+      freshAssistantId:
+          clearFresh ? null : (freshAssistantId ?? this.freshAssistantId),
     );
   }
 }

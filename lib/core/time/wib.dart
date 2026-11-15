@@ -68,6 +68,9 @@ String longDateLabel(DateTime date) =>
     '${AppTexts.weekdays[date.weekday - 1]}, ${date.day} '
     '${AppTexts.months[date.month - 1]}';
 
+/// `Sabtu, 14 November 2026` (dengan tahun), untuk penanda tanggal di chat.
+String fullDateLabel(DateTime date) => '${longDateLabel(date)} ${date.year}';
+
 /// `14 Nov`.
 String shortDateLabel(DateTime date) =>
     '${date.day} ${AppTexts.monthsShort[date.month - 1]}';

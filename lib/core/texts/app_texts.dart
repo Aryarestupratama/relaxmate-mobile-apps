@@ -152,6 +152,10 @@ abstract final class AppTexts {
   static const String chatInputHint = 'Ketik pesanmu...';
   static const String chatSend = 'Kirim';
   static const String chatTyping = 'RelaxMate sedang menulis...';
+  static const String chatHeaderSubtitle = 'Ruang amanmu untuk bercerita';
+
+  /// Penanda tanggal di atas percakapan, mis. "Hari ini · Minggu, 15 November 2026".
+  static String chatDateLabel(String date) => '$today · $date';
   static const String chatYouSaid = 'Kamu berkata';
   static const String chatMateSaid = 'RelaxMate berkata';
   static const String chatDailyLimit =

@@ -5,17 +5,17 @@ import 'package:relaxmate/core/theme/rb_radius.dart';
 import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 
-/// CMP-M03: penanda RelaxMate sedang menulis balasan, tiga titik yang naik turun bergantian.
-/// Teks "RelaxMate sedang menulis" hanya untuk pembaca layar. Bila pengguna mengurangi gerak,
-/// titik diam.
-class TypingIndicator extends StatefulWidget {
-  const TypingIndicator({super.key});
+/// Tiga titik yang naik turun bergantian (bagian dalam CMP-M03). Dipakai `TypingIndicator`
+/// (Beranda, tampilan maskot) dan `ChatTypingRow` (tampilan obrolan). Bila pengguna
+/// mengurangi gerak, titik diam. Tanpa semantik; pembungkusnya yang memberi label.
+class TypingDots extends StatefulWidget {
+  const TypingDots({super.key});
 
   @override
-  State<TypingIndicator> createState() => _TypingIndicatorState();
+  State<TypingDots> createState() => _TypingDotsState();
 }
 
-class _TypingIndicatorState extends State<TypingIndicator>
+class _TypingDotsState extends State<TypingDots>
     with SingleTickerProviderStateMixin {
   static const int _dotCount = 3;
   static const Duration _cycle = Duration(milliseconds: 1200);
@@ -54,6 +54,42 @@ class _TypingIndicatorState extends State<TypingIndicator>
     final colors = context.rbColors;
     final space = context.rbSpace;
 
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) => Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          for (var i = 0; i < _dotCount; i++) ...<Widget>[
+            if (i > 0) SizedBox(width: space.xxs),
+            Transform.translate(
+              offset: Offset(0, -RbSize.typingDotLift * _lift(i)),
+              child: Container(
+                width: RbSize.typingDot,
+                height: RbSize.typingDot,
+                decoration: BoxDecoration(
+                  color: colors.textSecondary,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// CMP-M03: penanda RelaxMate sedang menulis balasan, tiga titik yang naik turun bergantian.
+/// Teks "RelaxMate sedang menulis" hanya untuk pembaca layar. Bila pengguna mengurangi gerak,
+/// titik diam.
+class TypingIndicator extends StatelessWidget {
+  const TypingIndicator({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.rbColors;
+    final space = context.rbSpace;
+
     return Padding(
       padding: EdgeInsets.symmetric(vertical: space.xxs),
       child: Align(
@@ -72,28 +108,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
                 color: colors.surfaceAlt,
                 borderRadius: RbRadius.bubbleBorder,
               ),
-              child: AnimatedBuilder(
-                animation: _controller,
-                builder: (context, _) => Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    for (var i = 0; i < _dotCount; i++) ...<Widget>[
-                      if (i > 0) SizedBox(width: space.xxs),
-                      Transform.translate(
-                        offset: Offset(0, -RbSize.typingDotLift * _lift(i)),
-                        child: Container(
-                          width: RbSize.typingDot,
-                          height: RbSize.typingDot,
-                          decoration: BoxDecoration(
-                            color: colors.textSecondary,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
+              child: const TypingDots(),
             ),
           ),
         ),

@@ -4,6 +4,7 @@ import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/features/chat/state/chat_controller.dart';
+import 'package:relaxmate/features/chat/ui/chat_date_chip.dart';
 import 'package:relaxmate/features/mascot/data/mascot_state.dart';
 import 'package:relaxmate/features/mascot/ui/mascot_view.dart';
 import 'package:relaxmate/features/mood/state/today_mood_provider.dart';
@@ -32,6 +33,8 @@ class ChatWelcome extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
+            const ChatDateChip(),
+            SizedBox(height: space.sm),
             const MascotView(
               state: MascotState.idle,
               height: RbSize.mascotWelcomeHeight,

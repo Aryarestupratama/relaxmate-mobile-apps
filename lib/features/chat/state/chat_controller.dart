@@ -126,7 +126,23 @@ class ChatController extends Notifier<ChatState> {
       hasCrisis: now.hasCrisis || result.hasCrisis,
       sending: false,
       clearError: true,
+      // Balasan krisis tampil langsung (tanpa animasi mengetik) agar bantuan tidak tertunda.
+      freshAssistantId:
+          result.assistantMessage.isCrisis ? null : result.assistantMessage.id,
+      clearFresh: result.assistantMessage.isCrisis,
     );
+  }
+
+  /// Animasi mengetik balasan [messageId] selesai: balasan tampil utuh, saran tindakannya
+  /// boleh muncul.
+  void markReplyShown(int messageId) {
+    final now = state;
+    if (!ref.mounted ||
+        now is! ChatReady ||
+        now.freshAssistantId != messageId) {
+      return;
+    }
+    state = now.copyWith(clearFresh: true);
   }
 
   Future<SendOutcome> _afterSendFailure(
