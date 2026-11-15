@@ -75,17 +75,14 @@ abstract final class RbSize {
   static const double moodChartMaxLabelScale = 1.3;
 
   /// Layar sambutan (SCR-M02, TASK-M073): sisi ilustrasi (persegi) sebagai bagian dari
-  /// tinggi layar, dibatasi antara [onboardingHeroMin] dan [onboardingHeroMax]; lingkaran
-  /// lembut di belakangnya sedikit lebih besar dari ilustrasi.
+  /// tinggi layar, dibatasi antara [onboardingHeroMin] dan [onboardingHeroMax]; tanpa lingkaran
+  /// atau hiasan di sekitarnya.
   static const double onboardingHeroFactor = 0.36;
   static const double onboardingHeroMin = 180;
   static const double onboardingHeroMax = 300;
-  static const double onboardingBackdropFactor = 1.05;
 
-  /// Hiasan di sekitar maskot (bentuk garis): tebal garis dan ukuran bentuk.
-  static const double decorStroke = 3;
-  static const double decorShape = 22;
-  static const double decorShapeSmall = 14;
+  /// Ikon tombol "Bantuan" (CMP-M35) di pojok kanan atas layar tamu.
+  static const double crisisHelpIcon = 18;
 
   /// Lebar isi maksimum layar tamu (Masuk, Daftar, Lupa sandi, sambutan) agar tetap nyaman
   /// di layar lebar atau lanskap.

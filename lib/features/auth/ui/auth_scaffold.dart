@@ -1,23 +1,28 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:relaxmate/core/router/app_routes.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
+import 'package:relaxmate/shared/widgets/crisis_help_button.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar.dart';
-import 'package:relaxmate/shared/widgets/mate_avatar_size.dart';
 import 'package:relaxmate/shared/widgets/soft_gradient_background.dart';
 
 /// Kerangka layar tamu dan sesi (Masuk, Daftar, Lupa sandi, Cek email, sesi belum bisa
-/// diperiksa, consent): latar gradien lembut di atas, judul, keterangan, lalu isi. Bisa
-/// digulir agar muat saat papan ketik terbuka dan saat teks 200% (RULE-M055).
+/// diperiksa, consent): latar gradien lembut, bilah atas (tombol kembali bila ada, tombol
+/// "Bantuan" di kanan), judul, keterangan, lalu isi.
 ///
-/// Dua tata letak. [alignStart] `true` (Masuk, Daftar, Lupa sandi): tombol kembali bila ada
-/// layar sebelumnya, avatar kecil, judul rata kiri, isi mulai dari atas. Bawaan `false`
-/// (layar status): avatar dan judul di tengah, isi di tengah layar.
+/// Dua tata letak. [alignStart] `true` (Masuk, Daftar, Lupa sandi): judul rata kiri dan isi
+/// memenuhi tinggi layar tanpa gulir; sisa ruang diserap `Spacer` yang ditaruh layar di
+/// dalam [children] (biasanya di atas tombol utama, sehingga tombol menempel ke bawah).
+/// Gulir hanya muncul bila isi memang lebih tinggi dari layar: papan ketik terbuka, teks
+/// 200%, atau layar pendek (RULE-M055). Bawaan `false` (layar status): avatar dan judul di
+/// tengah, isi di tengah layar, bisa digulir.
 ///
-/// Tautan Kontak bantuan selalu ada di bawah isi (Design-M prinsip 4, TASK-M025).
+/// Jalur ke Kontak bantuan selalu ada lewat [CrisisHelpButton] di bilah atas (Design-M
+/// prinsip 4, TASK-M025), tanpa memakan baris sendiri.
 class AuthScaffold extends StatelessWidget {
   const AuthScaffold({
     required this.title,
@@ -34,45 +39,154 @@ class AuthScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final space = context.rbSpace;
-
-    final content = ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: RbSize.authMaxContentWidth),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: space.lg,
-          vertical: alignStart ? space.md : space.lg,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            _Header(
-              title: title,
-              subtitle: subtitle,
-              alignStart: alignStart,
-            ),
-            SizedBox(height: space.lg),
-            ...children,
-            SizedBox(height: space.md),
-            TextButton(
-              onPressed: () => context.push<void>(AppRoutes.crisisContacts),
-              child: const Text(
-                AppTexts.crisisNeedHelp,
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-
     return Scaffold(
       body: SoftGradientBackground(
         child: SafeArea(
-          child: alignStart
-              ? SingleChildScrollView(child: Center(child: content))
-              : Center(child: SingleChildScrollView(child: content)),
+          child: Column(
+            children: <Widget>[
+              _TopBar(showBack: alignStart && context.canPop()),
+              Expanded(
+                child: alignStart
+                    ? _FillBody(
+                        title: title,
+                        subtitle: subtitle,
+                        children: children,
+                      )
+                    : _CenteredBody(
+                        title: title,
+                        subtitle: subtitle,
+                        children: children,
+                      ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Lebar sisi kiri dan kanan agar isi tetap selebar [RbSize.authMaxContentWidth] di layar
+/// lebar, dengan batas dalam sebesar jarak `lg`.
+double _sidePadding(BuildContext context, double width) {
+  final inner = context.rbSpace.lg;
+  return math.max(inner, (width - RbSize.authMaxContentWidth) / 2 + inner);
+}
+
+class _TopBar extends StatelessWidget {
+  const _TopBar({required this.showBack});
+
+  final bool showBack;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.rbColors;
+    final space = context.rbSpace;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final side = _sidePadding(context, constraints.maxWidth);
+        return Padding(
+          padding: EdgeInsets.fromLTRB(side, space.xs, side, 0),
+          child: Row(
+            children: <Widget>[
+              if (showBack)
+                IconButton.outlined(
+                  onPressed: () => context.pop(),
+                  tooltip: AppTexts.authBack,
+                  icon: const Icon(LucideIcons.arrowLeft),
+                  style: IconButton.styleFrom(
+                    side: BorderSide(color: colors.border),
+                    backgroundColor: colors.card,
+                    minimumSize: const Size.square(RbSize.minTouch),
+                  ),
+                ),
+              const Spacer(),
+              const CrisisHelpButton(),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Masuk, Daftar, Lupa sandi: isi memenuhi tinggi yang tersedia; menggulir hanya bila
+/// isi lebih tinggi (`SliverFillRemaining` tanpa badan gulir).
+class _FillBody extends StatelessWidget {
+  const _FillBody({
+    required this.title,
+    required this.subtitle,
+    required this.children,
+  });
+
+  final String title;
+  final String? subtitle;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final space = context.rbSpace;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final side = _sidePadding(context, constraints.maxWidth);
+        return CustomScrollView(
+          slivers: <Widget>[
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(side, space.xs, side, space.md),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    _Header(title: title, subtitle: subtitle, alignStart: true),
+                    SizedBox(height: space.md),
+                    ...children,
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// Layar status (Cek email, sesi, consent): avatar dan judul di tengah, isi di tengah.
+class _CenteredBody extends StatelessWidget {
+  const _CenteredBody({
+    required this.title,
+    required this.subtitle,
+    required this.children,
+  });
+
+  final String title;
+  final String? subtitle;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final space = context.rbSpace;
+
+    return Center(
+      child: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints:
+              const BoxConstraints(maxWidth: RbSize.authMaxContentWidth),
+          child: Padding(
+            padding: EdgeInsets.all(space.lg),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                _Header(title: title, subtitle: subtitle, alignStart: false),
+                SizedBox(height: space.lg),
+                ...children,
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -102,28 +216,10 @@ class _Header extends StatelessWidget {
       crossAxisAlignment:
           alignStart ? CrossAxisAlignment.start : CrossAxisAlignment.center,
       children: <Widget>[
-        if (alignStart)
-          Row(
-            children: <Widget>[
-              if (context.canPop()) ...<Widget>[
-                IconButton.outlined(
-                  onPressed: () => context.pop(),
-                  tooltip: AppTexts.authBack,
-                  icon: const Icon(LucideIcons.arrowLeft),
-                  style: IconButton.styleFrom(
-                    side: BorderSide(color: colors.border),
-                    backgroundColor: colors.card,
-                    minimumSize: const Size.square(RbSize.minTouch),
-                  ),
-                ),
-                const Spacer(),
-              ],
-              const MateAvatar(size: MateAvatarSize.small),
-            ],
-          )
-        else
+        if (!alignStart) ...<Widget>[
           const MateAvatar(),
-        SizedBox(height: space.md),
+          SizedBox(height: space.md),
+        ],
         Semantics(
           header: true,
           child: Text(

@@ -185,7 +185,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   errorText: _errors['name'],
                 ),
               ),
-              SizedBox(height: space.md),
+              SizedBox(height: space.sm),
               TextField(
                 controller: _email,
                 focusNode: _emailFocus,
@@ -202,7 +202,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   errorText: _errors['email'],
                 ),
               ),
-              SizedBox(height: space.md),
+              SizedBox(height: space.sm),
               PasswordField(
                 controller: _password,
                 focusNode: _passwordFocus,
@@ -213,7 +213,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 onChanged: (_) => _clearError('password'),
                 onSubmitted: (_) => _confirmFocus.requestFocus(),
               ),
-              SizedBox(height: space.md),
+              SizedBox(height: space.sm),
               PasswordField(
                 controller: _passwordConfirm,
                 focusNode: _confirmFocus,
@@ -268,14 +268,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           SizedBox(height: space.md),
           ErrorAlert(message: formError),
         ],
-        SizedBox(height: space.lg),
+        SizedBox(height: space.sm),
+        const Spacer(),
         FilledButton(
           onPressed: _submitting ? null : _submit,
           child: Text(
             _submitting ? AppTexts.processing : AppTexts.registerAction,
           ),
         ),
-        SizedBox(height: space.md),
+        SizedBox(height: space.xs),
         AuthSwitchRow(
           prompt: AppTexts.registerHaveAccount,
           action: AppTexts.registerToLogin,

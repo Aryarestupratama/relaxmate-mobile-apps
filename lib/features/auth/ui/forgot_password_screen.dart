@@ -96,7 +96,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         title: AppTexts.forgotTitle,
         children: <Widget>[
           _SentNote(message: sent),
-          SizedBox(height: space.lg),
+          const Spacer(),
           FilledButton(
             onPressed: () => context.go(AppRoutes.login),
             child: const Text(AppTexts.forgotBack),
@@ -134,7 +134,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           SizedBox(height: space.md),
           ErrorAlert(message: formError),
         ],
-        SizedBox(height: space.lg),
+        SizedBox(height: space.md),
+        const Spacer(),
         FilledButton(
           onPressed: _submitting ? null : _submit,
           child: Text(

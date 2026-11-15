@@ -161,11 +161,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ErrorAlert(message: formError),
         ],
         SizedBox(height: space.md),
+        const Spacer(),
         FilledButton(
           onPressed: _submitting ? null : _submit,
           child: Text(_submitting ? AppTexts.processing : AppTexts.loginAction),
         ),
-        SizedBox(height: space.md),
+        SizedBox(height: space.xs),
         AuthSwitchRow(
           prompt: AppTexts.loginNoAccount,
           action: AppTexts.loginToRegister,

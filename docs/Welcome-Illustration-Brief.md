@@ -10,11 +10,11 @@ Aset ini dibuat di luar repo (ChatGPT) lalu dipasang sebagai satu berkas: `asset
 |---|---|
 | Berkas | `assets/images/welcome/welcome-hero.png` (nama harus sama; kode memuat jalur ini) |
 | Rasio dan ukuran | Persegi 1:1, 1024 x 1024 px (hasil generate 1536 atau 2048 boleh, perkecil ke 1024) |
-| Latar | Transparan. Tanpa bayangan lantai, tanpa lingkaran latar (lingkaran lembut digambar kode) |
-| Isi | Hanya karakter dan lima blob mood. Tanpa hiasan segitiga, cincin, kilau, dan sejenisnya (digambar kode dengan token warna) |
+| Latar | Transparan. Tanpa bayangan lantai dan tanpa lingkaran latar; ilustrasi tampil langsung di atas gradien (sejak 2026-11-15 kode tidak lagi menggambar lingkaran) |
+| Isi | Hanya karakter dan lima blob mood. Tanpa hiasan segitiga, cincin, kilau, dan sejenisnya (kode juga tidak menggambarnya lagi) |
 | Teks di gambar | Tidak ada sama sekali (teks "RelaxMate" di dada lembar karakter dihapus; ikon logo boleh tetap) |
 | Warna | Hanya token proyek: navy `#0A2244`, putih `#FFFFFF`, `#EEF2F8`, biru robot yang sudah ada di lembar karakter, dan lima warna mood `#A98BFF`, `#9CCBF2`, `#FFB997`, `#ABEAA2`, `#FCE46F` |
-| Zona aman | Semua elemen di dalam lingkaran bergaris tengah sekitar 88% kanvas (kode menaruh lingkaran lembut di belakangnya) |
+| Zona aman | Semua elemen di dalam kanvas dengan margin sekitar 3% di tiap sisi |
 | Ukuran berkas | Sasaran di bawah 500 KB (kompres di squoosh.app atau tinypng.com) |
 
 ## 2. Bahan referensi yang diunggah ke ChatGPT

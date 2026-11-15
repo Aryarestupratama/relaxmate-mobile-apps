@@ -93,8 +93,7 @@ abstract final class AppTexts {
   // Daftar (SCR-M03).
   static const String registerTitle = 'Buat akunmu';
   static const String registerSubtitle =
-      'Mulai perjalananmu bersama RelaxMate. Akun ini sama dengan akun '
-      'RelaxBoss di website.';
+      'Akun ini sama dengan akun RelaxBoss di website.';
   static const String registerAction = 'Daftar';
   static const String registerHaveAccount = 'Sudah punya akun?';
   static const String registerToLogin = 'Masuk';
@@ -192,6 +191,7 @@ abstract final class AppTexts {
   static const String crisisNeedHelp =
       'Butuh bantuan sekarang? Lihat kontak bantuan';
   static const String crisisMenuTooltip = 'Kontak bantuan';
+  static const String crisisHelpShort = 'Bantuan';
 
   static String crisisCallFailed(String phone) =>
       'Panggilan belum bisa dimulai. Hubungi $phone lewat aplikasi telepon.';
