@@ -18,22 +18,23 @@ DateTime wibDate(DateTime instant) {
 /// memberi tanggal (`range.to` di API-M019 lebih diutamakan).
 DateTime wibToday() => wibDate(DateTime.now());
 
-/// Bagian hari menurut WIB untuk sapaan di Beranda.
-enum DayPeriod { morning, noon, afternoon, evening }
+/// Bagian hari menurut WIB untuk sapaan di Beranda. Bernama `GreetingPeriod` agar tidak
+/// bentrok dengan `DayPeriod` milik `package:flutter/material.dart`.
+enum GreetingPeriod { morning, noon, afternoon, evening }
 
 /// Pagi 04.00-10.59, siang 11.00-14.59, sore 15.00-17.59, malam 18.00-03.59 (WIB).
-DayPeriod dayPeriodOf(DateTime instant) {
+GreetingPeriod greetingPeriodOf(DateTime instant) {
   final hour = toWib(instant).hour;
   if (hour >= 4 && hour < 11) {
-    return DayPeriod.morning;
+    return GreetingPeriod.morning;
   }
   if (hour >= 11 && hour < 15) {
-    return DayPeriod.noon;
+    return GreetingPeriod.noon;
   }
   if (hour >= 15 && hour < 18) {
-    return DayPeriod.afternoon;
+    return GreetingPeriod.afternoon;
   }
-  return DayPeriod.evening;
+  return GreetingPeriod.evening;
 }
 
 /// `YYYY-MM-DD` menjadi tanggal; `null` bila bentuknya salah.

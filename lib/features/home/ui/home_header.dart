@@ -21,11 +21,11 @@ import 'package:relaxmate/shared/widgets/mate_avatar_size.dart';
 class HomeHeader extends ConsumerWidget {
   const HomeHeader({super.key});
 
-  String _salutation(DayPeriod period) => switch (period) {
-        DayPeriod.morning => AppTexts.greetMorning,
-        DayPeriod.noon => AppTexts.greetNoon,
-        DayPeriod.afternoon => AppTexts.greetAfternoon,
-        DayPeriod.evening => AppTexts.greetEvening,
+  String _salutation(GreetingPeriod period) => switch (period) {
+        GreetingPeriod.morning => AppTexts.greetMorning,
+        GreetingPeriod.noon => AppTexts.greetNoon,
+        GreetingPeriod.afternoon => AppTexts.greetAfternoon,
+        GreetingPeriod.evening => AppTexts.greetEvening,
       };
 
   @override
@@ -37,7 +37,7 @@ class HomeHeader extends ConsumerWidget {
     final fullName = auth is AuthAuthenticated ? auth.user.name.trim() : '';
     final firstName = fullName.split(RegExp(r'\s+')).first;
     final done = ref.watch(todayMoodProvider) != null;
-    final salutation = _salutation(dayPeriodOf(DateTime.now()));
+    final salutation = _salutation(greetingPeriodOf(DateTime.now()));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
