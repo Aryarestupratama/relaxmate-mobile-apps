@@ -87,4 +87,9 @@ abstract final class RbSize {
   /// Lebar isi maksimum layar tamu (Masuk, Daftar, Lupa sandi, sambutan) agar tetap nyaman
   /// di layar lebar atau lanskap.
   static const double authMaxContentWidth = 440;
+
+  /// Dock navigasi bawah (CMP-M30): lebar maksimum dan tinggi pil tab. Lebar tab aktif dihitung
+  /// dari panjang label dan skala teks, tab lain tidak pernah di bawah [minTouch].
+  static const double navDockMaxWidth = 440;
+  static const double navItemHeight = 56;
 }
