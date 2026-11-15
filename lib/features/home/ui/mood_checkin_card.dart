@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:relaxmate/core/config/app_constants.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_motion.dart';
+import 'package:relaxmate/core/theme/rb_radius.dart';
 import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/core/time/wib.dart';
@@ -19,7 +20,8 @@ import 'package:relaxmate/shared/widgets/floating_card.dart';
 
 /// SCR-M22, kartu mood di Beranda (FR-M013, FR-M029). Tiga keadaan:
 /// - belum ada mood hari ini (atau "Ubah" ditekan): lima blob, satu ketukan mencatat;
-/// - sudah tercatat: konfirmasi (label, jam WIB, "Ubah");
+/// - sudah tercatat: konfirmasi (label, jam WIB, ucapan terima kasih di baris sendiri, tombol
+///   "Ubah" berbingkai);
 /// - deret sedang dimuat: penanda memuat, supaya pilihan tidak berkedip lalu hilang bagi
 ///   yang sudah mengisi.
 /// Blob memakai `MoodBlobRow` yang sudah ada; tidak memanggil AI. Kartu melayang (TASK-M074):
@@ -98,19 +100,20 @@ class MoodCheckinCard extends ConsumerWidget {
                     AppTexts.homeMoodRecordedAt(wibTimeLabel(today.loggedAt)),
                     style: text.small.copyWith(color: colors.textSecondary),
                   ),
-                  TextButton(
+                  Text(
+                    AppTexts.homeMoodThanks,
+                    style: text.small.copyWith(color: colors.textSecondary),
+                  ),
+                  SizedBox(height: space.sm),
+                  OutlinedButton(
                     onPressed: controller.startEditing,
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      alignment: Alignment.centerLeft,
-                    ),
-                    child: Text(
-                      AppTexts.homeMoodChange,
-                      style: text.button.copyWith(
-                        color: colors.primary,
-                        decoration: TextDecoration.underline,
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: colors.card,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: RbRadius.pillBorder,
                       ),
                     ),
+                    child: const Text(AppTexts.homeMoodChange),
                   ),
                 ],
               ),

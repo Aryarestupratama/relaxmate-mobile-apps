@@ -7,6 +7,7 @@ import 'package:relaxmate/core/config/app_constants.dart';
 import 'package:relaxmate/core/router/app_routes.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_motion.dart';
+import 'package:relaxmate/core/theme/rb_radius.dart';
 import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/features/checkin/data/mood_level.dart';
@@ -20,7 +21,8 @@ import 'package:relaxmate/shared/widgets/mate_avatar_size.dart';
 
 /// SCR-M22, kartu ringkasan mingguan (TASK-M074). Pengganti skor persen: blob besar yang
 /// warnanya mengikuti mood rata-rata minggu ini (`averageLevel`, dihitung server; RULE-M033)
-/// dengan satu kalimat lembut dan "5 dari 7 hari terisi". Tanpa angka yang menilai atau
+/// dengan satu kalimat lembut pendek (tanpa mengulang "minggu ini" dari judul), "5 dari 7
+/// hari terisi", dan tombol berlabel "Lihat detail mood". Tanpa angka yang menilai atau
 /// menagih (RULE-M046). Belum dua hari terisi: kartu lavender dengan ajakan mengisi. Memuat
 /// atau gagal: tidak tampil (kartu grafik di bawahnya yang menampilkan galat).
 class HomeWeekCard extends ConsumerWidget {
@@ -122,17 +124,26 @@ class _WeekTile extends StatelessWidget {
                           ),
                         ],
                         SizedBox(height: space.sm),
-                        DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: colors.card,
-                            shape: BoxShape.circle,
-                          ),
-                          child: SizedBox.square(
-                            dimension: RbSize.minTouch,
-                            child: Icon(
-                              LucideIcons.chevronRight,
-                              color: colors.primary,
+                        OutlinedButton(
+                          onPressed: () => context.go(AppRoutes.mood),
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: colors.card,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: RbRadius.pillBorder,
                             ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              const Flexible(
+                                child: Text(AppTexts.homeWeekAction),
+                              ),
+                              SizedBox(width: space.xxs),
+                              const Icon(
+                                LucideIcons.chevronRight,
+                                size: RbSize.weekActionIcon,
+                              ),
+                            ],
                           ),
                         ),
                       ],

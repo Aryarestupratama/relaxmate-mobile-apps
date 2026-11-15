@@ -497,8 +497,8 @@ abstract final class AppTexts {
   static const String homeMoodCancel = 'Batal';
   static const String homeMoodSaving = 'Mencatat perasaanmu...';
   static String homeMoodDone(String label) => 'Hari ini kamu merasa $label';
-  static String homeMoodRecordedAt(String time) =>
-      'Tercatat pukul $time. Terima kasih sudah jujur.';
+  static String homeMoodRecordedAt(String time) => 'Tercatat pukul $time';
+  static const String homeMoodThanks = 'Terima kasih sudah jujur.';
   static const String homeMoodChange = 'Ubah';
   static const String homeInviteTitle = 'Mau cerita sedikit?';
   static const String homeInviteBubble = 'Hari ini terasa seperti apa?';
@@ -526,17 +526,16 @@ abstract final class AppTexts {
   static const String homeSupportAction = 'Buka Kontak bantuan';
 
   static const String homeWeekTitle = 'Moodmu minggu ini';
-  static const String homeWeekTone1 =
-      'Minggu ini terasa berat. Pelan-pelan saja.';
-  static const String homeWeekTone2 = 'Minggu ini cenderung sendu.';
-  static const String homeWeekTone3 = 'Minggu ini cenderung biasa saja.';
-  static const String homeWeekTone4 = 'Minggu ini cenderung tenang.';
-  static const String homeWeekTone5 = 'Minggu ini cenderung cerah.';
+  static const String homeWeekTone1 = 'Terasa berat. Pelan-pelan saja ya.';
+  static const String homeWeekTone2 = 'Agak sendu, dan itu wajar.';
+  static const String homeWeekTone3 = 'Cukup stabil dan tenang.';
+  static const String homeWeekTone4 = 'Terasa ringan dan lega.';
+  static const String homeWeekTone5 = 'Cerah dan penuh semangat.';
   static String homeWeekFilled(int filled, int total) =>
       '$filled dari $total hari terisi';
   static const String homeWeekEmpty =
-      'Isi mood-mu dulu. Ringkasan minggu ini muncul setelah 2 hari terisi.';
-  static const String homeWeekAction = 'Lihat suasana hatiku';
+      'Isi mood-mu dulu. Ringkasannya muncul setelah 2 hari terisi.';
+  static const String homeWeekAction = 'Lihat detail mood';
 
   static const String homeChartAverageLead = 'Rata-rata minggu ini: ';
   static const String homeChartBestLead = '. Hari terbaikmu: ';

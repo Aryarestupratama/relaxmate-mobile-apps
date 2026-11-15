@@ -21,14 +21,15 @@ enum _InviteStage { typing, bubble, replies }
 /// langsung menampilkan hasil akhirnya (dibuat ulang tiap layar tab, ADR-M16).
 bool _invitePlayed = false;
 
-/// CMP-M38: kartu "Mau cerita sedikit?" (TASK-M074, konsep K1 dan K2). RelaxMate menyapa lewat
-/// gelembung obrolan: titik mengetik sebentar, gelembung muncul dengan efek pop lembut, lalu
-/// dua tombol balasan ("Cerita ke RelaxMate", "Temani saja") muncul berurutan, sehingga
-/// terasa membalas teman, bukan mengetuk spanduk. Maskot mengintip dari sudut kanan bawah di
-/// atas gradien lavender hangat (animasi `idle` yang sudah ada, satu-satunya gerak
-/// berulang di Beranda) dan disembunyikan pada teks besar. Tata letak akhir sudah
-/// disisihkan sejak awal, jadi tidak ada lonjakan tinggi. Bila gerak dikurangi, semuanya
-/// langsung tampil. Mood rendah memakai kalimat yang lebih menemani.
+/// CMP-M38: kartu "Mau cerita sedikit?" (TASK-M074, konsep K1 dan K2). Tata letak: judul, lalu
+/// satu baris berisi maskot RelaxMate di kiri dan gelembung obrolannya di kanan (ekor
+/// gelembung menghadap maskot), lalu dua tombol balasan sejajar di paling bawah ("Cerita ke
+/// RelaxMate", "Temani saja"). Urutan muncul: titik mengetik di tempat gelembung, gelembung
+/// dengan efek pop lembut, lalu kedua tombol bersamaan dengan geser lembut. Maskot memakai
+/// animasi `idle` yang sudah ada (satu-satunya gerak berulang di Beranda) dan disembunyikan
+/// pada teks besar. Tata letak akhir sudah disisihkan sejak awal, jadi tidak ada lonjakan
+/// tinggi. Bila gerak dikurangi, semuanya langsung tampil. Mood rendah memakai kalimat yang
+/// lebih menemani.
 class HomeInviteCard extends StatefulWidget {
   const HomeInviteCard({required this.low, super.key});
 
@@ -111,7 +112,6 @@ class _HomeInviteCardState extends State<HomeInviteCard> {
         MediaQuery.textScalerOf(context).scale(1) <= RbSize.homeRowMaxTextScale;
     final bubbleShown = _stage != _InviteStage.typing;
     final repliesShown = _stage == _InviteStage.replies;
-    final reservedRight = showMascot ? RbSize.mascotPeekWidth + space.xs : 0.0;
 
     final bubble = Container(
       padding: EdgeInsets.symmetric(horizontal: space.md, vertical: space.sm),
@@ -130,20 +130,29 @@ class _HomeInviteCardState extends State<HomeInviteCard> {
       ),
     );
 
+    final buttonPadding = EdgeInsets.symmetric(
+      horizontal: space.sm,
+      vertical: space.xs,
+    );
     final chatButton = FilledButton(
       onPressed: () => context.go(AppRoutes.chat),
       style: FilledButton.styleFrom(
+        padding: buttonPadding,
         shape: const RoundedRectangleBorder(borderRadius: RbRadius.pillBorder),
       ),
-      child: const Text(AppTexts.homeInviteChat),
+      child: const Text(AppTexts.homeInviteChat, textAlign: TextAlign.center),
     );
     final companionButton = OutlinedButton(
       onPressed: () => context.push<void>(AppRoutes.companion),
       style: OutlinedButton.styleFrom(
+        padding: buttonPadding,
         backgroundColor: colors.card,
         shape: const RoundedRectangleBorder(borderRadius: RbRadius.pillBorder),
       ),
-      child: const Text(AppTexts.homeInviteCompanion),
+      child: const Text(
+        AppTexts.homeInviteCompanion,
+        textAlign: TextAlign.center,
+      ),
     );
 
     Widget slideIn(Widget child, Duration delay) => child
@@ -157,8 +166,6 @@ class _HomeInviteCardState extends State<HomeInviteCard> {
         );
 
     return FloatingCard(
-      padding: EdgeInsets.zero,
-      clip: Clip.antiAlias,
       gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -170,25 +177,28 @@ class _HomeInviteCardState extends State<HomeInviteCard> {
           ),
         ],
       ),
-      child: Stack(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-              space.md,
-              space.md,
-              space.md + reservedRight,
-              space.md,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Semantics(
-                  header: true,
-                  child: Text(AppTexts.homeInviteTitle, style: text.h3),
+          Semantics(
+            header: true,
+            child: Text(AppTexts.homeInviteTitle, style: text.h3),
+          ),
+          SizedBox(height: space.sm),
+          Row(
+            children: <Widget>[
+              if (showMascot) ...<Widget>[
+                const ExcludeSemantics(
+                  child: MascotView(
+                    state: MascotState.idle,
+                    height: RbSize.inviteMascotHeight,
+                  ),
                 ),
-                SizedBox(height: space.sm),
-                Stack(
-                  alignment: Alignment.topLeft,
+                SizedBox(width: space.sm),
+              ],
+              Expanded(
+                child: Stack(
+                  alignment: Alignment.centerLeft,
                   children: <Widget>[
                     _reveal(
                       shown: bubbleShown,
@@ -199,7 +209,7 @@ class _HomeInviteCardState extends State<HomeInviteCard> {
                           .scaleXY(
                             begin: RbMotion.popFrom,
                             end: 1,
-                            alignment: Alignment.bottomLeft,
+                            alignment: Alignment.centerLeft,
                             duration: RbMotion.pop,
                             curve: RbMotion.curve,
                           ),
@@ -207,42 +217,42 @@ class _HomeInviteCardState extends State<HomeInviteCard> {
                     if (_stage == _InviteStage.typing) const TypingIndicator(),
                   ],
                 ),
-                SizedBox(height: space.sm),
-                Wrap(
-                  spacing: space.xs,
-                  runSpacing: space.xs,
-                  children: <Widget>[
-                    _reveal(
-                      shown: repliesShown,
-                      child: chatButton,
-                      effects: (child) => slideIn(child, Duration.zero),
-                    ),
-                    _reveal(
-                      shown: repliesShown,
-                      child: companionButton,
-                      effects: (child) => slideIn(child, RbMotion.stagger),
-                    ),
-                  ],
+              ),
+            ],
+          ),
+          SizedBox(height: space.md),
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Expanded(
+                  flex: _chatFlex,
+                  child: _reveal(
+                    shown: repliesShown,
+                    child: chatButton,
+                    effects: (child) => slideIn(child, Duration.zero),
+                  ),
+                ),
+                SizedBox(width: space.xs),
+                Expanded(
+                  flex: _companionFlex,
+                  child: _reveal(
+                    shown: repliesShown,
+                    child: companionButton,
+                    effects: (child) => slideIn(child, RbMotion.stagger),
+                  ),
                 ),
               ],
             ),
           ),
-          if (showMascot)
-            Positioned(
-              right: space.sm,
-              bottom:
-                  -RbSize.mascotPeekHeight * RbSize.mascotPeekHiddenFraction,
-              child: const ExcludeSemantics(
-                child: MascotView(
-                  state: MascotState.idle,
-                  height: RbSize.mascotPeekHeight,
-                ),
-              ),
-            ),
         ],
       ),
     );
   }
+
+  /// Perbandingan lebar dua tombol: label "Cerita ke RelaxMate" lebih panjang.
+  static const int _chatFlex = 6;
+  static const int _companionFlex = 4;
 
   /// Seberapa hangat (campuran `mood3`) gradien lavender kartu.
   static const double _warmth = 0.3;
