@@ -9,6 +9,7 @@ import 'package:relaxmate/features/auth/state/auth_controller.dart';
 import 'package:relaxmate/features/auth/ui/auth_scaffold.dart';
 import 'package:relaxmate/features/auth/ui/auth_validators.dart';
 import 'package:relaxmate/features/auth/ui/password_field.dart';
+import 'package:relaxmate/shared/widgets/auth_switch_row.dart';
 import 'package:relaxmate/shared/widgets/error_alert.dart';
 
 /// SCR-M04: Masuk. Berhasil: `AuthController` memperbarui sesi dan router memindahkan
@@ -110,6 +111,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final formError = _formError;
 
     return AuthScaffold(
+      alignStart: true,
       title: AppTexts.loginTitle,
       subtitle: AppTexts.loginSubtitle,
       children: <Widget>[
@@ -145,26 +147,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ],
           ),
         ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            onPressed: _submitting
+                ? null
+                : () => context.push<void>(AppRoutes.forgotPassword),
+            child: const Text(AppTexts.loginToForgot),
+          ),
+        ),
         if (formError != null) ...<Widget>[
-          SizedBox(height: space.md),
+          SizedBox(height: space.xs),
           ErrorAlert(message: formError),
         ],
-        SizedBox(height: space.lg),
+        SizedBox(height: space.md),
         FilledButton(
           onPressed: _submitting ? null : _submit,
           child: Text(_submitting ? AppTexts.processing : AppTexts.loginAction),
         ),
-        SizedBox(height: space.xs),
-        TextButton(
-          onPressed: _submitting
-              ? null
-              : () => context.push<void>(AppRoutes.forgotPassword),
-          child: const Text(AppTexts.loginToForgot),
-        ),
-        TextButton(
+        SizedBox(height: space.md),
+        AuthSwitchRow(
+          prompt: AppTexts.loginNoAccount,
+          action: AppTexts.loginToRegister,
           onPressed:
               _submitting ? null : () => context.push<void>(AppRoutes.register),
-          child: const Text(AppTexts.loginToRegister),
         ),
       ],
     );

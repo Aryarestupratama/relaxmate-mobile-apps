@@ -7,6 +7,7 @@ class PasswordField extends StatefulWidget {
   const PasswordField({
     required this.controller,
     required this.focusNode,
+    this.label = AppTexts.fieldPassword,
     this.errorText,
     this.readOnly = false,
     this.textInputAction = TextInputAction.done,
@@ -18,6 +19,7 @@ class PasswordField extends StatefulWidget {
 
   final TextEditingController controller;
   final FocusNode focusNode;
+  final String label;
   final String? errorText;
   final bool readOnly;
   final TextInputAction textInputAction;
@@ -46,7 +48,7 @@ class _PasswordFieldState extends State<PasswordField> {
       onChanged: widget.onChanged,
       onSubmitted: widget.onSubmitted,
       decoration: InputDecoration(
-        labelText: AppTexts.fieldPassword,
+        labelText: widget.label,
         errorText: widget.errorText,
         suffixIcon: IconButton(
           tooltip: _obscured ? AppTexts.showPassword : AppTexts.hidePassword,

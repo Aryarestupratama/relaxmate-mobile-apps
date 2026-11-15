@@ -16,6 +16,9 @@ abstract final class AppRoutes {
   /// Peralihan saat sesi belum bisa diperiksa (offline, timeout, galat server).
   static const String sessionError = '/sesi';
 
+  /// Sambutan (SCR-M02): hanya untuk tamu, tampil sekali pada pembukaan pertama.
+  static const String welcome = '/mulai';
+
   static const String login = '/masuk'; // SCR-M04
   static const String register = '/daftar'; // SCR-M03
   static const String forgotPassword = '/lupa-sandi'; // SCR-M05
@@ -55,9 +58,10 @@ abstract final class AppRoutes {
 
   /// Layar yang hanya untuk tamu; pengguna yang sudah masuk dialihkan keluar.
   static const Set<String> guestOnly = <String>{
+    welcome,
     login,
     register,
-    forgotPassword
+    forgotPassword,
   };
 
   /// Layar peralihan yang tidak boleh ditinggali pengguna terverifikasi.

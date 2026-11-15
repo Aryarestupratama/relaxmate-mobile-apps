@@ -1,5 +1,5 @@
 # RelaxMate Mobile - PRD
-Version: 0.10 | Status: Draft | Last updated: 2026-11-14
+Version: 0.11 | Status: Draft | Last updated: 2026-11-15
 Depends on: PRD RelaxBoss v1.8, Architecture v1.74, Rules v1.5 | Owner: Founder (solo developer)
 
 Label klaim: `[Verified]` = ada sumber yang dicek, `[Inference]` = kesimpulan dari konteks, `[Assumption]` = asumsi yang bisa diubah. Kedalaman: **Lite**.
@@ -168,6 +168,7 @@ Dokumen ini terpisah dari PRD RelaxBoss (web). Aplikasi mobile masuk daftar Won'
 | FR-M028 | Aplikasi MUST punya layar **Tentang RelaxBoss** yang menjelaskan bahwa RelaxMate bagian dari RelaxBoss: kisah awal, visi, arti nama, kolaborasi kampus, penegasan bukan diagnosis atau layanan medis dengan jalan ke Kontak bantuan, serta tautan ke situs dan Instagram RelaxBoss. Isi mengikuti halaman Tentang di situs; daftar tim dan acara cukup lewat tautan ke situs. Dibuka dari Pengaturan. (usulan founder 2026-11-13) | Should |
 | FR-M029 | Layar pertama setelah masuk MUST berupa **Beranda**, bukan chat: sapaan, kartu mood hari ini (FR-M013), grafik ringkas 7 hari, tombol utama "Ngobrol dengan RelaxMate", jalan pintas Latihan napas dan Temani saja, dan tautan Kontak bantuan yang selalu terlihat. Navigasi bawah empat tab: Beranda, Ngobrol, Latihan, Mood. Pengaturan lewat ikon di Beranda. Mood Sedih atau Sangat sedih memunculkan kartu lembut ke Kontak bantuan tanpa memanggil AI (batas diperluas dari Sangat sedih saja mengikuti mockup founder, 2026-11-14). Beranda tidak membutuhkan consent AI; consent hanya dicek saat membuka Ngobrol (FR-M002). (keputusan founder 2026-11-13) | Must |
 | FR-M030 | Layar **Mood** MUST menampilkan grafik suasana hati 7 atau 30 hari (satu titik per hari, warna sesuai mood), ringkasan (rata-rata, hari terbaik, jumlah hari diisi), daftar catatan terakhir, keadaan kosong yang ramah, ringkasan teks untuk pembaca layar, dan penegasan bahwa ini bukan diagnosis. Data dari API-M019. (keputusan founder 2026-11-13) | Must |
+| FR-M031 | Tamu MUST melihat **satu layar sambutan** (SCR-M02) pada pembukaan pertama di perangkat: judul, satu kalimat tentang RelaxMate, maskot, tombol "Mulai" (ke Daftar), "Sudah punya akun? Masuk", dan tautan Kontak bantuan. Sambutan hanya tampil sekali; sesudah itu tamu langsung ke Masuk (penanda lokal di perangkat, hilang bila aplikasi dihapus atau datanya dibersihkan). Lokal: tanpa jaringan dan tanpa AI. Layar Masuk, Daftar, dan Lupa sandi dipoles (usulan founder 2026-11-15); Daftar menambah kolom "Konfirmasi kata sandi" (pemeriksaan salah ketik di klien; server tidak berubah). Masuk dengan Google dan "Ingat saya" **tidak** dibuat: tidak ada di backend maupun PRD, dan sesi sudah bertahan lewat token. | Should |
 
 ---
 
@@ -252,6 +253,7 @@ Dokumen ini terpisah dari PRD RelaxBoss (web). Aplikasi mobile masuk daftar Won'
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.11 | 2026-11-15 | TASK-M073 (bagian 1): FR-M031 layar sambutan (SCR-M02) dan poles Masuk, Daftar, Lupa sandi; Masuk dengan Google dan "Ingat saya" dicatat sebagai tidak dibuat. |
 | 0.10 | 2026-11-14 | TASK-M072 dibangun: FR-M029 kartu bantuan lembut untuk Sedih dan Sangat sedih (mengikuti mockup); mood dicatat dengan satu ketukan, tanpa pesan chat. |
 | 0.9 | 2026-11-13 | Konsep Beranda: FR-M029 (Beranda sebagai layar pertama, navigasi bawah), FR-M030 (grafik mood), FR-M013 dipindah ke Beranda, non-goal grafik mood dicabut. |
 | 0.8 | 2026-11-13 | FR-M028: layar Tentang RelaxBoss. |

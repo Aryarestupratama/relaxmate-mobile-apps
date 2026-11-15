@@ -37,6 +37,10 @@ abstract final class AppConstants {
   /// Tampilan chat harian: `mascot` atau `conversation` (TASK-M035, FR-M027).
   static const String settingsChatViewModeKey = 'settings_chat_view_mode_v1';
 
+  /// Penanda bahwa layar sambutan (SCR-M02) sudah dilihat di perangkat ini. Tidak sensitif;
+  /// hanya menentukan apakah tamu melihat sambutan atau langsung Masuk (TASK-M073).
+  static const String settingsOnboardingSeenKey = 'settings_onboarding_seen_v1';
+
   /// Nama kunci token di penyimpanan aman.
   static const String tokenStorageKey = 'auth_token';
 

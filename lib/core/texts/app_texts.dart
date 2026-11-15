@@ -62,22 +62,40 @@ abstract final class AppTexts {
   static const String fieldEmailRequired = 'Email wajib diisi.';
   static const String fieldEmailInvalid = 'Format email belum benar.';
   static const String fieldPasswordRequired = 'Kata sandi wajib diisi.';
+  static const String fieldPasswordConfirm = 'Konfirmasi kata sandi';
+  static const String fieldPasswordConfirmRequired =
+      'Ulangi kata sandimu di kolom ini.';
+  static const String fieldPasswordMismatch =
+      'Konfirmasi kata sandi belum sama.';
+  static const String authBack = 'Kembali';
   static const String termsRequired =
       'Centang dulu bahwa kamu sudah membaca ketentuan.';
 
+  // Sambutan (SCR-M02).
+  static const String welcomeTitle =
+      'Rasakan dukungan setiap hari bersama RelaxMate';
+  static const String welcomeBody =
+      'Catat suasana hati, bercerita, dan menenangkan diri dengan lembut.';
+  static const String welcomeStart = 'Mulai';
+  static const String welcomeHaveAccount = 'Sudah punya akun?';
+
   // Masuk (SCR-M04).
-  static const String loginTitle = 'Masuk';
-  static const String loginSubtitle = 'Lanjutkan ceritamu bersama RelaxMate.';
+  static const String loginTitle = 'Halo, selamat datang kembali';
+  static const String loginSubtitle =
+      'Masuk untuk melanjutkan ceritamu bersama RelaxMate.';
   static const String loginAction = 'Masuk';
   static const String loginToForgot = 'Lupa kata sandi?';
-  static const String loginToRegister = 'Belum punya akun? Daftar';
+  static const String loginNoAccount = 'Belum punya akun?';
+  static const String loginToRegister = 'Daftar';
 
   // Daftar (SCR-M03).
-  static const String registerTitle = 'Buat akun';
+  static const String registerTitle = 'Buat akunmu';
   static const String registerSubtitle =
-      'Akun ini sama dengan akun RelaxBoss di website.';
+      'Mulai perjalananmu bersama RelaxMate. Akun ini sama dengan akun '
+      'RelaxBoss di website.';
   static const String registerAction = 'Daftar';
-  static const String registerToLogin = 'Sudah punya akun? Masuk';
+  static const String registerHaveAccount = 'Sudah punya akun?';
+  static const String registerToLogin = 'Masuk';
   static const String termsAccept =
       'Aku sudah membaca dan menyetujui Ketentuan dan Kebijakan Privasi.';
   static const String termsLink = 'Baca Ketentuan';

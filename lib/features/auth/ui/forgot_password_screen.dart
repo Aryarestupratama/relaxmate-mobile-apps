@@ -92,6 +92,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
     if (sent != null) {
       return AuthScaffold(
+        alignStart: true,
         title: AppTexts.forgotTitle,
         children: <Widget>[
           _SentNote(message: sent),
@@ -105,6 +106,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     }
 
     return AuthScaffold(
+      alignStart: true,
       title: AppTexts.forgotTitle,
       subtitle: AppTexts.forgotSubtitle,
       children: <Widget>[

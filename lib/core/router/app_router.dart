@@ -21,6 +21,8 @@ import 'package:relaxmate/features/home/ui/home_screen.dart';
 import 'package:relaxmate/features/history/ui/history_screen.dart';
 import 'package:relaxmate/features/mascot/ui/companion_screen.dart';
 import 'package:relaxmate/features/mood/ui/mood_screen.dart';
+import 'package:relaxmate/features/onboarding/state/onboarding_controller.dart';
+import 'package:relaxmate/features/onboarding/ui/welcome_screen.dart';
 import 'package:relaxmate/features/overlay/ui/overlay_settings_screen.dart';
 import 'package:relaxmate/features/settings/ui/about_screen.dart';
 import 'package:relaxmate/features/settings/ui/delete_account_screen.dart';
@@ -40,6 +42,10 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
     authControllerProvider,
     (previous, next) => refresh.ping(),
   );
+  ref.listen<OnboardingStatus>(
+    onboardingControllerProvider,
+    (previous, next) => refresh.ping(),
+  );
 
   final router = GoRouter(
     initialLocation: AppRoutes.home,
@@ -47,6 +53,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) => authRedirect(
       ref.read(authControllerProvider),
       state.matchedLocation,
+      onboarding: ref.read(onboardingControllerProvider),
     ),
     routes: <RouteBase>[
       GoRoute(
@@ -56,6 +63,10 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.sessionError,
         builder: (context, state) => const SessionErrorScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.welcome,
+        builder: (context, state) => const WelcomeScreen(),
       ),
       GoRoute(
         path: AppRoutes.login,

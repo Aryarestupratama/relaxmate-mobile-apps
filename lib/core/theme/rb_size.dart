@@ -73,4 +73,21 @@ abstract final class RbSize {
   static const double moodChartLabelWidth = 52;
   static const double moodChartLabelHeight = 20;
   static const double moodChartMaxLabelScale = 1.3;
+
+  /// Layar sambutan (SCR-M02, TASK-M073): tinggi maskot sebagai bagian dari tinggi layar,
+  /// dibatasi antara [onboardingMascotMin] dan [onboardingMascotMax]; lingkaran lembut di
+  /// belakangnya sedikit lebih besar dari maskot.
+  static const double onboardingMascotFactor = 0.3;
+  static const double onboardingMascotMin = 150;
+  static const double onboardingMascotMax = 280;
+  static const double onboardingBackdropFactor = 1.05;
+
+  /// Hiasan di sekitar maskot (bentuk garis): tebal garis dan ukuran bentuk.
+  static const double decorStroke = 3;
+  static const double decorShape = 22;
+  static const double decorShapeSmall = 14;
+
+  /// Lebar isi maksimum layar tamu (Masuk, Daftar, Lupa sandi, sambutan) agar tetap nyaman
+  /// di layar lebar atau lanskap.
+  static const double authMaxContentWidth = 440;
 }

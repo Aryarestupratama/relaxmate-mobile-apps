@@ -12,6 +12,7 @@ import 'package:relaxmate/features/auth/state/auth_controller.dart';
 import 'package:relaxmate/features/auth/ui/auth_scaffold.dart';
 import 'package:relaxmate/features/auth/ui/auth_validators.dart';
 import 'package:relaxmate/features/auth/ui/password_field.dart';
+import 'package:relaxmate/shared/widgets/auth_switch_row.dart';
 import 'package:relaxmate/shared/widgets/error_alert.dart';
 
 /// SCR-M03: Daftar. Aturan sama dengan web (FR-M001); akunnya akun RelaxBoss yang sama.
@@ -28,15 +29,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     'name',
     'email',
     'password',
+    'passwordConfirm',
     'terms',
   };
 
   final TextEditingController _name = TextEditingController();
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
+  final TextEditingController _passwordConfirm = TextEditingController();
   final FocusNode _nameFocus = FocusNode();
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
+  final FocusNode _confirmFocus = FocusNode();
 
   Map<String, String> _errors = const <String, String>{};
   String? _formError;
@@ -48,9 +52,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     _name.dispose();
     _email.dispose();
     _password.dispose();
+    _passwordConfirm.dispose();
     _nameFocus.dispose();
     _emailFocus.dispose();
     _passwordFocus.dispose();
+    _confirmFocus.dispose();
     super.dispose();
   }
 
@@ -69,6 +75,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       _emailFocus.requestFocus();
     } else if (errors.containsKey('password')) {
       _passwordFocus.requestFocus();
+    } else if (errors.containsKey('passwordConfirm')) {
+      _confirmFocus.requestFocus();
     }
   }
 
@@ -95,6 +103,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final passwordError = AuthValidators.password(_password.text);
     if (passwordError != null) {
       errors['password'] = passwordError;
+    }
+    // Hanya pemeriksaan salah ketik; aturan sandi sebenarnya dinilai server (RULE-M023).
+    if (passwordError == null) {
+      if (_passwordConfirm.text.isEmpty) {
+        errors['passwordConfirm'] = AppTexts.fieldPasswordConfirmRequired;
+      } else if (_passwordConfirm.text != _password.text) {
+        errors['passwordConfirm'] = AppTexts.fieldPasswordMismatch;
+      }
     }
     if (!_termsAccepted) {
       errors['terms'] = AppTexts.termsRequired;
@@ -146,6 +162,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final termsError = _errors['terms'];
 
     return AuthScaffold(
+      alignStart: true,
       title: AppTexts.registerTitle,
       subtitle: AppTexts.registerSubtitle,
       children: <Widget>[
@@ -191,8 +208,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 focusNode: _passwordFocus,
                 readOnly: _submitting,
                 errorText: _errors['password'],
+                textInputAction: TextInputAction.next,
                 autofillHints: const <String>[AutofillHints.newPassword],
                 onChanged: (_) => _clearError('password'),
+                onSubmitted: (_) => _confirmFocus.requestFocus(),
+              ),
+              SizedBox(height: space.md),
+              PasswordField(
+                controller: _passwordConfirm,
+                focusNode: _confirmFocus,
+                label: AppTexts.fieldPasswordConfirm,
+                readOnly: _submitting,
+                errorText: _errors['passwordConfirm'],
+                autofillHints: const <String>[AutofillHints.newPassword],
+                onChanged: (_) => _clearError('passwordConfirm'),
                 onSubmitted: (_) => FocusScope.of(context).unfocus(),
               ),
             ],
@@ -246,10 +275,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             _submitting ? AppTexts.processing : AppTexts.registerAction,
           ),
         ),
-        SizedBox(height: space.xs),
-        TextButton(
+        SizedBox(height: space.md),
+        AuthSwitchRow(
+          prompt: AppTexts.registerHaveAccount,
+          action: AppTexts.registerToLogin,
           onPressed: _submitting ? null : () => context.go(AppRoutes.login),
-          child: const Text(AppTexts.registerToLogin),
         ),
       ],
     );
