@@ -54,6 +54,8 @@ class PillSegments<T> extends StatelessWidget {
       ),
       child: Row(
         mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
+        // Segmen mengisi tinggi pil (target sentuh), lebarnya mengikuti isi bila tidak `expand`.
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           for (final segment in segments)
             _wrap(
@@ -102,29 +104,34 @@ class _Segment<T> extends StatelessWidget {
         child: AnimatedContainer(
           duration: reduceMotion ? Duration.zero : RbMotion.screen,
           curve: RbMotion.curve,
-          alignment: Alignment.center,
-          padding: EdgeInsets.symmetric(horizontal: space.md),
+          padding: EdgeInsets.symmetric(horizontal: space.sm),
           decoration: BoxDecoration(
             color: selected ? colors.primary : Colors.transparent,
             borderRadius: RbRadius.pillBorder,
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              if (segment.icon != null)
-                Icon(
-                  segment.icon,
-                  size: RbSize.modeSwitchIcon,
-                  color: foreground,
-                ),
-              if (segment.icon != null && segment.label != null)
-                SizedBox(width: space.xs),
-              if (segment.label != null)
-                Text(
-                  segment.label!,
-                  style: text.button.copyWith(color: foreground),
-                ),
-            ],
+          // `Center` dengan widthFactor 1: lebar mengikuti isi (bukan melebar penuh seperti
+          // `Container.alignment`, yang membuat segmen pertama menelan semua ruang dan
+          // mendorong segmen berikutnya keluar pil), tinggi mengikuti pil.
+          child: Center(
+            widthFactor: 1,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                if (segment.icon != null)
+                  Icon(
+                    segment.icon,
+                    size: RbSize.modeSwitchIcon,
+                    color: foreground,
+                  ),
+                if (segment.icon != null && segment.label != null)
+                  SizedBox(width: space.xs),
+                if (segment.label != null)
+                  Text(
+                    segment.label!,
+                    style: text.button.copyWith(color: foreground),
+                  ),
+              ],
+            ),
           ),
         ),
       ),

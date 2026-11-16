@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Design System dan Spesifikasi Layar
-Version: 0.41 | Status: Draft | Last updated: 2026-11-15
+Version: 0.42 | Status: Draft | Last updated: 2026-11-15
 Depends on: PRD-Mobile v0.3, Architecture-Mobile v0.3, Design RelaxBoss (web) | Owner: Founder (solo developer)
 
 Label: `[Assumption]` bisa diubah. Kedalaman: **Lite**. Platform: Android (phone) dulu, mode terang. Tata letak layar yang tidak tertulis dibangun sederhana (fungsi dulu) memakai token dan komponen di dokumen ini (RULE-M007).
@@ -151,7 +151,7 @@ Teks layar penting (judul sambutan, krisis) tidak lebih kecil dari 16sp.
 | CMP-M54 | `MoodQuickLog` | Kartu "Gimana perasaanmu hari ini?" berisi `MoodBlobRow`; tampil di Mood Tracker hanya selama mood hari ini belum tercatat |
 | CMP-M55 | `RbAppBar` | Bilah atas tunggal untuk semua layar sesudah masuk, selalu tiga unsur: penanda kiri, nama layar, SOS kanan. `RbAppBar.root` (layar tab) memakai logo RelaxMate (avatar maskot kecil) lalu nama fitur; `RbAppBar.pushed` (layar lanjutan) memakai tombol kembali lalu nama layar. Latar transparan; `showSos: false` hanya untuk Kontak bantuan; `sosPulse` untuk Ngobrol saat krisis. Tanpa tagline, menu, atau tombol lain; kendali tambahan milik layar ada di badan layar |
 | CMP-M56 | `PillSegments` | Kontrol pilihan berbentuk pil dua segmen atau lebih (tinggi 48dp), segmen terpilih `primary` dengan teks `onPrimary`; `expand` untuk lebar penuh. Dipakai pilihan 7 atau 30 hari (Mood Tracker) dan pengalih tampilan Ngobrol |
-| CMP-M57 | `ChatSubBar` | Sub-baris Ngobrol di bawah bilah atas: `ChatModeSwitch` di kiri, tombol Riwayat (ikon jam dan teks, ikon saja pada teks sangat besar) di kanan |
+| CMP-M57 | `ChatSubBar` | Sub-baris Ngobrol di bawah bilah atas: `ChatModeSwitch` di kiri, tombol Riwayat (ikon jam dan teks, ikon saja pada teks sangat besar) di kanan. Pil pengalih mendapat seluruh sisa lebar dan dibungkus `FittedBox(scaleDown)`; tombol Riwayat tinggal ikon bila sub-baris lebih sempit dari 320dp |
 | CMP-M22 | `HistoryLoadMore` | Kaki daftar riwayat dan detail (TASK-M027): tombol teks "Muat lebih banyak" / "Muat pesan berikutnya", indikator saat memuat, atau `ErrorAlert` dengan "Coba lagi" |
 | CMP-M20 | `ConsentChoiceTile` | Kartu pilihan tunggal setara tombol radio: tinggi >= 48dp, radius kartu, garis `inputBorder` 1dp; terpilih = latar `surfaceAlt`, garis `primary` 2dp, ikon radio terisi (tidak hanya warna). `Semantics`: `inMutuallyExclusiveGroup`, `checked`, label teks pilihan. Dibangun di TASK-M023 `[Verified: kode]` |
 
@@ -407,6 +407,7 @@ Ikon: satu set (`[Assumption]` Lucide untuk Flutter), ukuran 24dp, stroke 2. OQ-
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.42 | 2026-11-15 | Perbaikan lebar pil Ngobrol: jarak samping segmen `PillSegments` 16 menjadi 12dp, pil dibungkus `FittedBox(scaleDown)`, Riwayat tinggal ikon di bawah 320dp. |
 | 0.41 | 2026-11-15 | Header dan navigasi dirapikan: `RbAppBar` (logo atau kembali, nama layar, SOS) di semua layar; lima tab dengan Pengaturan; sub-baris Ngobrol (`ChatSubBar`, `PillSegments`) menggantikan menu tiga titik, nama RelaxMate, dan tagline di bilah atas; Temani saja pindah ke tab Latihan; Beranda tanpa ikon Pengaturan di kepala; CMP-M55 sampai M57. |
 | 0.40 | 2026-11-15 | Redesign SCR-M23: halaman dinamai "Mood Tracker"; gelembung blob, kartu refleksi, kurva halus 7 hari, kalender 30 hari, riwayat membulat, isi mood cepat; CMP-M50 sampai M54; CMP-M31 tetap hanya untuk Beranda. |
 | 0.39 | 2026-11-15 | Poles halaman Latihan (SCR-M11/M12): `ExerciseScaffold` dengan latar gradien lembut seperti Beranda, ubin kartu melayang, pratinjau dan kartu pilihan napas, panduan napas bergradien tipis; grounding tanpa angka ganda (titik kemajuan, "Sebutkan" + angka + isi, petunjuk per indra); copy Latihan ditulis ulang. |
