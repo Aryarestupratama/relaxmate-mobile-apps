@@ -155,7 +155,8 @@ abstract final class RbSize {
   /// Beranda yang dipoles (TASK-M074): jarak geser masuk kartu, blob besar kartu mingguan, dan
   /// maskot di kiri gelembung pada kartu undangan (lebar mengikuti rasio gambar).
   static const double motionShift = 12;
-  static const double weekBlob = 88;
+  static const double weekBlob = 72;
+  static const double weekDot = 10;
   static const double inviteMascotHeight = 104;
   static const double weekActionIcon = 18;
 

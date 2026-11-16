@@ -7,7 +7,6 @@ import 'package:relaxmate/core/theme/rb_motion.dart';
 import 'package:relaxmate/core/theme/rb_radius.dart';
 import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
-import 'package:relaxmate/core/time/wib.dart';
 import 'package:relaxmate/features/checkin/state/checkin_controller.dart';
 import 'package:relaxmate/features/checkin/ui/mood_blob_row.dart';
 import 'package:relaxmate/features/checkin/ui/mood_level_color.dart';
@@ -20,8 +19,8 @@ import 'package:relaxmate/shared/widgets/floating_card.dart';
 
 /// SCR-M22, kartu mood di Beranda (FR-M013, FR-M029). Tiga keadaan:
 /// - belum ada mood hari ini (atau "Ubah" ditekan): lima blob, satu ketukan mencatat;
-/// - sudah tercatat: konfirmasi (label, jam WIB, ucapan terima kasih di baris sendiri, tombol
-///   "Ubah" berbingkai);
+/// - sudah tercatat: konfirmasi singkat (label mood dan tombol "Ubah" berbingkai; tanpa jam
+///   dan tanpa ucapan terima kasih, revisi 2026-11-16);
 /// - deret sedang dimuat: penanda memuat, supaya pilihan tidak berkedip lalu hilang bagi
 ///   yang sudah mengisi.
 /// Blob memakai `MoodBlobRow` yang sudah ada; tidak memanggil AI. Kartu melayang (TASK-M074):
@@ -95,14 +94,6 @@ class MoodCheckinCard extends ConsumerWidget {
                       AppTexts.homeMoodDone(today.level.label),
                       style: text.body.copyWith(fontWeight: FontWeight.w700),
                     ),
-                  ),
-                  Text(
-                    AppTexts.homeMoodRecordedAt(wibTimeLabel(today.loggedAt)),
-                    style: text.small.copyWith(color: colors.textSecondary),
-                  ),
-                  Text(
-                    AppTexts.homeMoodThanks,
-                    style: text.small.copyWith(color: colors.textSecondary),
                   ),
                   SizedBox(height: space.sm),
                   OutlinedButton(

@@ -529,8 +529,6 @@ abstract final class AppTexts {
   static const String homeMoodCancel = 'Batal';
   static const String homeMoodSaving = 'Mencatat perasaanmu...';
   static String homeMoodDone(String label) => 'Hari ini kamu merasa $label';
-  static String homeMoodRecordedAt(String time) => 'Tercatat pukul $time';
-  static const String homeMoodThanks = 'Terima kasih sudah jujur.';
   static const String homeMoodChange = 'Ubah';
   static const String homeInviteTitle = 'Mau cerita sedikit?';
   static const String homeInviteBubble = 'Hari ini terasa seperti apa?';
@@ -550,23 +548,13 @@ abstract final class AppTexts {
   static const String homeBreathingSubtitle = 'Tenang dalam beberapa menit';
   static const String homeCompanionTitle = 'Temani saja';
   static const String homeCompanionSubtitle = 'Tanpa harus bicara';
-  static const String homeSupportTitle = 'Kalau terasa sangat berat';
-  static const String homeSupportBody =
-      'Kamu tidak sendirian. Ada orang yang siap membantumu sekarang, gratis.';
-  static const String homeSupportAction = 'Buka Kontak bantuan';
 
   static const String homeWeekTitle = 'Perasaanmu seminggu ini';
-  static const String homeWeekTone1 =
-      'Cukup berat akhir-akhir ini. Pelan-pelan saja ya.';
-  static const String homeWeekTone2 = 'Agak sendu, dan itu wajar.';
-  static const String homeWeekTone3 = 'Cukup tenang dan stabil.';
-  static const String homeWeekTone4 = 'Terasa ringan dan lega.';
-  static const String homeWeekTone5 = 'Cerah dan penuh semangat.';
   static String homeWeekFilled(int filled, int total) =>
-      'Sudah $filled dari $total hari tercatat';
+      '$filled dari $total hari terisi';
   static const String homeWeekEmpty =
-      'Catat perasaanmu selama 2 hari, nanti ringkasannya muncul di sini.';
-  static const String homeWeekAction = 'Lihat selengkapnya';
+      'Isi mood 2 hari dulu, ringkasannya muncul di sini.';
+  static const String homeWeekAction = 'Lihat detail';
 
   static const String homeChartAverageLead = 'Rata-rata: ';
   static const String homeChartBestLead = '. Hari terbaik: ';

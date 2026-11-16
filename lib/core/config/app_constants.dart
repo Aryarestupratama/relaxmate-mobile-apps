@@ -88,7 +88,7 @@ abstract final class AppConstants {
   /// Pada rentang 30 hari label sumbu x dipasang tiap sekian hari, dihitung mundur dari hari ini.
   static const int moodLongLabelStepDays = 7;
 
-  /// Mood terendah yang memunculkan kartu "Kalau terasa sangat berat" di Beranda (Sangat sedih
-  /// dan Sedih, sesuai mockup).
+  /// Mood terendah yang membuat kartu undangan Beranda memakai nada lebih lembut (Sangat sedih
+  /// dan Sedih). Kartu "Kalau terasa sangat berat" sudah dihapus (2026-11-16).
   static const int moodSupportCardMaxLevel = 2;
 }

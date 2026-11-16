@@ -19,22 +19,16 @@ import 'package:relaxmate/shared/widgets/floating_card.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar_size.dart';
 
-/// SCR-M22, kartu ringkasan mingguan (TASK-M074). Pengganti skor persen: blob besar yang
-/// warnanya mengikuti mood rata-rata minggu ini (`averageLevel`, dihitung server; RULE-M033)
-/// dengan satu kalimat lembut pendek (tanpa mengulang "minggu ini" dari judul), "5 dari 7
-/// hari terisi", dan tombol berlabel "Lihat detail mood". Tanpa angka yang menilai atau
-/// menagih (RULE-M046). Belum dua hari terisi: kartu lavender dengan ajakan mengisi. Memuat
-/// atau gagal: tidak tampil (kartu grafik di bawahnya yang menampilkan galat).
+/// SCR-M22, kartu ringkasan mingguan (TASK-M074, dirapikan 2026-11-16). Dua baris:
+/// 1. kepala: judul "Perasaanmu seminggu ini" dan pil status mood rata-rata (titik warna +
+///    label, mis. "Biasa") sejajar dalam satu baris;
+/// 2. isi: blob mood di kiri, di kanan "5 dari 7 hari terisi" dan tombol "Lihat detail".
+/// Mood rata-rata dihitung server (`averageLevel`, RULE-M033). Kalimat penjelas dihapus karena
+/// pil status sudah menyampaikan nadanya. Tanpa angka yang menilai atau menagih (RULE-M046).
+/// Belum dua hari terisi: kartu lavender tanpa pil, berisi ajakan singkat. Memuat atau gagal:
+/// tidak tampil (kartu grafik di bawahnya yang menampilkan galat).
 class HomeWeekCard extends ConsumerWidget {
   const HomeWeekCard({super.key});
-
-  String _tone(MoodLevel level) => switch (level) {
-        MoodLevel.verySad => AppTexts.homeWeekTone1,
-        MoodLevel.sad => AppTexts.homeWeekTone2,
-        MoodLevel.neutral => AppTexts.homeWeekTone3,
-        MoodLevel.happy => AppTexts.homeWeekTone4,
-        MoodLevel.great => AppTexts.homeWeekTone5,
-      };
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -50,7 +44,6 @@ class HomeWeekCard extends ConsumerWidget {
       level: level,
       filled: series.filledDays,
       total: series.totalDays,
-      tone: level == null ? AppTexts.homeWeekEmpty : _tone(level),
     );
   }
 }
@@ -60,13 +53,11 @@ class _WeekTile extends StatelessWidget {
     required this.level,
     required this.filled,
     required this.total,
-    required this.tone,
   });
 
   final MoodLevel? level;
   final int filled;
   final int total;
-  final String tone;
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +66,9 @@ class _WeekTile extends StatelessWidget {
     final space = context.rbSpace;
     final current = level;
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
+    final summary = current == null
+        ? AppTexts.homeWeekEmpty
+        : AppTexts.homeWeekFilled(filled, total);
 
     final Widget picture = current == null
         ? const MateAvatar(size: MateAvatarSize.large)
@@ -88,9 +82,9 @@ class _WeekTile extends StatelessWidget {
     return Semantics(
       button: true,
       excludeSemantics: true,
-      label: '${AppTexts.homeWeekTitle}. $tone '
-          '${AppTexts.homeWeekFilled(filled, total)}. '
-          '${AppTexts.homeWeekAction}',
+      label: '${AppTexts.homeWeekTitle}. '
+          '${current == null ? '' : '${current.label}. '}'
+          '$summary. ${AppTexts.homeWeekAction}',
       onTap: () => context.go(AppRoutes.mood),
       child: FloatingCard(
         tint: current == null ? colors.softLavender : current.colorOf(colors),
@@ -102,72 +96,124 @@ class _WeekTile extends StatelessWidget {
             onTap: () => context.go(AppRoutes.mood),
             child: Padding(
               padding: EdgeInsets.all(space.md),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(AppTexts.homeWeekTitle, style: text.h3),
-                        SizedBox(height: space.xxs),
-                        Text(
-                          tone,
-                          style:
-                              text.body.copyWith(fontWeight: FontWeight.w700),
-                        ),
-                        if (current != null) ...<Widget>[
-                          SizedBox(height: space.xxs),
-                          Text(
-                            AppTexts.homeWeekFilled(filled, total),
-                            style: text.small
-                                .copyWith(color: colors.textSecondary),
-                          ),
-                        ],
-                        SizedBox(height: space.sm),
-                        OutlinedButton(
-                          onPressed: () => context.go(AppRoutes.mood),
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: colors.card,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: RbRadius.pillBorder,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              const Flexible(
-                                child: Text(AppTexts.homeWeekAction),
-                              ),
-                              SizedBox(width: space.xxs),
-                              const Icon(
-                                LucideIcons.chevronRight,
-                                size: RbSize.weekActionIcon,
-                              ),
-                            ],
-                          ),
-                        ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(AppTexts.homeWeekTitle, style: text.h3),
+                      ),
+                      if (current != null) ...<Widget>[
+                        SizedBox(width: space.xs),
+                        _StatusPill(level: current),
                       ],
-                    ),
+                    ],
                   ),
-                  SizedBox(width: space.sm),
-                  reduceMotion
-                      ? picture
-                      : picture
-                          .animate(delay: RbMotion.enter)
-                          .scaleXY(
-                            begin: RbMotion.popFrom,
-                            end: 1,
-                            duration: RbMotion.pop,
-                            curve: RbMotion.curve,
-                          )
-                          .fadeIn(
-                            duration: RbMotion.pop,
-                            curve: RbMotion.curve,
-                          ),
+                  SizedBox(height: space.sm),
+                  Row(
+                    children: <Widget>[
+                      reduceMotion
+                          ? picture
+                          : picture
+                              .animate(delay: RbMotion.enter)
+                              .scaleXY(
+                                begin: RbMotion.popFrom,
+                                end: 1,
+                                duration: RbMotion.pop,
+                                curve: RbMotion.curve,
+                              )
+                              .fadeIn(
+                                duration: RbMotion.pop,
+                                curve: RbMotion.curve,
+                              ),
+                      SizedBox(width: space.md),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              summary,
+                              style: text.small
+                                  .copyWith(color: colors.textSecondary),
+                            ),
+                            SizedBox(height: space.xs),
+                            OutlinedButton(
+                              onPressed: () => context.go(AppRoutes.mood),
+                              style: OutlinedButton.styleFrom(
+                                backgroundColor: colors.card,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: RbRadius.pillBorder,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  const Flexible(
+                                    child: Text(AppTexts.homeWeekAction),
+                                  ),
+                                  SizedBox(width: space.xxs),
+                                  const Icon(
+                                    LucideIcons.chevronRight,
+                                    size: RbSize.weekActionIcon,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Pil putih berisi titik warna mood dan label (mis. "Biasa"). Warna tidak menjadi satu-satunya
+/// pembawa makna: labelnya selalu tertulis (RULE-M052).
+class _StatusPill extends StatelessWidget {
+  const _StatusPill({required this.level});
+
+  final MoodLevel level;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.rbColors;
+    final text = context.rbText;
+    final space = context.rbSpace;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.card,
+        borderRadius: RbRadius.pillBorder,
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: space.sm,
+          vertical: space.xxs,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: level.colorOf(colors),
+                shape: BoxShape.circle,
+              ),
+              child: const SizedBox.square(dimension: RbSize.weekDot),
+            ),
+            SizedBox(width: space.xs),
+            Text(
+              level.label,
+              style: text.small.copyWith(fontWeight: FontWeight.w700),
+            ),
+          ],
         ),
       ),
     );
