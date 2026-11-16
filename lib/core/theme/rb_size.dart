@@ -46,6 +46,15 @@ abstract final class RbSize {
   static const double groundingBadge = 112;
   static const double groundingNumber = 56;
 
+  /// Titik kemajuan grounding (lima titik; yang aktif memanjang) dan pratinjau lingkaran
+  /// napas di layar pilih durasi.
+  static const double groundingDot = 8;
+  static const double groundingDotActive = 24;
+  static const double breathingPreview = 168;
+
+  /// Lingkaran ikon pada ubin daftar Latihan.
+  static const double exerciseIconChip = 44;
+
   /// Tinggi maskot beranimasi (CMP-M20): di sambutan chat dan di layar Temani saja. Lebar
   /// mengikuti rasio gambar.
   static const double mascotWelcomeHeight = 140;

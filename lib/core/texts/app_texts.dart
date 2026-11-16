@@ -363,9 +363,10 @@ abstract final class AppTexts {
   // Latihan lokal (SCR-M11, SCR-M12, FR-M014). Berjalan di perangkat: tanpa AI, tanpa kuota,
   // tanpa internet. Disclaimer dan jalur ke bantuan mengikuti RULE-M046.
   static const String exercisesTitle = 'Latihan';
+  static const String exercisesHeading = 'Tenangkan diri sebentar';
   static const String exercisesIntro =
-      'Beberapa menit untuk menenangkan diri. Semuanya berjalan di HP-mu, '
-      'tanpa AI, dan bisa dipakai tanpa internet.';
+      'Pilih yang terasa pas hari ini. Semuanya berjalan di HP-mu, tanpa AI '
+      'dan tanpa internet.';
   static const String exercisesDisclaimer =
       'Latihan ini membantu menenangkan diri. Ini bukan layanan medis dan '
       'tidak menggantikan profesional. Kalau terasa berat, kamu tidak harus '
@@ -380,17 +381,17 @@ abstract final class AppTexts {
 
   // Latihan napas (SCR-M11).
   static const String breathingTitle = 'Latihan napas';
-  static const String breathingSubtitle =
-      'Tarik, tahan, embuskan. Pilih 1, 3, atau 5 menit.';
+  static const String breathingSubtitle = 'Napas pelan selama 1 sampai 5 menit';
   static const String breathingIntro =
-      'Duduk dengan nyaman. Ikuti lingkaran: membesar saat kamu menarik napas, '
+      'Duduk dengan nyaman. Lingkaran membesar saat kamu menarik napas dan '
       'mengecil saat kamu mengembuskan.';
   static const String breathingDurationLabel = 'Berapa lama?';
   static const String breathingHaptics = 'Getar halus';
   static const String breathingHapticsHint =
-      'Terasa setiap pergantian napas. Bergantung pada pengaturan getar '
-      'perangkatmu.';
+      'Getaran lembut tiap pergantian napas, mengikuti pengaturan getar '
+      'HP-mu.';
   static const String breathingStart = 'Mulai';
+  static const String breathingStop = 'Akhiri';
   static const String breathingInhale = 'Tarik napas...';
   static const String breathingHold = 'Tahan...';
   static const String breathingExhale = 'Embuskan pelan-pelan...';
@@ -407,21 +408,36 @@ abstract final class AppTexts {
 
   // Grounding 5-4-3-2-1 (SCR-M12). Satu indra per langkah, dari 5 sampai 1.
   static const String groundingTitle = 'Grounding 5-4-3-2-1';
-  static const String groundingSubtitle =
-      'Kenali sekitarmu lewat lima indra, satu per satu.';
-  static const String groundingHint =
-      'Ambil waktumu. Tidak perlu terburu-buru.';
+  static const String groundingSubtitle = 'Kenali sekitarmu lewat lima indra';
   static const String groundingNext = 'Lanjut';
-  static const String groundingSee = 'Sebutkan 5 hal yang kamu lihat.';
-  static const String groundingTouch = 'Sebutkan 4 hal yang bisa kamu sentuh.';
-  static const String groundingHear = 'Sebutkan 3 hal yang kamu dengar.';
-  static const String groundingSmell = 'Sebutkan 2 hal yang kamu cium.';
-  static const String groundingTaste = 'Sebutkan 1 hal yang bisa kamu cicipi.';
+
+  /// Kata pembuka di atas angka besar; angka lalu [groundingSee] dan seterusnya melengkapi
+  /// kalimatnya ("Sebutkan" / 5 / "hal yang bisa kamu lihat"), jadi jumlahnya tidak
+  /// diulang di teks.
+  static const String groundingLead = 'Sebutkan';
+  static const String groundingSee = 'hal yang bisa kamu lihat';
+  static const String groundingTouch = 'hal yang bisa kamu sentuh';
+  static const String groundingHear = 'suara yang bisa kamu dengar';
+  static const String groundingSmell = 'aroma yang bisa kamu cium';
+  static const String groundingTaste = 'rasa yang bisa kamu cicipi';
+  static const String groundingSeeHint =
+      'Pelan-pelan saja. Warna, bentuk, atau cahaya juga boleh.';
+  static const String groundingTouchHint =
+      'Rasakan kain bajumu, sandaran kursi, atau permukaan di bawah tanganmu.';
+  static const String groundingHearHint =
+      'Dengarkan suara yang dekat, lalu yang jauh.';
+  static const String groundingSmellHint =
+      'Tidak tercium apa-apa? Bayangkan aroma yang kamu suka.';
+  static const String groundingTasteHint =
+      'Boleh rasa di mulutmu sekarang, atau bayangkan makanan kesukaanmu.';
   static const String groundingDoneTitle = 'Kamu sudah sampai di sini';
   static const String groundingDoneBody =
-      'Kamu sudah mengenali sekitarmu satu per satu. Perhatikan sebentar '
-      'bagaimana rasanya sekarang.';
+      'Kamu sudah mengenali sekitarmu lewat kelima indra. Tarik napas '
+      'sebentar dan rasakan bagaimana kamu sekarang.';
 
+  /// Untuk pembaca layar: kalimat utuh dari kata pembuka, angka, dan isi langkah.
+  static String groundingStepLabel(int count, String what) =>
+      '$groundingLead $count $what';
   static String groundingProgress(int step, int total) =>
       'Langkah $step dari $total';
 

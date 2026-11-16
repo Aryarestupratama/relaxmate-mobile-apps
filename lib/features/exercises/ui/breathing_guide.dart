@@ -4,16 +4,27 @@ import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/features/exercises/data/breathing_phase.dart';
 
-/// CMP-M11: lingkaran panduan napas. Cincin tipis tetap di ukuran penuh; lingkaran di dalamnya
-/// membesar selama tarik napas, bertahan saat menahan, lalu mengecil selama embusan. Murni
-/// hiasan: panduan untuk pembaca layar ada pada teks instruksi di layar latihan.
+/// CMP-M11: lingkaran panduan napas. Cakram sangat tipis dan cincin tipis tetap di ukuran
+/// penuh (menandai sejauh mana lingkaran akan membesar); lingkaran lavender di dalamnya
+/// membesar selama tarik napas, bertahan saat menahan, lalu mengecil selama embusan. Hanya
+/// satu gerak, lembut, tanpa kilau atau denyut tambahan. Murni hiasan: panduan untuk
+/// pembaca layar ada pada teks instruksi di layar latihan. [size] mengubah garis tengah
+/// (pratinjau di layar pilih durasi memakai ukuran lebih kecil).
 ///
 /// Bila pengguna mengurangi gerak (`MediaQuery.disableAnimations`), lingkaran diam di ukuran
 /// tengah dan panduan hanya lewat teks (Design-M aksesibilitas, RULE-M055).
 class BreathingGuide extends StatelessWidget {
-  const BreathingGuide({required this.phase, super.key});
+  const BreathingGuide({
+    required this.phase,
+    this.size = RbSize.breathingGuide,
+    super.key,
+  });
 
   final BreathingPhase phase;
+  final double size;
+
+  /// Seberapa tipis cakram latar di ukuran penuh.
+  static const double _discAlpha = 0.35;
 
   @override
   Widget build(BuildContext context) {
@@ -29,8 +40,8 @@ class BreathingGuide extends StatelessWidget {
 
     return ExcludeSemantics(
       child: SizedBox(
-        width: RbSize.breathingGuide,
-        height: RbSize.breathingGuide,
+        width: size,
+        height: size,
         child: Stack(
           fit: StackFit.expand,
           alignment: Alignment.center,
@@ -38,6 +49,7 @@ class BreathingGuide extends StatelessWidget {
             DecoratedBox(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
+                color: colors.softLavender.withValues(alpha: _discAlpha),
                 border: Border.all(
                   color: colors.border,
                   width: RbSize.borderThin,
@@ -55,7 +67,14 @@ class BreathingGuide extends StatelessWidget {
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: colors.softLavender,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: <Color>[
+                      colors.softLavender,
+                      colors.brandSoft.withValues(alpha: 0.45),
+                    ],
+                  ),
                 ),
               ),
             ),

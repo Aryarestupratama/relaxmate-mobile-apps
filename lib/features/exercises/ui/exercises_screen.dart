@@ -4,15 +4,18 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:relaxmate/core/router/app_routes.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
-import 'package:relaxmate/features/crisis/ui/sos_button.dart';
 import 'package:relaxmate/features/exercises/ui/exercise_disclaimer.dart';
+import 'package:relaxmate/features/exercises/ui/exercise_scaffold.dart';
 import 'package:relaxmate/features/exercises/ui/exercise_tile.dart';
 import 'package:relaxmate/shared/widgets/app_bottom_nav.dart';
+import 'package:relaxmate/shared/widgets/rb_entrance.dart';
 import 'package:relaxmate/shared/widgets/tab_back_scope.dart';
 
 /// Daftar latihan lokal (tab Latihan di navigasi bawah): latihan napas (SCR-M11) dan grounding
-/// (SCR-M12). Hanya perlu masuk; tidak dibungkus `ConsentGate` karena tanpa AI (RULE-M034,
-/// ADR-M14). Isinya statis, jadi tidak ada status memuat atau galat.
+/// (SCR-M12). Latar gradien lembut seperti Beranda, sapaan pendek, dua kartu pilihan, lalu
+/// catatan bukan layanan medis. Hanya perlu masuk; tidak dibungkus `ConsentGate` karena tanpa
+/// AI (RULE-M034, ADR-M14). Isinya statis, jadi tidak ada status memuat atau galat. Gerak
+/// hanya masuk berurutan sekali (`RbEntrance`).
 class ExercisesScreen extends StatelessWidget {
   const ExercisesScreen({super.key});
 
@@ -23,37 +26,53 @@ class ExercisesScreen extends StatelessWidget {
     final space = context.rbSpace;
 
     return TabBackScope(
-      child: Scaffold(
+      child: ExerciseScaffold(
+        title: AppTexts.exercisesTitle,
         bottomNavigationBar: const AppBottomNav(current: AppTab.exercises),
-        appBar: AppBar(
-          title: const Text(AppTexts.exercisesTitle),
-          actions: const <Widget>[SosAppBarAction()],
-        ),
-        body: SafeArea(
-          child: ListView(
-            padding: EdgeInsets.all(space.lg),
-            children: <Widget>[
-              Text(
-                AppTexts.exercisesIntro,
-                style: text.body.copyWith(color: colors.textSecondary),
+        body: ListView(
+          padding: EdgeInsets.fromLTRB(space.lg, space.md, space.lg, space.lg),
+          children: <Widget>[
+            RbEntrance(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Semantics(
+                    header: true,
+                    child: Text(AppTexts.exercisesHeading, style: text.h1),
+                  ),
+                  SizedBox(height: space.xs),
+                  Text(
+                    AppTexts.exercisesIntro,
+                    style: text.body.copyWith(color: colors.textSecondary),
+                  ),
+                ],
               ),
-              SizedBox(height: space.md),
-              ExerciseTile(
+            ),
+            SizedBox(height: space.lg),
+            RbEntrance(
+              index: 1,
+              child: ExerciseTile(
                 icon: LucideIcons.wind,
                 title: AppTexts.breathingTitle,
                 subtitle: AppTexts.breathingSubtitle,
+                tint: colors.mood2,
                 onTap: () => context.push<void>(AppRoutes.breathing),
               ),
-              ExerciseTile(
+            ),
+            SizedBox(height: space.sm),
+            RbEntrance(
+              index: 2,
+              child: ExerciseTile(
                 icon: LucideIcons.eye,
                 title: AppTexts.groundingTitle,
                 subtitle: AppTexts.groundingSubtitle,
+                tint: colors.softLavender,
                 onTap: () => context.push<void>(AppRoutes.grounding),
               ),
-              SizedBox(height: space.lg),
-              const ExerciseDisclaimer(),
-            ],
-          ),
+            ),
+            SizedBox(height: space.lg),
+            const RbEntrance(index: 3, child: ExerciseDisclaimer()),
+          ],
         ),
       ),
     );
