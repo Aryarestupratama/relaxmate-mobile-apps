@@ -4,13 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:relaxmate/core/router/app_routes.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
-import 'package:relaxmate/features/crisis/ui/sos_button.dart';
 import 'package:relaxmate/features/history/data/history_timeline.dart';
 import 'package:relaxmate/features/history/state/history_controller.dart';
 import 'package:relaxmate/features/history/state/history_state.dart';
 import 'package:relaxmate/features/history/ui/history_entry_tile.dart';
 import 'package:relaxmate/features/history/ui/history_load_more.dart';
 import 'package:relaxmate/shared/widgets/error_alert.dart';
+import 'package:relaxmate/shared/widgets/rb_app_bar.dart';
 
 /// SCR-M14: riwayat sebagai garis waktu per tanggal, hanya baca (FR-M005). Dibungkus
 /// `ConsentGate` di router. Isi diambil dari server tiap layar dibuka (ADR-M07) dan butuh
@@ -25,11 +25,7 @@ class HistoryScreen extends ConsumerWidget {
     final space = context.rbSpace;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppTexts.historyTitle),
-        // Jalur ke bantuan nyata selalu terlihat (Design-M prinsip 4).
-        actions: const <Widget>[SosAppBarAction()],
-      ),
+      appBar: const RbAppBar.pushed(title: AppTexts.historyTitle),
       body: SafeArea(
         child: switch (history) {
           HistoryLoading() => const Center(child: CircularProgressIndicator()),

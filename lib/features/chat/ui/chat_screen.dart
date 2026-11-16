@@ -17,29 +17,22 @@ import 'package:relaxmate/features/chat/ui/chat_date_chip.dart';
 import 'package:relaxmate/features/chat/ui/chat_entrance.dart';
 import 'package:relaxmate/features/chat/ui/calm_actions_button.dart';
 import 'package:relaxmate/features/chat/ui/chat_input_bar.dart';
-import 'package:relaxmate/features/chat/ui/chat_mode_switch.dart';
+import 'package:relaxmate/features/chat/ui/chat_sub_bar.dart';
 import 'package:relaxmate/features/chat/ui/chat_typing_row.dart';
 import 'package:relaxmate/features/chat/ui/chat_welcome.dart';
 import 'package:relaxmate/features/chat/ui/mascot_chat_pane.dart';
-import 'package:relaxmate/features/crisis/ui/sos_button.dart';
 import 'package:relaxmate/features/chat/ui/suggestion_chips.dart';
 import 'package:relaxmate/features/overlay/ui/overlay_resume_banner.dart';
 import 'package:relaxmate/features/crisis/ui/crisis_banner.dart';
 import 'package:relaxmate/shared/widgets/error_alert.dart';
-import 'package:relaxmate/shared/widgets/mate_avatar.dart';
 import 'package:relaxmate/features/settings/data/chat_view_mode.dart';
 import 'package:relaxmate/features/settings/state/settings_controller.dart';
-import 'package:relaxmate/shared/widgets/mate_avatar_size.dart';
 import 'package:relaxmate/shared/widgets/app_bottom_nav.dart';
+import 'package:relaxmate/shared/widgets/rb_app_bar.dart';
 import 'package:relaxmate/shared/widgets/tab_back_scope.dart';
 
-/// Pilihan di menu bilah atas chat. Ikon telepon (kontak bantuan) sudah tidak ada di bilah atas
-/// (keputusan founder 2026-11-15): jalur krisis lewat tombol SOS (tampilan maskot), banner
-/// krisis (tampilan obrolan), saran AI, dan tautan saat kuota habis.
-enum _ChatMenuAction { history, companion, settings }
-
 /// SCR-M08: aliran chat harian (FR-M004, M006, M007), tab Ngobrol. Dibungkus `ConsentGate` di
-/// router; Latihan kini tab sendiri di navigasi bawah, jadi tidak ada lagi di menu tiga titik.
+/// router; Latihan, Mood, dan Pengaturan adalah tab sendiri di navigasi bawah. Bilah atas memakai `RbAppBar.root` (logo, "Ngobrol", SOS yang berdenyut saat krisis); pengalih tampilan dan Riwayat ada di sub-baris `ChatSubBar` (menu tiga titik dan Temani saja dipindah, 2026-11-15).
 /// Tampilan obrolan dipoles di TASK-M073 bagian 7: latar gradien polos (`ChatBackdrop`, bulatan dihapus 2026-11-15),
 /// avatar dan nama RelaxMate di balasan, penanda tanggal, balasan yang "diketik", dan kolom
 /// ketik berbentuk kapsul.
@@ -111,126 +104,51 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           Scaffold(
             backgroundColor: Colors.transparent,
             bottomNavigationBar: const AppBottomNav(current: AppTab.chat),
-            appBar: AppBar(
-              backgroundColor: Colors.transparent,
-              title: const _ChatTitle(),
-              actions: <Widget>[
-                // Jalur bantuan selalu terlihat; cincinnya berdenyut saat krisis terdeteksi.
-                SosAppBarAction(pulse: chat is ChatReady && chat.hasCrisis),
-                ChatModeSwitch(
-                  mode: viewMode,
-                  onChanged: (mode) => ref
-                      .read(settingsControllerProvider.notifier)
-                      .setChatViewMode(mode),
-                ),
-                SizedBox(width: space.xxs),
-                PopupMenuButton<_ChatMenuAction>(
-                  tooltip: AppTexts.chatMenuTooltip,
-                  onSelected: (action) {
-                    switch (action) {
-                      case _ChatMenuAction.history:
-                        context.push<void>(AppRoutes.history);
-                      case _ChatMenuAction.companion:
-                        context.push<void>(AppRoutes.companion);
-                      case _ChatMenuAction.settings:
-                        context.push<void>(AppRoutes.settings);
-                    }
-                  },
-                  itemBuilder: (context) =>
-                      const <PopupMenuEntry<_ChatMenuAction>>[
-                    PopupMenuItem<_ChatMenuAction>(
-                      value: _ChatMenuAction.history,
-                      child: Text(AppTexts.historyTooltip),
-                    ),
-                    PopupMenuItem<_ChatMenuAction>(
-                      value: _ChatMenuAction.companion,
-                      child: Text(AppTexts.companionMenu),
-                    ),
-                    PopupMenuItem<_ChatMenuAction>(
-                      value: _ChatMenuAction.settings,
-                      child: Text(AppTexts.settingsTitle),
-                    ),
-                  ],
-                ),
-              ],
+            appBar: RbAppBar.root(
+              title: AppTexts.navChat,
+              sosPulse: chat is ChatReady && chat.hasCrisis,
             ),
             body: SafeArea(
-              child: switch (chat) {
-                ChatLoading() =>
-                  const Center(child: CircularProgressIndicator()),
-                ChatLoadFailed(:final error) => Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(space.lg),
-                      child: ErrorAlert(
-                        message: error.message,
-                        onRetry: controller.load,
-                      ),
-                    ),
+              child: Column(
+                children: <Widget>[
+                  ChatSubBar(
+                    mode: viewMode,
+                    onModeChanged: (mode) => ref
+                        .read(settingsControllerProvider.notifier)
+                        .setChatViewMode(mode),
                   ),
-                final ChatReady ready => _ChatBody(
-                    ready: ready,
-                    viewMode: viewMode,
-                    input: _input,
-                    onSend: _send,
-                    onRetry: controller.retry,
-                    dismissedSuggestions: _dismissedSuggestions,
-                    onDismissSuggestion: _dismissSuggestion,
-                    entered: _entered,
-                    onReplyTyped: controller.markReplyShown,
+                  Expanded(
+                    child: switch (chat) {
+                      ChatLoading() =>
+                        const Center(child: CircularProgressIndicator()),
+                      ChatLoadFailed(:final error) => Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(space.lg),
+                            child: ErrorAlert(
+                              message: error.message,
+                              onRetry: controller.load,
+                            ),
+                          ),
+                        ),
+                      final ChatReady ready => _ChatBody(
+                          ready: ready,
+                          viewMode: viewMode,
+                          input: _input,
+                          onSend: _send,
+                          onRetry: controller.retry,
+                          dismissedSuggestions: _dismissedSuggestions,
+                          onDismissSuggestion: _dismissSuggestion,
+                          entered: _entered,
+                          onReplyTyped: controller.markReplyShown,
+                        ),
+                    },
                   ),
-              },
+                ],
+              ),
             ),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _ChatTitle extends StatelessWidget {
-  const _ChatTitle();
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.rbColors;
-    final text = context.rbText;
-    final space = context.rbSpace;
-    final showSubtitle =
-        MediaQuery.textScalerOf(context).scale(1) <= RbSize.homeRowMaxTextScale;
-
-    return Row(
-      children: <Widget>[
-        const MateAvatar(size: MateAvatarSize.small),
-        SizedBox(width: space.sm),
-        Flexible(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Flexible(
-                    child: Text(
-                      AppTexts.appName,
-                      style: text.h3,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-              if (showSubtitle)
-                Text(
-                  AppTexts.chatHeaderSubtitle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: text.caption.copyWith(color: colors.textSecondary),
-                ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }
@@ -277,7 +195,7 @@ class _ChatBody extends StatelessWidget {
 
     return Column(
       children: <Widget>[
-        // Tampilan maskot memakai tombol SOS di panggung, bukan banner yang memakan ruang.
+        // Tampilan maskot tidak memakai banner yang memakan ruang; SOS ada di bilah atas.
         if (ready.hasCrisis && viewMode != ChatViewMode.mascot)
           const CrisisBanner(),
         const OverlayResumeBanner(),

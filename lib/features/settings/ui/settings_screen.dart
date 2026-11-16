@@ -16,14 +16,18 @@ import 'package:relaxmate/features/auth/state/auth_state.dart';
 import 'package:relaxmate/features/consent/data/consent_prompt.dart';
 import 'package:relaxmate/features/consent/data/training_choice.dart';
 import 'package:relaxmate/features/consent/ui/consent_choice_tile.dart';
-import 'package:relaxmate/features/crisis/ui/sos_button.dart';
 import 'package:relaxmate/features/overlay/state/overlay_feature_provider.dart';
 import 'package:relaxmate/features/settings/data/chat_view_mode.dart';
 import 'package:relaxmate/features/settings/state/settings_controller.dart';
 import 'package:relaxmate/features/settings/state/training_consent_controller.dart';
+import 'package:relaxmate/shared/widgets/app_bottom_nav.dart';
 import 'package:relaxmate/shared/widgets/error_alert.dart';
+import 'package:relaxmate/shared/widgets/rb_app_bar.dart';
+import 'package:relaxmate/shared/widgets/soft_gradient_background.dart';
+import 'package:relaxmate/shared/widgets/tab_back_scope.dart';
 
-/// SCR-M17: Pengaturan (FR-M025, FR-M003). Akun, pilihan persetujuan pelatihan (dari server,
+/// SCR-M17: Pengaturan (FR-M025, FR-M003), kini tab kelima navigasi bawah (2026-11-15) dengan
+/// `RbAppBar.root` dan latar gradien lembut seperti tab lain. Akun, pilihan persetujuan pelatihan (dari server,
 /// dapat diubah kapan saja), getar latihan napas, lapisan privasi, tautan Privasi,
 /// Ketentuan, dan Kontak bantuan, Keluar, serta Hapus akun. Hanya perlu masuk dengan email
 /// terverifikasi; di luar `ConsentGate` supaya yang menolak consent tetap bisa keluar atau
@@ -89,145 +93,155 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final version = ref.watch(appVersionProvider).value;
     final training = ref.watch(trainingConsentControllerProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppTexts.settingsTitle),
-        actions: const <Widget>[SosAppBarAction()],
-      ),
-      body: SafeArea(
-        child: ListView(
-          padding: EdgeInsets.all(space.lg),
-          children: <Widget>[
-            const _SectionTitle(AppTexts.settingsAccount),
-            if (auth is AuthAuthenticated) ...<Widget>[
-              Text(auth.user.name, style: text.body),
-              Text(
-                auth.user.email,
-                style: text.small.copyWith(color: colors.textSecondary),
-              ),
-            ],
-            SizedBox(height: space.lg),
-            const _SectionTitle(AppTexts.settingsTraining),
-            training.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, _) => Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  ErrorAlert(
-                    message: error is ApiException
-                        ? error.message
-                        : AppTexts.errorGeneric,
-                  ),
-                  SizedBox(height: space.xs),
-                  TextButton(
-                    onPressed: () =>
-                        ref.invalidate(trainingConsentControllerProvider),
-                    child: const Text(AppTexts.retry),
+    return TabBackScope(
+      child: Scaffold(
+        backgroundColor: context.rbColors.pageBg,
+        extendBodyBehindAppBar: true,
+        appBar: const RbAppBar.root(title: AppTexts.settingsTitle),
+        bottomNavigationBar: const AppBottomNav(current: AppTab.settings),
+        body: SoftGradientBackground(
+          child: SafeArea(
+            child: ListView(
+              padding: EdgeInsets.all(space.lg),
+              children: <Widget>[
+                const _SectionTitle(AppTexts.settingsAccount),
+                if (auth is AuthAuthenticated) ...<Widget>[
+                  Text(auth.user.name, style: text.body),
+                  Text(
+                    auth.user.email,
+                    style: text.small.copyWith(color: colors.textSecondary),
                   ),
                 ],
-              ),
-              data: (prompt) => _TrainingChoice(
-                prompt: prompt,
-                saving: _savingTraining,
-                onChoose: _choose,
-              ),
-            ),
-            SizedBox(height: space.lg),
-            const _SectionTitle(AppTexts.settingsDisplay),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              value: settings.chatViewMode == ChatViewMode.mascot,
-              onChanged: (enabled) => ref
-                  .read(settingsControllerProvider.notifier)
-                  .setChatViewMode(
-                    enabled ? ChatViewMode.mascot : ChatViewMode.conversation,
+                SizedBox(height: space.lg),
+                const _SectionTitle(AppTexts.settingsTraining),
+                training.when(
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (error, _) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      ErrorAlert(
+                        message: error is ApiException
+                            ? error.message
+                            : AppTexts.errorGeneric,
+                      ),
+                      SizedBox(height: space.xs),
+                      TextButton(
+                        onPressed: () =>
+                            ref.invalidate(trainingConsentControllerProvider),
+                        child: const Text(AppTexts.retry),
+                      ),
+                    ],
                   ),
-              title: Text(AppTexts.settingsChatMascotMode, style: text.body),
-              subtitle: Text(
-                AppTexts.settingsChatMascotModeHint,
-                style: text.small.copyWith(color: colors.textSecondary),
-              ),
-            ),
-            SizedBox(height: space.lg),
-            const _SectionTitle(AppTexts.settingsPractice),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              value: settings.breathingHaptics,
-              onChanged: ref
-                  .read(settingsControllerProvider.notifier)
-                  .setBreathingHaptics,
-              title: Text(AppTexts.breathingHaptics, style: text.body),
-              subtitle: Text(
-                AppTexts.breathingHapticsHint,
-                style: text.small.copyWith(color: colors.textSecondary),
-              ),
-            ),
-            SizedBox(height: space.lg),
-            if (defaultTargetPlatform == TargetPlatform.android &&
-                (ref.watch(overlayFeatureProvider).value ?? true)) ...<Widget>[
-              const _SectionTitle(AppTexts.settingsMascot),
-              _LinkTile(
-                icon: LucideIcons.heartHandshake,
-                label: AppTexts.overlayTitle,
-                onTap: () => context.push<void>(AppRoutes.overlaySettings),
-              ),
-              SizedBox(height: space.lg),
-            ],
-            const _SectionTitle(AppTexts.settingsPrivacy),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              value: settings.privacyCover,
-              onChanged:
-                  ref.read(settingsControllerProvider.notifier).setPrivacyCover,
-              title: Text(AppTexts.settingsPrivacyCover, style: text.body),
-              subtitle: Text(
-                AppTexts.settingsPrivacyCoverHint,
-                style: text.small.copyWith(color: colors.textSecondary),
-              ),
-            ),
-            _LinkTile(
-              icon: LucideIcons.shieldCheck,
-              label: AppTexts.settingsPolicy,
-              onTap: () => _openWeb(AppConstants.privacyPath),
-            ),
-            _LinkTile(
-              icon: LucideIcons.fileText,
-              label: AppTexts.settingsTerms,
-              onTap: () => _openWeb(AppConstants.termsPath),
-            ),
-            _LinkTile(
-              icon: LucideIcons.smile,
-              label: AppTexts.settingsAbout,
-              onTap: () => context.push<void>(AppRoutes.about),
-            ),
-            _LinkTile(
-              icon: LucideIcons.phone,
-              label: AppTexts.settingsHelp,
-              onTap: () => context.push<void>(AppRoutes.crisisContacts),
-            ),
-            SizedBox(height: space.lg),
-            OutlinedButton(
-              onPressed: _signingOut ? null : _logout,
-              child: Text(
-                _signingOut ? AppTexts.processing : AppTexts.logout,
-              ),
-            ),
-            SizedBox(height: space.xs),
-            TextButton(
-              style: TextButton.styleFrom(foregroundColor: colors.danger),
-              onPressed: () => context.push<void>(AppRoutes.deleteAccount),
-              child: const Text(AppTexts.settingsDeleteAccount),
-            ),
-            if (version != null) ...<Widget>[
-              SizedBox(height: space.md),
-              Center(
-                child: Text(
-                  AppTexts.settingsVersion(version),
-                  style: text.caption.copyWith(color: colors.textMuted),
+                  data: (prompt) => _TrainingChoice(
+                    prompt: prompt,
+                    saving: _savingTraining,
+                    onChoose: _choose,
+                  ),
                 ),
-              ),
-            ],
-          ],
+                SizedBox(height: space.lg),
+                const _SectionTitle(AppTexts.settingsDisplay),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: settings.chatViewMode == ChatViewMode.mascot,
+                  onChanged: (enabled) => ref
+                      .read(settingsControllerProvider.notifier)
+                      .setChatViewMode(
+                        enabled
+                            ? ChatViewMode.mascot
+                            : ChatViewMode.conversation,
+                      ),
+                  title:
+                      Text(AppTexts.settingsChatMascotMode, style: text.body),
+                  subtitle: Text(
+                    AppTexts.settingsChatMascotModeHint,
+                    style: text.small.copyWith(color: colors.textSecondary),
+                  ),
+                ),
+                SizedBox(height: space.lg),
+                const _SectionTitle(AppTexts.settingsPractice),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: settings.breathingHaptics,
+                  onChanged: ref
+                      .read(settingsControllerProvider.notifier)
+                      .setBreathingHaptics,
+                  title: Text(AppTexts.breathingHaptics, style: text.body),
+                  subtitle: Text(
+                    AppTexts.breathingHapticsHint,
+                    style: text.small.copyWith(color: colors.textSecondary),
+                  ),
+                ),
+                SizedBox(height: space.lg),
+                if (defaultTargetPlatform == TargetPlatform.android &&
+                    (ref.watch(overlayFeatureProvider).value ??
+                        true)) ...<Widget>[
+                  const _SectionTitle(AppTexts.settingsMascot),
+                  _LinkTile(
+                    icon: LucideIcons.heartHandshake,
+                    label: AppTexts.overlayTitle,
+                    onTap: () => context.push<void>(AppRoutes.overlaySettings),
+                  ),
+                  SizedBox(height: space.lg),
+                ],
+                const _SectionTitle(AppTexts.settingsPrivacy),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: settings.privacyCover,
+                  onChanged: ref
+                      .read(settingsControllerProvider.notifier)
+                      .setPrivacyCover,
+                  title: Text(AppTexts.settingsPrivacyCover, style: text.body),
+                  subtitle: Text(
+                    AppTexts.settingsPrivacyCoverHint,
+                    style: text.small.copyWith(color: colors.textSecondary),
+                  ),
+                ),
+                _LinkTile(
+                  icon: LucideIcons.shieldCheck,
+                  label: AppTexts.settingsPolicy,
+                  onTap: () => _openWeb(AppConstants.privacyPath),
+                ),
+                _LinkTile(
+                  icon: LucideIcons.fileText,
+                  label: AppTexts.settingsTerms,
+                  onTap: () => _openWeb(AppConstants.termsPath),
+                ),
+                _LinkTile(
+                  icon: LucideIcons.smile,
+                  label: AppTexts.settingsAbout,
+                  onTap: () => context.push<void>(AppRoutes.about),
+                ),
+                _LinkTile(
+                  icon: LucideIcons.phone,
+                  label: AppTexts.settingsHelp,
+                  onTap: () => context.push<void>(AppRoutes.crisisContacts),
+                ),
+                SizedBox(height: space.lg),
+                OutlinedButton(
+                  onPressed: _signingOut ? null : _logout,
+                  child: Text(
+                    _signingOut ? AppTexts.processing : AppTexts.logout,
+                  ),
+                ),
+                SizedBox(height: space.xs),
+                TextButton(
+                  style: TextButton.styleFrom(foregroundColor: colors.danger),
+                  onPressed: () => context.push<void>(AppRoutes.deleteAccount),
+                  child: const Text(AppTexts.settingsDeleteAccount),
+                ),
+                if (version != null) ...<Widget>[
+                  SizedBox(height: space.md),
+                  Center(
+                    child: Text(
+                      AppTexts.settingsVersion(version),
+                      style: text.caption.copyWith(color: colors.textMuted),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
         ),
       ),
     );

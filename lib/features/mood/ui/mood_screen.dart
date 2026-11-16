@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:relaxmate/core/config/app_constants.dart';
-import 'package:relaxmate/core/router/app_routes.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/features/checkin/data/mood_level.dart';
 import 'package:relaxmate/features/checkin/state/checkin_controller.dart';
-import 'package:relaxmate/features/crisis/ui/sos_button.dart';
 import 'package:relaxmate/features/mood/data/mood_series.dart';
 import 'package:relaxmate/features/mood/state/mood_series_controller.dart';
 import 'package:relaxmate/features/mood/state/mood_series_state.dart';
@@ -25,11 +21,12 @@ import 'package:relaxmate/features/mood/ui/mood_trend_chart.dart';
 import 'package:relaxmate/shared/widgets/app_bottom_nav.dart';
 import 'package:relaxmate/shared/widgets/error_alert.dart';
 import 'package:relaxmate/shared/widgets/floating_card.dart';
+import 'package:relaxmate/shared/widgets/rb_app_bar.dart';
 import 'package:relaxmate/shared/widgets/rb_entrance.dart';
 import 'package:relaxmate/shared/widgets/soft_gradient_background.dart';
 import 'package:relaxmate/shared/widgets/tab_back_scope.dart';
 
-/// SCR-M23: Mood Tracker (FR-M030), didesain ulang 2026-11-15. Latar gradien lembut seperti
+/// SCR-M23: Mood Tracker (FR-M030), didesain ulang 2026-11-15; layar tab dengan `RbAppBar.root`. Latar gradien lembut seperti
 /// Beranda. Urutan: kalimat pengantar, pilihan rentang (pil 7 atau 30 hari), kartu isi mood
 /// cepat (hanya bila hari ini belum diisi), gelembung blob mood yang paling sering
 /// (`MoodBubbleCloud`), kartu refleksi dengan tombol ke RelaxMate, kartu grafik (kurva 7 hari
@@ -74,20 +71,7 @@ class _MoodScreenState extends ConsumerState<MoodScreen> {
       child: Scaffold(
         backgroundColor: colors.pageBg,
         extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          scrolledUnderElevation: 0,
-          leading: IconButton(
-            onPressed: () => context.go(AppRoutes.home),
-            tooltip: AppTexts.moodBackTooltip,
-            icon: const Icon(LucideIcons.arrowLeft),
-          ),
-          title: Semantics(
-            header: true,
-            child: const Text(AppTexts.moodTitle),
-          ),
-          actions: const <Widget>[SosAppBarAction()],
-        ),
+        appBar: const RbAppBar.root(title: AppTexts.moodTitle),
         bottomNavigationBar: const AppBottomNav(current: AppTab.mood),
         body: SoftGradientBackground(
           child: SafeArea(

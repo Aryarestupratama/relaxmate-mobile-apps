@@ -20,13 +20,14 @@ import 'package:relaxmate/shared/widgets/app_bottom_nav.dart';
 import 'package:relaxmate/shared/widgets/floating_card.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar_size.dart';
+import 'package:relaxmate/shared/widgets/rb_app_bar.dart';
 import 'package:relaxmate/shared/widgets/rb_entrance.dart';
 import 'package:relaxmate/shared/widgets/soft_gradient_background.dart';
 
 /// SCR-M22: Beranda, layar pertama setelah masuk (FR-M029). Latar gradien lembut seperti
 /// layar Masuk dengan kartu putih melayang (TASK-M074). Sapaan sadar waktu, kartu mood, kartu
 /// ringkasan mingguan, grafik 7 hari, undangan bercerita, jalan ke Ngobrol, Latihan napas,
-/// Temani saja; jalan ke Kontak bantuan selalu ada lewat tombol SOS di kepala. Tanpa `ConsentGate` dan tanpa AI:
+/// Temani saja; jalan ke Kontak bantuan selalu ada lewat tombol SOS di bilah atas (`RbAppBar.root`). Tanpa `ConsentGate` dan tanpa AI:
 /// consent hanya dicek saat membuka Ngobrol. Kartu masuk berurutan (`RbEntrance`); gerak
 /// berulang hanya napas maskot di kartu undangan. Setelah mood tercatat: konfirmasi, ajakan
 /// bercerita, ringkasan, grafik, lalu kartu bantuan lembut bila mood rendah.
@@ -46,11 +47,18 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: colors.pageBg,
+      extendBodyBehindAppBar: true,
+      appBar: const RbAppBar.root(title: AppTexts.navHome),
       bottomNavigationBar: const AppBottomNav(current: AppTab.home),
       body: SoftGradientBackground(
         child: SafeArea(
           child: ListView(
-            padding: EdgeInsets.all(space.md),
+            padding: EdgeInsets.fromLTRB(
+              space.md,
+              space.xs,
+              space.md,
+              space.md,
+            ),
             children: <Widget>[
               const RbEntrance(
                 key: ValueKey<String>('header'),

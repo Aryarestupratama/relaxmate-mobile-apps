@@ -41,6 +41,12 @@ class ChatWelcome extends ConsumerWidget {
             ),
             SizedBox(height: space.md),
             Text(
+              AppTexts.chatHeaderSubtitle,
+              textAlign: TextAlign.center,
+              style: text.h3,
+            ),
+            SizedBox(height: space.xs),
+            Text(
               AppTexts.welcome,
               textAlign: TextAlign.center,
               style: text.body.copyWith(color: colors.textSecondary),

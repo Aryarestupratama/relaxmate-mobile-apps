@@ -11,8 +11,8 @@ import 'package:relaxmate/shared/widgets/app_bottom_nav.dart';
 import 'package:relaxmate/shared/widgets/rb_entrance.dart';
 import 'package:relaxmate/shared/widgets/tab_back_scope.dart';
 
-/// Daftar latihan lokal (tab Latihan di navigasi bawah): latihan napas (SCR-M11) dan grounding
-/// (SCR-M12). Latar gradien lembut seperti Beranda, sapaan pendek, dua kartu pilihan, lalu
+/// Daftar latihan lokal (tab Latihan di navigasi bawah, `RbAppBar.root`): latihan napas (SCR-M11),
+/// grounding (SCR-M12), dan Temani saja (SCR-M13, dipindah dari menu Ngobrol 2026-11-15). Latar gradien lembut seperti Beranda, sapaan pendek, tiga kartu pilihan, lalu
 /// catatan bukan layanan medis. Hanya perlu masuk; tidak dibungkus `ConsentGate` karena tanpa
 /// AI (RULE-M034, ADR-M14). Isinya statis, jadi tidak ada status memuat atau galat. Gerak
 /// hanya masuk berurutan sekali (`RbEntrance`).
@@ -28,6 +28,7 @@ class ExercisesScreen extends StatelessWidget {
     return TabBackScope(
       child: ExerciseScaffold(
         title: AppTexts.exercisesTitle,
+        root: true,
         bottomNavigationBar: const AppBottomNav(current: AppTab.exercises),
         body: ListView(
           padding: EdgeInsets.fromLTRB(space.lg, space.md, space.lg, space.lg),
@@ -70,8 +71,19 @@ class ExercisesScreen extends StatelessWidget {
                 onTap: () => context.push<void>(AppRoutes.grounding),
               ),
             ),
+            SizedBox(height: space.sm),
+            RbEntrance(
+              index: 3,
+              child: ExerciseTile(
+                icon: LucideIcons.heartHandshake,
+                title: AppTexts.companionTitle,
+                subtitle: AppTexts.companionTileSubtitle,
+                tint: colors.mood4,
+                onTap: () => context.push<void>(AppRoutes.companion),
+              ),
+            ),
             SizedBox(height: space.lg),
-            const RbEntrance(index: 3, child: ExerciseDisclaimer()),
+            const RbEntrance(index: 4, child: ExerciseDisclaimer()),
           ],
         ),
       ),

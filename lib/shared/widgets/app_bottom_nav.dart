@@ -20,12 +20,13 @@ import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/features/checkin/ui/mood_level_color.dart';
 import 'package:relaxmate/features/mood/state/today_mood_provider.dart';
 
-/// Empat tab utama (FR-M029): Beranda, Ngobrol, Latihan, Mood.
+/// Lima tab utama (FR-M029): Beranda, Ngobrol, Latihan, Mood, Pengaturan.
 enum AppTab {
   home(AppRoutes.home, AppTexts.navHome),
   chat(AppRoutes.chat, AppTexts.navChat),
   exercises(AppRoutes.exercises, AppTexts.navExercises),
-  mood(AppRoutes.mood, AppTexts.navMood);
+  mood(AppRoutes.mood, AppTexts.navMood),
+  settings(AppRoutes.settings, AppTexts.navSettings);
 
   const AppTab(this.route, this.label);
 
@@ -37,6 +38,7 @@ enum AppTab {
         AppTab.chat => LucideIcons.messageCircle,
         AppTab.exercises => LucideIcons.wind,
         AppTab.mood => Icons.bar_chart_rounded,
+        AppTab.settings => LucideIcons.settings,
       };
 }
 
@@ -44,7 +46,7 @@ enum AppTab {
 /// nilai ini yang memungkinkan pil aktif meluncur dari tab sebelumnya ke tab baru.
 AppTab? _lastShownTab;
 
-/// CMP-M30: dock navigasi bawah melayang, empat tab. Tab aktif berupa pil yang memuat ikon
+/// CMP-M30: dock navigasi bawah melayang, lima tab. Tab aktif berupa pil yang memuat ikon
 /// dan label; tab lain hanya ikon. Warna pil mengikuti mood hari ini (token `mood1` sampai
 /// `mood5`), `softLavender` bila belum diisi. Pil meluncur dari tab sebelumnya selama
 /// [RbMotion.screen] (langsung pindah bila animasi dikurangi), dan ikon tab yang baru aktif

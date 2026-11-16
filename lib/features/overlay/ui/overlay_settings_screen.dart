@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
-import 'package:relaxmate/features/crisis/ui/sos_button.dart';
 import 'package:relaxmate/features/overlay/data/overlay_permissions.dart';
 import 'package:relaxmate/features/overlay/data/overlay_platform.dart';
 import 'package:relaxmate/features/overlay/state/overlay_home_provider.dart';
 import 'package:relaxmate/features/overlay/state/overlay_permissions_controller.dart';
 import 'package:relaxmate/features/settings/state/settings_controller.dart';
+import 'package:relaxmate/shared/widgets/rb_app_bar.dart';
 
 /// SCR-M18: Maskot mengambang (FR-M022, Architecture-M 6.4). Penjelasan sebelum izin, saklar
 /// (bawaan mati), status dua izin, dan tombol ke pengaturan sistem. Menyalakan saklar memulai
@@ -216,10 +216,7 @@ class _OverlaySettingsScreenState extends ConsumerState<OverlaySettingsScreen>
     final restUntil = ref.watch(overlayRestProvider).value;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppTexts.overlayTitle),
-        actions: const <Widget>[SosAppBarAction()],
-      ),
+      appBar: const RbAppBar.pushed(title: AppTexts.overlayTitle),
       body: SafeArea(
         child: ListView(
           padding: EdgeInsets.all(space.lg),

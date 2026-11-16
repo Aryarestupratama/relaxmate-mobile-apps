@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/features/crisis/ui/crisis_contacts_list.dart';
+import 'package:relaxmate/shared/widgets/rb_app_bar.dart';
 
 /// SCR-M16: kontak bantuan. Terbuka untuk semua keadaan (tamu, belum verifikasi, belum
 /// consent) dan bekerja tanpa internet (FR-M011, Design-M prinsip 4). Tidak dibungkus
@@ -16,7 +17,10 @@ class CrisisContactsScreen extends StatelessWidget {
     final space = context.rbSpace;
 
     return Scaffold(
-      appBar: AppBar(title: const Text(AppTexts.crisisContactsTitle)),
+      appBar: const RbAppBar.pushed(
+        title: AppTexts.crisisContactsTitle,
+        showSos: false,
+      ),
       body: SafeArea(
         child: ListView(
           padding: EdgeInsets.all(space.lg),

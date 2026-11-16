@@ -352,6 +352,8 @@ abstract final class AppTexts {
   // Maskot dan Temani saja (SCR-M13, FR-M015). Tanpa AI dan tanpa kuota; maskot tidak
   // mengaku punya perasaan (RULE-M046).
   static const String companionMenu = 'Temani saja';
+  static const String companionTileSubtitle =
+      'Ditemani maskot, tanpa perlu bicara';
   static const String companionTitle = 'Temani saja';
   static const String companionBody = 'Aku di sini. Tidak perlu bicara.';
   static const String companionDone = 'Selesai';
@@ -478,6 +480,7 @@ abstract final class AppTexts {
   static const String navChat = 'Ngobrol';
   static const String navExercises = 'Latihan';
   static const String navMood = 'Mood';
+  static const String navSettings = 'Pengaturan';
 
   static const List<String> weekdays = <String>[
     'Senin',

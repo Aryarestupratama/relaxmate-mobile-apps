@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/features/chat/ui/chat_bubble.dart';
-import 'package:relaxmate/features/crisis/ui/sos_button.dart';
 import 'package:relaxmate/features/history/state/conversation_controller.dart';
 import 'package:relaxmate/features/history/state/conversation_state.dart';
 import 'package:relaxmate/features/history/ui/history_load_more.dart';
 import 'package:relaxmate/shared/widgets/error_alert.dart';
+import 'package:relaxmate/shared/widgets/rb_app_bar.dart';
 
 /// SCR-M15: detail satu hari, hanya baca (FR-M005). Pesan urut lama ke baru memakai
 /// `ChatBubble` yang sama dengan chat; tanpa kolom isian, tanpa chip saran, dan tanpa
@@ -29,11 +29,7 @@ class ConversationScreen extends ConsumerWidget {
     };
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title, overflow: TextOverflow.ellipsis),
-        // Jalur ke bantuan nyata selalu terlihat (Design-M prinsip 4).
-        actions: const <Widget>[SosAppBarAction()],
-      ),
+      appBar: RbAppBar.pushed(title: title),
       body: SafeArea(
         child: switch (conversation) {
           ConversationLoading() =>
