@@ -52,6 +52,9 @@ abstract final class RbSize {
   static const double groundingDotActive = 24;
   static const double breathingPreview = 168;
 
+  /// Tinggi bilah kemajuan sesi napas (lebarnya sama dengan [breathingGuide]).
+  static const double breathingProgressHeight = 8;
+
   /// Lingkaran ikon pada ubin daftar Latihan.
   static const double exerciseIconChip = 44;
 

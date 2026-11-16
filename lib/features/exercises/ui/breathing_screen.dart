@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:relaxmate/core/config/app_constants.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
+import 'package:relaxmate/core/theme/rb_radius.dart';
 import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/features/exercises/data/breathing_phase.dart';
@@ -148,7 +149,6 @@ class _BreathingRun extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.rbColors;
     final text = context.rbText;
     final space = context.rbSpace;
 
@@ -170,18 +170,70 @@ class _BreathingRun extends StatelessWidget {
                 style: text.h2,
               ),
             ),
-            SizedBox(height: space.xs),
-            Text(
-              AppTexts.breathingCycle(state.cycle, state.totalCycles),
-              textAlign: TextAlign.center,
-              style: text.small.copyWith(color: colors.textSecondary),
-            ),
+            SizedBox(height: space.md),
+            Center(child: _BreathingProgress(state: state)),
             SizedBox(height: space.lg),
             OutlinedButton(
               onPressed: () => leaveExercise(context),
               child: const Text(AppTexts.breathingStop),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Bilah kemajuan sesi napas, menggantikan tulisan "Putaran N dari M". Isinya mengalir
+/// mulus (linear) selama tiap tahap dan dihitung dari detik, jadi tahap yang lebih lama
+/// (embuskan 6 dtk) mengisi lebih banyak dari tahap yang lebih singkat. Pembaca layar
+/// tetap mendengar "Kemajuan latihan, putaran N dari M" satu kali, bukan persentase yang
+/// berubah terus. Bila gerak dikurangi, bilah melompat per tahap tanpa animasi.
+class _BreathingProgress extends StatelessWidget {
+  const _BreathingProgress({required this.state});
+
+  final BreathingState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.rbColors;
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
+
+    final cycleSeconds = BreathingPhase.values.fold<int>(
+      0,
+      (sum, phase) => sum + phase.seconds,
+    );
+    final totalSeconds = state.totalCycles * cycleSeconds;
+    var elapsedInCycle = 0;
+    for (final phase in BreathingPhase.values) {
+      if (phase == state.phase) {
+        break;
+      }
+      elapsedInCycle += phase.seconds;
+    }
+    final startSeconds = (state.cycle - 1) * cycleSeconds + elapsedInCycle;
+    final endSeconds = startSeconds + state.phase.seconds;
+    final begin = totalSeconds == 0 ? 0.0 : startSeconds / totalSeconds;
+    final end = totalSeconds == 0 ? 0.0 : endSeconds / totalSeconds;
+
+    return Semantics(
+      label: AppTexts.breathingProgressLabel,
+      value: AppTexts.breathingCycle(state.cycle, state.totalCycles),
+      child: ExcludeSemantics(
+        child: SizedBox(
+          width: RbSize.breathingGuide,
+          child: TweenAnimationBuilder<double>(
+            tween: Tween<double>(begin: begin, end: end),
+            duration: reduceMotion ? Duration.zero : state.phase.duration,
+            curve: Curves.linear,
+            builder: (context, value, _) => LinearProgressIndicator(
+              value: value,
+              minHeight: RbSize.breathingProgressHeight,
+              color: colors.primary,
+              backgroundColor: colors.border,
+              borderRadius: RbRadius.pillBorder,
+            ),
+          ),
         ),
       ),
     );

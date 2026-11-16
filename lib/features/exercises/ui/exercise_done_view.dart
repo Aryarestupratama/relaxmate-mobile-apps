@@ -7,7 +7,7 @@ import 'package:relaxmate/shared/widgets/mate_avatar.dart';
 import 'package:relaxmate/shared/widgets/mate_avatar_size.dart';
 
 /// Layar penutup latihan napas dan grounding: sapaan hangat, "Selesai" (keluar), "Ulangi", dan
-/// catatan bukan layanan medis dengan jalan ke kontak bantuan (RULE-M046).
+/// catatan bukan layanan medis (RULE-M046; jalan ke bantuan lewat SOS di bilah atas).
 class ExerciseDoneView extends StatelessWidget {
   const ExerciseDoneView({
     required this.title,

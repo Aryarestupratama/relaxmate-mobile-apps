@@ -401,6 +401,9 @@ abstract final class AppTexts {
 
   static String breathingMinutes(int minutes) => '$minutes menit';
 
+  static const String breathingProgressLabel = 'Kemajuan latihan';
+
+  /// Hanya untuk pembaca layar (nilai bilah kemajuan); tidak lagi tampil sebagai teks.
   static String breathingCycle(int cycle, int total) =>
       'Putaran $cycle dari $total';
 
@@ -423,7 +426,7 @@ abstract final class AppTexts {
   static const String groundingSmell = 'aroma yang bisa kamu cium';
   static const String groundingTaste = 'rasa yang bisa kamu cicipi';
   static const String groundingSeeHint =
-      'Pelan-pelan saja. Warna, bentuk, atau cahaya juga boleh.';
+      'Warna, bentuk, atau cahaya juga boleh.';
   static const String groundingTouchHint =
       'Rasakan kain bajumu, sandaran kursi, atau permukaan di bawah tanganmu.';
   static const String groundingHearHint =
