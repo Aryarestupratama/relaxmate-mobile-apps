@@ -83,7 +83,7 @@ abstract final class AppConstants {
   static const int moodRangeLongDays = 30;
 
   /// Banyak baris di daftar "Catatan terakhir" layar Mood.
-  static const int moodRecentNotes = 3;
+  static const int moodRecentNotes = 5;
 
   /// Pada rentang 30 hari label sumbu x dipasang tiap sekian hari, dihitung mundur dari hari ini.
   static const int moodLongLabelStepDays = 7;

@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Architecture
-Version: 0.46 | Status: Draft | Last updated: 2026-11-15
+Version: 0.47 | Status: Draft | Last updated: 2026-11-15
 Depends on: PRD RelaxMate Mobile v0.3, Architecture RelaxBoss (web), Schema RelaxBoss (web), Rules v1.5 | Owner: Founder (solo developer)
 
 Label: `[Verified]` ada sumber (sisi mobile: repo `relaxmate-mobile-apps` commit `8014c38`; sisi backend: repo `RELAXBOSS_WEBSITE` commit `9afd27c`), `[Inference]` kesimpulan, `[Assumption]` bisa diubah. **Dokumen ini mengikuti kode:** bila berbeda dari kode, kode yang benar. Kedalaman: **Lite**. Dokumen ini hanya mengatur sisi mobile dan tambahan di backend. Subsistem AI (rotasi key, `ChatbotService`, `CrisisDetector`), enkripsi, dan admin tetap di Architecture web dan tidak diulang di sini.
@@ -99,7 +99,7 @@ relaxmate-mobile-apps/              # nama repo; paket Dart: relaxmate
                   # ui/ (MoodBlobRow)
       mood/       # (M072) data/ (MoodDay, MoodSeries, MoodToday, MoodSeriesRepository),
                   # state/ (MoodSeriesState, MoodSeriesController, todayMoodProvider),
-                  # ui/ (MoodScreen, MoodChart, MoodRangeToggle, MoodSummaryRow, MoodRecentNotes)
+                  # ui/ (MoodScreen, MoodChart (Beranda), MoodRangeToggle, MoodBubbleCloud, MoodTrendChart, MoodCalendar, MoodReflectionCard, MoodQuickLog, MoodSummaryRow, MoodRecentNotes); data/mood_insight.dart
       home/       # (M072) ui/ (HomeScreen, MoodCheckinCard, HomeChartCard); (M073 bagian 6) HomeHeader, HomeWeekCard, HomeInviteCard
       mascot/           # maskot (M030): data/ (MascotState), ui/ (MascotView, CompanionScreen)
       exercises/        # latihan lokal (M029): data/ (BreathingPhase, BreathingPlan, GroundingStep),
@@ -490,6 +490,7 @@ Alat pengembangan di luar aplikasi: Node.js untuk `tool/mock_api.mjs` (tanpa dep
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.47 | 2026-11-15 | Redesign halaman Mood Tracker: widget baru `MoodBubbleCloud`, `MoodTrendChart`, `MoodCalendar`, `MoodReflectionCard`, `MoodQuickLog`, enum `MoodInsight` (murni, di `features/mood/data`); `MoodRangeToggle`, `MoodSummaryRow`, `MoodRecentNotes` dirombak; `MoodChart` kini hanya dipakai Beranda; `AppConstants.moodRecentNotes` 3 menjadi 5; token `RbSize.mood*` baru. `MoodScreen` menyegarkan deret 30 hari saat check-in tercatat dari halaman itu. Tanpa perubahan API, paket, atau backend. |
 | 0.46 | 2026-11-15 | `features/exercises/ui/exercise_scaffold.dart` baru (dipakai tiga layar Latihan); `ExerciseTile` memakai `FloatingCard`; `BreathingGuide` punya parameter `size`; `GroundingStep` punya `hint`; teks `grounding*` dipecah dan `groundingHint` dihapus; token `RbSize` baru untuk titik grounding, pratinjau napas, dan ikon ubin. Tanpa perubahan state, paket, atau backend. |
 | 0.45 | 2026-11-15 | `SosButton` mendapat parameter `compact` dan `pulse`, widget baru `SosAppBarAction` (`features/crisis/ui/sos_button.dart`) dipasang di AppBar semua layar sesudah masuk; `ChatBackdrop` tanpa bulatan; `MascotChatPane` tidak lagi memasang SOS; `RbSize.sosCompactHeight`; teks `homeHelpLink*` dihapus. Tanpa perubahan state, paket, atau backend. |
 | 0.44 | 2026-11-15 | TASK-M073 (bagian 8): tampilan maskot chat dipoles (panggung, gelembung balasan di samping kepala, SOS, tombol Tenangkan diri, pengalih tampilan, aset berbingkai gelap); lencana "AI" dan ikon telepon dihapus dari chat. |

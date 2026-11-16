@@ -125,6 +125,19 @@ abstract final class RbSize {
   static const double moodChartLabelHeight = 20;
   static const double moodChartMaxLabelScale = 1.3;
 
+  /// Halaman Mood Tracker (redesign 2026-11-15): tinggi gelembung blob, tinggi dan sumbu
+  /// kurva 7 hari, tinggi label "Terbaik", jarak antarsel kalender 30 hari, dan tinggi pil
+  /// pilihan rentang.
+  static const double moodCloudHeight = 220;
+  static const double moodTrendHeight = 200;
+  static const double moodTrendAxisWidth = 32;
+  static const double moodAxisBlob = 24;
+  static const double moodCalloutWidth = 68;
+  static const double moodCalloutHeight = 28;
+  static const double moodCalendarGap = 6;
+  static const double moodRangePillHeight = 48;
+  static const double moodLegendBlob = 20;
+
   /// Layar sambutan (SCR-M02, TASK-M073): sisi ilustrasi (persegi) sebagai bagian dari
   /// tinggi layar, dibatasi antara [onboardingHeroMin] dan [onboardingHeroMax]; tanpa lingkaran
   /// atau hiasan di sekitarnya.

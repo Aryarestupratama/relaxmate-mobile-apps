@@ -568,24 +568,59 @@ abstract final class AppTexts {
   static const String homeChartAverageLead = 'Rata-rata: ';
   static const String homeChartBestLead = '. Hari terbaik: ';
 
-  static const String moodTitle = 'Suasana hatiku';
+  static const String moodTitle = 'Mood Tracker';
   static const String moodBackTooltip = 'Kembali ke Beranda';
+  static const String moodIntro =
+      'Lihat bagaimana perasaanmu bergerak dari hari ke hari.';
   static const String moodRange7 = '7 hari';
   static const String moodRange30 = '30 hari';
   static const String moodAverage = 'Rata-rata';
   static const String moodBest = 'Terbaik';
   static const String moodFilled = 'Diisi';
   static String moodFilledValue(int filled, int total) => '$filled dari $total';
-  static const String moodChartCaption =
-      'Garis putus-putus: rata-rata. Titik berwarna sesuai mood hari itu. '
-      'Hari tanpa catatan dibiarkan kosong.';
-  static const String moodRecentTitle = 'Catatan terakhir';
+
+  // Isi mood langsung dari halaman ini bila hari ini belum diisi.
+  static const String moodLogTitle = 'Gimana perasaanmu hari ini?';
+  static const String moodLogHint = 'Pilih satu, nanti polanya ikut terlihat.';
+
+  // Gelembung blob: ukuran sebanding jumlah hari tiap mood.
+  static const String moodCloudTitle = 'Paling sering kamu rasakan';
+  static String moodCloudTop1(String label) => 'Paling sering terasa $label.';
+  static String moodCloudTop2(String first, String second) =>
+      'Paling sering terasa $first dan $second.';
+  static const String moodCloudMixed =
+      'Perasaanmu cukup beragam, dan itu wajar.';
+  static String moodLegendItem(String label, int days) => '$label · $days hari';
+  static String moodCloudSemantics(String items) =>
+      'Perasaan yang paling sering kamu rasakan: $items.';
+
+  // Kartu refleksi: kalimat netral dari pola, tanpa menyimpulkan kondisi.
+  static const String moodReflectionTitle = 'Catatan kecil untukmu';
+  static const String moodInsightNotEnough =
+      'Isi beberapa hari lagi, nanti polanya mulai terlihat.';
+  static const String moodInsightLighter =
+      'Beberapa hari terakhir terasa lebih ringan dari sebelumnya. '
+      'Senang melihatnya.';
+  static const String moodInsightHeavier =
+      'Beberapa hari terakhir terasa lebih berat. Mau cerita sebentar?';
+  static const String moodInsightSteady =
+      'Perasaanmu relatif stabil belakangan ini.';
+  static const String moodReflectionAction = 'Ceritakan ke RelaxMate';
+
+  static const String moodTrendTitle = 'Naik turun perasaanmu';
+  static const String moodTrendCaption =
+      'Garis putus-putus menandai rata-rata. Hari tanpa catatan dilewati.';
+  static const String moodCalendarTitle = 'Kalender perasaanmu';
+  static const String moodCalendarCaption =
+      'Warna lingkaran sesuai mood hari itu. Lingkaran kosong berarti belum '
+      'diisi.';
+
+  static const String moodHistoryTitle = 'Riwayat terakhir';
   static const String moodDisclaimer =
       'Ini gambaran perasaanmu, bukan diagnosis.';
   static const String moodEmptyTitle = 'Belum ada catatan';
   static const String moodEmptyBody =
-      'Isi mood pertamamu; grafik muncul setelah 2 hari.';
-  static const String moodEmptyAction = 'Isi mood hari ini';
+      'Isi mood pertamamu di atas. Setelah 2 hari, polanya mulai terlihat.';
   static const String moodNoEntry = 'belum diisi';
 
   static String moodChartSemantics(int total, int filled) =>
