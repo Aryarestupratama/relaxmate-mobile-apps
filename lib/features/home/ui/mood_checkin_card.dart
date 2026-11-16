@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:relaxmate/core/config/app_constants.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
-import 'package:relaxmate/core/theme/rb_motion.dart';
-import 'package:relaxmate/core/theme/rb_radius.dart';
 import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/features/checkin/state/checkin_controller.dart';
 import 'package:relaxmate/features/checkin/ui/mood_blob_row.dart';
-import 'package:relaxmate/features/checkin/ui/mood_level_color.dart';
-import 'package:relaxmate/features/checkin/ui/mood_ripple.dart';
+import 'package:relaxmate/features/home/ui/mood_done_card.dart';
 import 'package:relaxmate/features/mood/state/mood_series_controller.dart';
 import 'package:relaxmate/features/mood/state/mood_series_state.dart';
 import 'package:relaxmate/features/mood/state/today_mood_provider.dart';
@@ -19,13 +15,12 @@ import 'package:relaxmate/shared/widgets/floating_card.dart';
 
 /// SCR-M22, kartu mood di Beranda (FR-M013, FR-M029). Tiga keadaan:
 /// - belum ada mood hari ini (atau "Ubah" ditekan): lima blob, satu ketukan mencatat;
-/// - sudah tercatat: konfirmasi singkat (label mood dan tombol "Ubah" berbingkai; tanpa jam
-///   dan tanpa ucapan terima kasih, revisi 2026-11-16);
+/// - sudah tercatat: `MoodDoneCard` (blob besar berhalo, label, kalimat hangat sesuai mood,
+///   jam WIB, "N dari 7 hari tercatat", tombol "Ubah");
 /// - deret sedang dimuat: penanda memuat, supaya pilihan tidak berkedip lalu hilang bagi
 ///   yang sudah mengisi.
 /// Blob memakai `MoodBlobRow` yang sudah ada; tidak memanggil AI. Kartu melayang (TASK-M074):
-/// pilihan di atas putih, konfirmasi berwarna pastel sesuai mood dengan blob yang muncul
-/// lembut dan satu cincin riak.
+/// pilihan di atas putih, konfirmasi berwarna pastel sesuai mood.
 class MoodCheckinCard extends ConsumerWidget {
   const MoodCheckinCard({super.key});
 
@@ -51,66 +46,11 @@ class MoodCheckinCard extends ConsumerWidget {
     }
 
     if (today != null && !state.editing) {
-      final reduceMotion = MediaQuery.disableAnimationsOf(context);
-      final Widget blob = Image.asset(
-        today.level.asset,
-        width: RbSize.moodBlob,
-        height: RbSize.moodBlob,
-        excludeFromSemantics: true,
-      );
-      return FloatingCard(
-        tint: today.level.colorOf(colors),
-        child: Row(
-          children: <Widget>[
-            Stack(
-              alignment: Alignment.center,
-              clipBehavior: Clip.none,
-              children: <Widget>[
-                MoodRipple(color: today.level.colorOf(colors)),
-                reduceMotion
-                    ? blob
-                    : blob
-                        .animate()
-                        .scaleXY(
-                          begin: RbMotion.popFrom,
-                          end: 1,
-                          duration: RbMotion.pop,
-                          curve: RbMotion.curve,
-                        )
-                        .fadeIn(
-                          duration: RbMotion.pop,
-                          curve: RbMotion.curve,
-                        ),
-              ],
-            ),
-            SizedBox(width: space.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Semantics(
-                    header: true,
-                    child: Text(
-                      AppTexts.homeMoodDone(today.level.label),
-                      style: text.body.copyWith(fontWeight: FontWeight.w700),
-                    ),
-                  ),
-                  SizedBox(height: space.sm),
-                  OutlinedButton(
-                    onPressed: controller.startEditing,
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor: colors.card,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: RbRadius.pillBorder,
-                      ),
-                    ),
-                    child: const Text(AppTexts.homeMoodChange),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+      return MoodDoneCard(
+        entry: today,
+        filledDays: series is MoodSeriesReady ? series.series.filledDays : null,
+        totalDays: AppConstants.moodRangeShortDays,
+        onChange: controller.startEditing,
       );
     }
 

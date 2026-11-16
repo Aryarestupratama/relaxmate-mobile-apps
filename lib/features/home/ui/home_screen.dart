@@ -13,7 +13,6 @@ import 'package:relaxmate/features/checkin/state/checkin_controller.dart';
 import 'package:relaxmate/features/home/ui/home_chart_card.dart';
 import 'package:relaxmate/features/home/ui/home_header.dart';
 import 'package:relaxmate/features/home/ui/home_invite_card.dart';
-import 'package:relaxmate/features/home/ui/home_week_card.dart';
 import 'package:relaxmate/features/home/ui/mood_checkin_card.dart';
 import 'package:relaxmate/features/mood/state/today_mood_provider.dart';
 import 'package:relaxmate/shared/widgets/app_bottom_nav.dart';
@@ -25,12 +24,13 @@ import 'package:relaxmate/shared/widgets/rb_entrance.dart';
 import 'package:relaxmate/shared/widgets/soft_gradient_background.dart';
 
 /// SCR-M22: Beranda, layar pertama setelah masuk (FR-M029). Latar gradien lembut seperti
-/// layar Masuk dengan kartu putih melayang (TASK-M074). Sapaan sadar waktu, kartu mood, kartu
-/// ringkasan mingguan, grafik 7 hari, undangan bercerita, jalan ke Ngobrol, Latihan napas,
-/// Temani saja; jalan ke Kontak bantuan selalu ada lewat tombol SOS di bilah atas (`RbAppBar.root`), tanpa kartu bantuan di badan Beranda (revisi 2026-11-16). Tanpa `ConsentGate` dan tanpa AI:
+/// layar Masuk dengan kartu putih melayang (TASK-M074). Sapaan sadar waktu, kartu mood (yang
+/// sudah tercatat memuat ringkasan hari ini dan "N dari 7 hari"), grafik 7 hari, undangan
+/// bercerita, jalan ke Ngobrol, Latihan napas,
+/// Temani saja; jalan ke Kontak bantuan selalu ada lewat tombol SOS di bilah atas (`RbAppBar.root`). Tanpa `ConsentGate` dan tanpa AI:
 /// consent hanya dicek saat membuka Ngobrol. Kartu masuk berurutan (`RbEntrance`); gerak
 /// berulang hanya napas maskot di kartu undangan. Setelah mood tercatat: konfirmasi, ajakan
-/// bercerita, ringkasan, lalu grafik. Mood rendah hanya mengubah nada kartu undangan.
+/// bercerita, grafik, lalu kartu bantuan lembut bila mood rendah.
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -80,29 +80,27 @@ class HomeScreen extends ConsumerWidget {
                 SizedBox(height: space.sm),
               ],
               const RbEntrance(
-                key: ValueKey<String>('week'),
-                index: 3,
-                child: HomeWeekCard(),
-              ),
-              SizedBox(height: space.sm),
-              const RbEntrance(
                 key: ValueKey<String>('chart'),
-                index: 4,
+                index: 3,
                 child: HomeChartCard(),
               ),
               SizedBox(height: space.sm),
               if (!done) ...<Widget>[
                 const RbEntrance(
                   key: ValueKey<String>('chat'),
-                  index: 5,
+                  index: 4,
                   child: _ChatButton(),
                 ),
                 SizedBox(height: space.sm),
                 const RbEntrance(
                   key: ValueKey<String>('shortcuts'),
-                  index: 6,
+                  index: 5,
                   child: _Shortcuts(),
                 ),
+              ],
+              if (done && low) ...<Widget>[
+                SizedBox(height: space.md),
+                const _SupportCard(),
               ],
             ],
           ),
@@ -266,6 +264,49 @@ class _ShortcutTile extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _SupportCard extends StatelessWidget {
+  const _SupportCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.rbColors;
+    final text = context.rbText;
+
+    return FloatingCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Semantics(
+            header: true,
+            child: Text(
+              AppTexts.homeSupportTitle,
+              style: text.body.copyWith(fontWeight: FontWeight.w800),
+            ),
+          ),
+          Text(
+            AppTexts.homeSupportBody,
+            style: text.small.copyWith(color: colors.textSecondary),
+          ),
+          TextButton(
+            onPressed: () => context.push<void>(AppRoutes.crisisContacts),
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              alignment: Alignment.centerLeft,
+            ),
+            child: Text(
+              AppTexts.homeSupportAction,
+              style: text.button.copyWith(
+                color: colors.primary,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

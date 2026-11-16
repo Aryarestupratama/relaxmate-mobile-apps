@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Architecture
-Version: 0.48 | Status: Draft | Last updated: 2026-11-15
+Version: 0.49 | Status: Draft | Last updated: 2026-11-16
 Depends on: PRD RelaxMate Mobile v0.3, Architecture RelaxBoss (web), Schema RelaxBoss (web), Rules v1.5 | Owner: Founder (solo developer)
 
 Label: `[Verified]` ada sumber (sisi mobile: repo `relaxmate-mobile-apps` commit `8014c38`; sisi backend: repo `RELAXBOSS_WEBSITE` commit `9afd27c`), `[Inference]` kesimpulan, `[Assumption]` bisa diubah. **Dokumen ini mengikuti kode:** bila berbeda dari kode, kode yang benar. Kedalaman: **Lite**. Dokumen ini hanya mengatur sisi mobile dan tambahan di backend. Subsistem AI (rotasi key, `ChatbotService`, `CrisisDetector`), enkripsi, dan admin tetap di Architecture web dan tidak diulang di sini.
@@ -100,7 +100,7 @@ relaxmate-mobile-apps/              # nama repo; paket Dart: relaxmate
       mood/       # (M072) data/ (MoodDay, MoodSeries, MoodToday, MoodSeriesRepository),
                   # state/ (MoodSeriesState, MoodSeriesController, todayMoodProvider),
                   # ui/ (MoodScreen, MoodChart (Beranda), MoodRangeToggle, MoodBubbleCloud, MoodTrendChart, MoodCalendar, MoodReflectionCard, MoodQuickLog, MoodSummaryRow, MoodRecentNotes); data/mood_insight.dart
-      home/       # (M072) ui/ (HomeScreen, MoodCheckinCard, HomeChartCard); (M073 bagian 6) HomeHeader, HomeWeekCard, HomeInviteCard
+      home/       # (M072) ui/ (HomeScreen, MoodCheckinCard, HomeChartCard); (M073 bagian 6) HomeHeader, HomeInviteCard; (2026-11-16) MoodDoneCard (kartu mood tercatat), HomeWeekCard dihapus
       mascot/           # maskot (M030): data/ (MascotState), ui/ (MascotView, CompanionScreen)
       exercises/        # latihan lokal (M029): data/ (BreathingPhase, BreathingPlan, GroundingStep),
                         # state/ (Breathing*/Grounding* controller + state), ui/ (layar dan komponen)
@@ -490,6 +490,7 @@ Alat pengembangan di luar aplikasi: Node.js untuk `tool/mock_api.mjs` (tanpa dep
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.49 | 2026-11-16 | `features/home/ui/home_week_card.dart` dihapus (kartu mingguan tidak dipakai lagi); `mood_done_card.dart` baru (`MoodDoneCard`) dipakai `MoodCheckinCard` untuk keadaan sudah tercatat; token `RbSize.moodHeroBlob` dan `moodHeroHalo` menggantikan `weekBlob` dan `weekActionIcon`; teks `homeWeek*` dan `homeMoodThanks` diganti `homeMoodTodayLead`, `homeMoodNote1..5`, `homeMoodWeekFilled`. Tanpa perubahan API atau skema. |
 | 0.48 | 2026-11-15 | `shared/widgets/rb_app_bar.dart` (`RbAppBar.root`, `RbAppBar.pushed`) dipakai semua layar sesudah masuk; `shared/widgets/pill_segments.dart` (`PillSegments`) dipakai `MoodRangeToggle` dan `ChatModeSwitch`; `features/chat/ui/chat_sub_bar.dart` baru; `AppTab.settings` (tab kelima, rute `/pengaturan`, `SettingsScreen` memakai `TabBackScope`, `AppBottomNav`, dan `SoftGradientBackground`); `ExerciseScaffold` mendapat `root`; `HomeHeader` hanya sapaan. Tanpa perubahan API, paket, atau backend. |
 | 0.47 | 2026-11-15 | Redesign halaman Mood Tracker: widget baru `MoodBubbleCloud`, `MoodTrendChart`, `MoodCalendar`, `MoodReflectionCard`, `MoodQuickLog`, enum `MoodInsight` (murni, di `features/mood/data`); `MoodRangeToggle`, `MoodSummaryRow`, `MoodRecentNotes` dirombak; `MoodChart` kini hanya dipakai Beranda; `AppConstants.moodRecentNotes` 3 menjadi 5; token `RbSize.mood*` baru. `MoodScreen` menyegarkan deret 30 hari saat check-in tercatat dari halaman itu. Tanpa perubahan API, paket, atau backend. |
 | 0.46 | 2026-11-15 | `features/exercises/ui/exercise_scaffold.dart` baru (dipakai tiga layar Latihan); `ExerciseTile` memakai `FloatingCard`; `BreathingGuide` punya parameter `size`; `GroundingStep` punya `hint`; teks `grounding*` dipecah dan `groundingHint` dihapus; token `RbSize` baru untuk titik grounding, pratinjau napas, dan ikon ubin. Tanpa perubahan state, paket, atau backend. |
