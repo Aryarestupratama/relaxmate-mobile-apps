@@ -231,16 +231,14 @@ abstract final class AppTexts {
 
   // Pengaturan (SCR-M17) dan Hapus akun (SCR-M19), FR-M003, FR-M025.
   static const String settingsTitle = 'Pengaturan';
-  static const String settingsAccount = 'Akun';
   static const String settingsTraining = 'Persetujuan pelatihan';
   static const String settingsTrainingSaved = 'Pilihanmu disimpan.';
-  static const String settingsPractice = 'Latihan';
-  static const String settingsMascot = 'Maskot';
-  static const String settingsDisplay = 'Tampilan';
+  static const String settingsPreferences = 'Tampilan dan latihan';
   static const String settingsChatMascotMode = 'Maskot di chat';
   static const String settingsChatMascotModeHint =
       'Maskot di tengah layar dan balasan terakhir di bawahnya. Matikan untuk daftar obrolan biasa.';
-  static const String settingsPrivacy = 'Privasi dan bantuan';
+  static const String settingsPrivacy = 'Privasi';
+  static const String settingsInfo = 'Tentang dan bantuan';
   static const String settingsPrivacyCover =
       'Sembunyikan layar di aplikasi terbaru';
   static const String settingsPrivacyCoverHint =
@@ -291,6 +289,8 @@ abstract final class AppTexts {
   static const String aboutWebsiteFull = 'Cerita lengkap dan tim di situs';
   static const String aboutInstagram = 'Instagram @relaxboss_id';
   static String settingsVersion(String version) => 'Versi $version';
+  static String settingsProfileLabel(String name, String email) =>
+      'Akun: $name, $email';
 
   static const String deleteBody =
       'Akunmu dan semua datamu akan dihapus dan tidak bisa dipulihkan: '
@@ -356,6 +356,8 @@ abstract final class AppTexts {
       'Ditemani maskot, tanpa perlu bicara';
   static const String companionTitle = 'Temani saja';
   static const String companionBody = 'Aku di sini. Tidak perlu bicara.';
+  static const String companionHint =
+      'Tarik napas pelan kalau kamu mau. Tidak ada yang perlu dijawab.';
   static const String companionDone = 'Selesai';
   static const String mascotStateIdle = 'Maskot RelaxMate sedang diam';
   static const String mascotStateListening = 'Maskot RelaxMate menyimak';
@@ -453,6 +455,10 @@ abstract final class AppTexts {
   static const String historyEmpty =
       'Belum ada riwayat. Setelah kamu bercerita, hari-harimu akan muncul di '
       'sini.';
+  static const String historySubtitle =
+      'Percakapanmu bersama RelaxMate, dari yang terbaru.';
+  static const String historyEmptyTitle = 'Belum ada cerita di sini';
+  static const String historyEmptyAction = 'Mulai ngobrol';
   static const String historyLoadMore = 'Muat lebih banyak';
   static const String historyLoadMoreMessages = 'Muat pesan berikutnya';
   static const String historyReadOnly =
@@ -518,6 +524,7 @@ abstract final class AppTexts {
     'Des',
   ];
   static const String today = 'Hari ini';
+  static const String yesterday = 'Kemarin';
 
   static const String greetMorning = 'Selamat pagi';
   static const String greetNoon = 'Selamat siang';

@@ -7,6 +7,9 @@ abstract final class RbMotion {
   static const Duration screen = Duration(milliseconds: 250);
   static const Duration mascotBreath = Duration(milliseconds: 3500);
 
+  /// Satu napas cincin di belakang maskot pada layar Temani saja (mengembang lalu mengempis).
+  static const Duration haloBreath = Duration(milliseconds: 4000);
+
   /// Gerak masuk dan sentuhan (TASK-M074, `flutter_animate`): lambat dan tenang, 350 sampai
   /// 600 ms, kurva [curve], tanpa pantulan.
   static const Duration enter = Duration(milliseconds: 450);

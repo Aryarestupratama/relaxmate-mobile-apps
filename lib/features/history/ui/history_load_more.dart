@@ -3,7 +3,7 @@ import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
 import 'package:relaxmate/shared/widgets/error_alert.dart';
 
-/// Kaki daftar riwayat dan detail hari: tombol memuat halaman berikutnya, indikator saat
+/// Kaki daftar riwayat dan detail hari: tombol pil memuat halaman berikutnya, indikator saat
 /// memuat, atau galat ramah dengan "Coba lagi". Memuat selalu atas aksi pengguna.
 class HistoryLoadMore extends StatelessWidget {
   const HistoryLoadMore({
@@ -27,7 +27,7 @@ class HistoryLoadMore extends StatelessWidget {
     final message = error;
 
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: space.sm),
+      padding: EdgeInsets.symmetric(vertical: space.md),
       child: message != null
           ? ErrorAlert(message: message, onRetry: onPressed)
           : Center(
@@ -35,7 +35,10 @@ class HistoryLoadMore extends StatelessWidget {
                   ? const CircularProgressIndicator(
                       semanticsLabel: AppTexts.loading,
                     )
-                  : TextButton(onPressed: onPressed, child: Text(label)),
+                  : OutlinedButton(
+                      onPressed: onPressed,
+                      child: Text(label),
+                    ),
             ),
     );
   }

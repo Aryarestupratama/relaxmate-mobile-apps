@@ -166,4 +166,42 @@ abstract final class RbSize {
   /// dari panjang label dan skala teks, tab lain tidak pernah di bawah [minTouch].
   static const double navDockMaxWidth = 440;
   static const double navItemHeight = 56;
+
+  /// Riwayat sebagai garis waktu (TASK-M073 bagian 9): lebar kolom rel di kiri, tebal garis rel,
+  /// titik tanggal dan titik percakapan, jarak titik dari tepi atas barisnya, dan lingkaran
+  /// ikon pada kartu percakapan.
+  static const double historyRailWidth = 28;
+  static const double historyRailLine = 2;
+  static const double historyDateDot = 14;
+  static const double historyEntryDot = 10;
+  static const double historyDateDotTop = 14;
+  static const double historyEntryDotTop = 31;
+  static const double historyEntryChip = 40;
+  static const double historyEmptyAura = 220;
+  static const double historyEmptyMascot = 140;
+  static const double historySkeletonHeight = 72;
+
+  /// Temani saja (SCR-M13): maskot setengah badan menempel di tepi bawah layar dengan cincin
+  /// napas di belakang kepalanya. Tinggi maskot = [companionMascotHeightFactor] kali tinggi
+  /// layar (dibatasi [companionMascotMin] sampai [companionMascotMax]); garis tengah cincin
+  /// terluar = [companionHaloFactor] kali tinggi maskot (tidak melebihi lebar layar); pusat
+  /// cincin berada [companionHeadFromBottom] kali tinggi maskot dari tepi bawah (kira-kira
+  /// tengah kepala); cincin mengecil sampai [companionHaloMinScale] saat napas habis, tebal
+  /// garis cincin [companionRingStroke]. Lebar tombol "Selesai" [companionButtonWidth].
+  static const double companionMascotHeightFactor = 0.3;
+  static const double companionMascotMin = 180;
+  static const double companionMascotMax = 300;
+  static const double companionHaloFactor = 1.2;
+  static const double companionHeadFromBottom = 0.72;
+  static const double companionHaloMinScale = 0.82;
+  static const double companionRingStroke = 1.5;
+  static const double companionButtonWidth = 200;
+
+  /// Pengaturan (SCR-M17): lingkaran inisial profil, kotak ikon baris beserta ikon dan
+  /// radiusnya, dan tinggi minimal satu baris.
+  static const double settingsAvatar = 56;
+  static const double settingsRowChip = 36;
+  static const double settingsRowIcon = 20;
+  static const double settingsRowChipRadius = 10;
+  static const double settingsRowMinHeight = 56;
 }
