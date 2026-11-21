@@ -173,6 +173,26 @@ abstract final class AppTexts {
   static const String moodNotSaved =
       'Perasaanmu belum tercatat. Coba lagi sebentar lagi, ya.';
 
+  // Tenaga yang menyertai mood (opsional), label sama dengan web.
+  static const String arousalEnergized = 'Bertenaga';
+  static const String arousalTired = 'Lelah';
+
+  // Halaman menulis buku harian (SCR-M24, FR-M032).
+  static const String journalWriteTitle = 'Tulis catatan';
+  static const String journalMoodTitle = 'Perasaanmu';
+  static const String journalArousalTitle = 'Tenagamu (boleh dilewati)';
+  static const String journalHint =
+      'Tulis apa saja yang ingin kamu ingat dari hari ini...';
+  static String journalCounter(int used, int max) => '$used/$max';
+  static const String journalSave = 'Simpan catatan';
+  static const String journalSaveNoNote = 'Simpan tanpa catatan';
+  static const String journalSaving = 'Menyimpan...';
+  static const String journalPickMood = 'Pilih perasaanmu dulu, ya.';
+  static const String journalSavedAnnounce = 'Catatanmu tersimpan.';
+  static const String journalWritingSemantics =
+      'Catatanmu sedang ditulis ke buku.';
+  static const String journalTapToClose = 'Ketuk untuk menutup buku';
+
   /// Kalimat pembuka chat bila mood hari ini sudah tercatat (OQ-MP5); tidak dikirim otomatis.
   static String moodChatMessage(String label) =>
       'Aku merasa ${label.toLowerCase()} hari ini';
@@ -537,7 +557,7 @@ abstract final class AppTexts {
   static const String settingsTooltip = 'Pengaturan';
   static const String homeMoodTitle = 'Gimana perasaanmu hari ini?';
   static const String homeMoodCancel = 'Batal';
-  static const String homeMoodSaving = 'Mencatat perasaanmu...';
+  static const String homeMoodHint = 'Pilih satu, lalu tulis kalau kamu mau.';
   static String homeMoodDone(String label) => 'Hari ini kamu merasa $label';
   static String homeMoodRecordedAt(String time) => 'Tercatat pukul $time';
   static const String homeMoodTodayLead = 'Hari ini kamu merasa';
@@ -592,7 +612,8 @@ abstract final class AppTexts {
 
   // Isi mood langsung dari halaman ini bila hari ini belum diisi.
   static const String moodLogTitle = 'Gimana perasaanmu hari ini?';
-  static const String moodLogHint = 'Pilih satu, nanti polanya ikut terlihat.';
+  static const String moodLogHint =
+      'Pilih satu, lalu tulis kalau kamu mau. Polanya ikut terlihat.';
 
   // Gelembung blob: ukuran sebanding jumlah hari tiap mood.
   static const String moodCloudTitle = 'Paling sering kamu rasakan';

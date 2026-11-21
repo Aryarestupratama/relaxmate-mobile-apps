@@ -10,6 +10,10 @@ abstract final class AppRoutes {
   /// Mood: grafik suasana hati 7 atau 30 hari (SCR-M23, FR-M030).
   static const String mood = '/mood';
 
+  /// Halaman menulis buku harian (SCR-M24, FR-M032): dibuka dari kartu mood di Beranda dan dari
+  /// layar Mood, dengan mood terpilih dikirim lewat `extra`. Hanya perlu masuk, tanpa AI.
+  static const String journalWrite = '/mood/tulis';
+
   /// Peralihan saat token tersimpan sedang diperiksa (SCR-M01).
   static const String restoring = '/memuat';
 

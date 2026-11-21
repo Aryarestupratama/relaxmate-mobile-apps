@@ -204,4 +204,12 @@ abstract final class RbSize {
   static const double settingsRowIcon = 20;
   static const double settingsRowChipRadius = 10;
   static const double settingsRowMinHeight = 56;
+
+  /// Buku harian (TASK-M079): stiker mood di halaman, ikon pena, garis buku, punggung buku,
+  /// dan letak garis di dalam kotak barisnya (bagian tinggi baris dari bawah).
+  static const double journalSticker = 64;
+  static const double journalPenIcon = 22;
+  static const double journalRuleStroke = 1;
+  static const double journalSpineWidth = 6;
+  static const double journalRuleDrop = 0.22;
 }

@@ -49,6 +49,8 @@
 //                   GET /__moods?email=...   lihat Mood Entry yang tercatat (JSON, untuk memeriksa hasil uji)
 //                   GET /__set-moods?email=...&n=5  atur jumlah Mood Entry hari ini (uji batas harian)
 //                   GET /__fail-mood         POST /mood-entries berikutnya dijawab 503 (sekali)
+//                 Buku harian (TASK-M079): POST /mood-entries juga menerima `arousal_input` (energized|tired) dan `note`
+//                 (maks. MOOD_NOTE_MAX = 1500 karakter, lebih -> 422 `errors.note`); /__moods menampilkan panjang catatan, bukan isinya.
 //                 Mood 7 dan 30 hari (TASK-M072, API-M019): GET /mood-entries?days=7|30 (hari WIB, catatan terakhir
 //                 per hari, ringkasan, `range`; days selain 7 atau 30 -> 422). Menggabungkan Mood Entry hari ini
 //                 dan data lampau dari pembantu di bawah (data lampau tidak menghitung batas harian).
@@ -123,6 +125,7 @@ let contactsVariant = 1; // 1 = daftar awal, 2 = daftar berubah (uji penyegaran 
 let messageSeq = 100;
 
 const CHAT_PER_DAY = 20;
+const MOOD_NOTE_MAX = 1500;
 const MOOD_PER_DAY = 5;
 const CHAT_MAX_CHARS = 2000;
 const HISTORY_PER_PAGE = 15;
@@ -719,12 +722,25 @@ async function authApi(req, res, path) {
     if (!Number.isInteger(body.mood) || body.mood < 1 || body.mood > 5) {
       return validation(res, { mood: ['Pilihan perasaan tidak valid. Coba lagi, ya.'] });
     }
+    // Buku harian (TASK-M079, API-M018): tenaga dan catatan opsional; batas catatan 1500 karakter.
+    if (body.arousal_input !== undefined && body.arousal_input !== null && !['energized', 'tired'].includes(body.arousal_input)) {
+      return validation(res, { arousal_input: ['Pilihan tenaga tidak valid. Coba lagi, ya.'] });
+    }
+    if (body.note !== undefined && body.note !== null) {
+      if (typeof body.note !== 'string') {
+        return validation(res, { note: ['Catatan tidak valid. Coba lagi, ya.'] });
+      }
+      if ([...body.note].length > MOOD_NOTE_MAX) {
+        return validation(res, { note: [`Catatan terlalu panjang. Maksimal ${MOOD_NOTE_MAX} karakter.`] });
+      }
+    }
     if (user.moods.length >= MOOD_PER_DAY) {
       return apiError(res, 429, 'mood_limit_reached', `Kamu sudah mencatat ${MOOD_PER_DAY} kali hari ini. Besok kamu bisa mencatat lagi.`);
     }
     const labels = ['Sangat sedih', 'Sedih', 'Biasa', 'Senang', 'Luar biasa'];
     const entry = { id: user.moods.length + 1, mood: body.mood, mood_label: labels[body.mood - 1], created_at: new Date().toISOString() };
-    user.moods.push(entry);
+    // Catatan dan tenaga hanya disimpan di memori mock dan tidak dikembalikan (seperti server).
+    user.moods.push({ ...entry, arousal_input: body.arousal_input ?? null, has_note: typeof body.note === 'string' && body.note.length > 0, note_length: typeof body.note === 'string' ? [...body.note].length : 0 });
     return send(res, 201, { data: { entry } });
   }
 

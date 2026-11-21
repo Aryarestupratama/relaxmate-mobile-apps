@@ -13,6 +13,7 @@ class RbText extends ThemeExtension<RbText> {
     required this.h2,
     required this.h1,
     required this.button,
+    required this.journal,
   });
 
   factory RbText.fromColors(RbColors colors) {
@@ -34,10 +35,23 @@ class RbText extends ThemeExtension<RbText> {
       h2: style(22, FontWeight.w700, 1.3),
       h1: style(28, FontWeight.w800, 1.2),
       button: style(16, FontWeight.w700, 1.2),
+      journal: TextStyle(
+        fontFamily: journalFontFamily,
+        fontSize: journalFontSize,
+        fontWeight: FontWeight.w400,
+        height: journalLineFactor,
+        color: colors.text,
+      ),
     );
   }
 
   static const String fontFamily = 'PlusJakartaSans';
+
+  /// Tulisan tangan buku harian (TASK-M079): Patrick Hand (OFL), dibundel sebagai aset. Ukuran
+  /// dan faktor tinggi baris tetap supaya garis buku sejajar dengan baris teks.
+  static const String journalFontFamily = 'PatrickHand';
+  static const double journalFontSize = 20;
+  static const double journalLineFactor = 1.6;
 
   /// Teks isi dan pesan chat.
   final TextStyle body;
@@ -48,6 +62,9 @@ class RbText extends ThemeExtension<RbText> {
   final TextStyle h1;
   final TextStyle button;
 
+  /// Teks buku harian: tulisan tangan, dipakai kolom menulis, animasi menulis, dan halaman baca.
+  final TextStyle journal;
+
   @override
   RbText copyWith({
     TextStyle? body,
@@ -57,6 +74,7 @@ class RbText extends ThemeExtension<RbText> {
     TextStyle? h2,
     TextStyle? h1,
     TextStyle? button,
+    TextStyle? journal,
   }) {
     return RbText(
       body: body ?? this.body,
@@ -66,6 +84,7 @@ class RbText extends ThemeExtension<RbText> {
       h2: h2 ?? this.h2,
       h1: h1 ?? this.h1,
       button: button ?? this.button,
+      journal: journal ?? this.journal,
     );
   }
 

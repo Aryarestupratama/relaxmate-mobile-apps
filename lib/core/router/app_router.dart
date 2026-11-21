@@ -11,14 +11,16 @@ import 'package:relaxmate/features/auth/ui/login_screen.dart';
 import 'package:relaxmate/features/auth/ui/register_screen.dart';
 import 'package:relaxmate/features/auth/ui/session_error_screen.dart';
 import 'package:relaxmate/features/chat/ui/chat_screen.dart';
+import 'package:relaxmate/features/checkin/data/mood_level.dart';
 import 'package:relaxmate/features/consent/ui/consent_gate.dart';
 import 'package:relaxmate/features/crisis/ui/crisis_contacts_screen.dart';
 import 'package:relaxmate/features/exercises/ui/breathing_screen.dart';
 import 'package:relaxmate/features/exercises/ui/exercises_screen.dart';
 import 'package:relaxmate/features/exercises/ui/grounding_screen.dart';
 import 'package:relaxmate/features/history/ui/conversation_screen.dart';
-import 'package:relaxmate/features/home/ui/home_screen.dart';
 import 'package:relaxmate/features/history/ui/history_screen.dart';
+import 'package:relaxmate/features/home/ui/home_screen.dart';
+import 'package:relaxmate/features/journal/ui/journal_write_screen.dart';
 import 'package:relaxmate/features/mascot/ui/companion_screen.dart';
 import 'package:relaxmate/features/mood/ui/mood_screen.dart';
 import 'package:relaxmate/features/onboarding/state/onboarding_controller.dart';
@@ -96,6 +98,15 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.mood,
         builder: (context, state) => const MoodScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.journalWrite,
+        builder: (context, state) {
+          final extra = state.extra;
+          return JournalWriteScreen(
+            initialLevel: extra is MoodLevel ? extra : null,
+          );
+        },
       ),
       // Consent AI hanya diperiksa saat membuka Ngobrol (FR-M002, FR-M029).
       GoRoute(

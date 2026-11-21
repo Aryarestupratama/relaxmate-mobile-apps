@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:relaxmate/core/config/app_constants.dart';
+import 'package:relaxmate/core/router/app_routes.dart';
 import 'package:relaxmate/core/texts/app_texts.dart';
 import 'package:relaxmate/core/theme/rb_size.dart';
 import 'package:relaxmate/core/theme/rb_theme_context.dart';
@@ -10,11 +12,11 @@ import 'package:relaxmate/features/home/ui/mood_done_card.dart';
 import 'package:relaxmate/features/mood/state/mood_series_controller.dart';
 import 'package:relaxmate/features/mood/state/mood_series_state.dart';
 import 'package:relaxmate/features/mood/state/today_mood_provider.dart';
-import 'package:relaxmate/shared/widgets/error_alert.dart';
 import 'package:relaxmate/shared/widgets/floating_card.dart';
 
 /// SCR-M22, kartu mood di Beranda (FR-M013, FR-M029). Tiga keadaan:
-/// - belum ada mood hari ini (atau "Ubah" ditekan): lima blob, satu ketukan mencatat;
+/// - belum ada mood hari ini (atau "Ubah" ditekan): lima blob; memilih satu membuka halaman
+///   menulis buku harian (SCR-M24) yang menyimpan mood dengan atau tanpa catatan (FR-M032);
 /// - sudah tercatat: `MoodDoneCard` (blob besar berhalo, label, kalimat hangat sesuai mood,
 ///   jam WIB, "N dari 7 hari tercatat", tombol "Ubah");
 /// - deret sedang dimuat: penanda memuat, supaya pilihan tidak berkedip lalu hilang bagi
@@ -36,7 +38,7 @@ class MoodCheckinCard extends ConsumerWidget {
       moodSeriesControllerProvider(AppConstants.moodRangeShortDays),
     );
 
-    if (today == null && series is MoodSeriesLoading && !state.submitting) {
+    if (today == null && series is MoodSeriesLoading) {
       return const FloatingCard(
         child: SizedBox(
           height: RbSize.moodBlob,
@@ -62,29 +64,18 @@ class MoodCheckinCard extends ConsumerWidget {
             header: true,
             child: Text(AppTexts.homeMoodTitle, style: text.h3),
           ),
+          SizedBox(height: space.xxs),
+          Text(
+            AppTexts.homeMoodHint,
+            style: text.small.copyWith(color: colors.textSecondary),
+          ),
           SizedBox(height: space.sm),
           MoodBlobRow(
-            selected: state.submittingLevel,
-            enabled: !state.submitting,
-            onSelected: controller.submit,
+            selected: null,
+            onSelected: (level) =>
+                context.push(AppRoutes.journalWrite, extra: level),
           ),
-          if (state.submitting)
-            Semantics(
-              liveRegion: true,
-              child: Padding(
-                padding: EdgeInsets.only(top: space.xs),
-                child: Text(
-                  AppTexts.homeMoodSaving,
-                  textAlign: TextAlign.center,
-                  style: text.small.copyWith(color: colors.textSecondary),
-                ),
-              ),
-            ),
-          if (state.error case final String message) ...<Widget>[
-            SizedBox(height: space.sm),
-            ErrorAlert(message: message),
-          ],
-          if (state.editing && !state.submitting)
+          if (state.editing)
             TextButton(
               onPressed: controller.cancelEditing,
               child: const Text(AppTexts.homeMoodCancel),

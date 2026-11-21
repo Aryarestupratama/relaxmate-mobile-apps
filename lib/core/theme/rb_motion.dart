@@ -37,6 +37,14 @@ abstract final class RbMotion {
   /// Pergantian isi gelembung balasan di tampilan maskot chat (titik mengetik ke teks).
   static const Duration bubbleSwap = Duration(milliseconds: 300);
 
+  /// Animasi menulis di buku (TASK-M079): lama per karakter, batas bawah dan atas total, jeda
+  /// setelah selesai sebelum halaman menutup, dan skala akhir halaman saat menutup.
+  static const Duration inkPerChar = Duration(milliseconds: 14);
+  static const Duration inkMin = Duration(milliseconds: 900);
+  static const Duration inkMax = Duration(milliseconds: 2200);
+  static const Duration inkHold = Duration(milliseconds: 700);
+  static const double closeScale = 0.92;
+
   /// Denyut cincin tombol SOS.
   static const Duration sosPulse = Duration(milliseconds: 1800);
   static const Curve curve = Curves.easeOut;

@@ -91,4 +91,13 @@ abstract final class AppConstants {
   /// Mood terendah yang membuat kartu undangan Beranda memakai nada lebih lembut (Sangat sedih
   /// dan Sedih). Kartu "Kalau terasa sangat berat" sudah dihapus (2026-11-16).
   static const int moodSupportCardMaxLevel = 2;
+
+  /// Batas panjang catatan buku harian. Cermin `limits.mood_note_max_chars` di server (1.500,
+  /// keputusan founder 2026-11-21); hanya untuk kemudahan mengetik, server tetap yang
+  /// memutuskan (RULE-M023). Bila batas server berubah, ubah juga di sini. Catatan: API-M007
+  /// belum mengirim nilai ini (lihat Architecture-M, utang TASK-M079).
+  static const int moodNoteMaxChars = 1500;
+
+  /// Tinggi minimal kolom menulis dan halaman buku harian, dalam baris.
+  static const int journalMinLines = 6;
 }

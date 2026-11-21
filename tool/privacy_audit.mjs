@@ -113,6 +113,24 @@ check('notifikasi layanan tersembunyi di layar kunci', /VISIBILITY_SECRET/.test(
 const contacts = read('assets/crisis/crisis_contacts.json');
 check('aset kontak bantuan tanpa kontak dummy', !/"dummy"\s*:\s*true/.test(contacts));
 
+// 10. Buku harian (TASK-M079, RULE-M074): isi catatan hanya di memori.
+const journalFiles = walk('lib/features/journal', '.dart');
+const journalSrc = journalFiles.map((f) => stripCodeComments(read(f))).join('\n');
+check('buku harian ada di lib/features/journal', journalFiles.length > 0);
+check(
+  'buku harian tanpa penyimpanan lokal (preferensi, secure storage, dart:io)',
+  !/shared_preferences|SharedPreferences|flutter_secure_storage|FlutterSecureStorage|dart:io/.test(journalSrc),
+);
+check('buku harian tanpa papan klip', !/Clipboard/.test(journalSrc));
+check(
+  'kolom catatan mematikan pembelajaran keyboard',
+  /enableIMEPersonalizedLearning:\s*false/.test(stripCodeComments(read('lib/features/journal/ui/journal_lined_field.dart'))),
+);
+check(
+  'state pengendali mood tidak menyimpan isi catatan',
+  !/\bnote\b/.test(stripCodeComments(read('lib/features/checkin/state/checkin_state.dart'))),
+);
+
 let failed = 0;
 for (const r of results) {
   if (!r.ok) failed += 1;
