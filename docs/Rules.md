@@ -1,5 +1,5 @@
 # RelaxMate Mobile - Rules (Aturan Proyek)
-Version: 0.26 | Status: Draft | Last updated: 2026-11-15
+Version: 0.27 | Status: Draft | Last updated: 2026-11-21
 Depends on: PRD-Mobile v0.4, Architecture-Mobile v0.3, Schema-Mobile v0.1, Design-Mobile v0.4, Rules RelaxBoss (web) v1.5 | Owner: Founder (solo developer)
 
 Dokumen ini adalah panduan kerja founder sebagai pengembang tunggal untuk **repo mobile (Flutter)**; bantuan AI boleh dipakai dengan tetap mengikuti seluruh aturan, melakukan verifikasi manual, dan tidak menganggap keluaran otomatis sebagai bukti kebenaran. Untuk pekerjaan di **repo web** (task backend `TASK-M01x`), `Rules.md` web tetap berlaku penuh; aturan di sini hanya menambah. Kata MUST, MUST NOT, SHOULD dipakai secara tegas. Kedalaman: **Lite**. Prinsip: sederhana, fungsi dulu, aman dulu.
@@ -107,6 +107,8 @@ Dokumen ini adalah panduan kerja founder sebagai pengembang tunggal untuk **repo
 | RULE-M071 | Tidak ada panggilan API suara berbayar dari aplikasi. Penambahan suara premium via API butuh keputusan OQ-M6 dan telaah privasi. |
 | RULE-M072 | Dilarang melatih atau mengkloning model suara dari hasil layanan lain tanpa konfirmasi tertulis bahwa syaratnya mengizinkan. |
 | RULE-M073 | Fitur suara baru (STT, TTS, mode percakapan) MUST mengikuti RULE-M041 dan diuji dengan kasus krisis suara (RULE-M047). |
+| RULE-M074 | Isi buku harian (`note`) hanya hidup di memori: dilarang menulisnya ke penyimpanan perangkat (secure storage, preferensi, berkas, basis data), log, analytics, galat yang dilaporkan, atau papan klip otomatis. State dibuang saat layar ditutup dan saat keluar akun. `tool/privacy_audit.mjs` memeriksa ini. |
+| RULE-M075 | Animasi menulis dan balik halaman buku harian MUST dapat dilewati dengan satu ketukan, mati penuh bila `disableAnimations`, dan tidak menunda akses ke isi (pembaca layar mendapat teks lengkap sejak awal). |
 
 ---
 
@@ -157,6 +159,7 @@ Jangan: menambah fitur di luar PRD, memanggil Groq atau layanan suara langsung d
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 0.27 | 2026-11-21 | RULE-M074 (isi buku harian hanya di memori) dan RULE-M075 (animasi buku dapat dilewati, hormati reduce motion) untuk TASK-M079 dan M080. |
 | 0.26 | 2026-11-15 | RULE-M051 mencakup `flutter_animate` untuk animasi komponen (TASK-M074). |
 | 0.25 | 2026-11-15 | A-R22 (pemeriksaan M073 bagian 1). |
 | 0.24 | 2026-11-14 | A-R21 (pemeriksaan M072). |

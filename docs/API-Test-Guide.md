@@ -2,7 +2,7 @@
 
 Version: 1.2 | Status: Draft | Last updated: 2026-11-13
 Koleksi: `docs/postman/RelaxMate-M017.postman_collection.json` di repo web.
-Mencakup API-M001 sampai M006, M008 sampai M013, M015, M016, dan M017 (hapus akun; API-M019 di bagian G dengan koleksi terpisah), plus RULE-033 (isolasi), RULE-040 (log), NFR-M01 dan NFR-M02.
+Mencakup API-M001 sampai M006, M008 sampai M013, M015, M016, dan M017 (hapus akun; API-M019 di bagian G dan API-M020 sampai M022 di bagian H, masing-masing dengan koleksi terpisah), plus RULE-033 (isolasi), RULE-040 (log), NFR-M01 dan NFR-M02.
 
 ## A. Persiapan (sekali)
 
@@ -103,10 +103,29 @@ Koleksi terpisah: `docs/postman/RelaxMate-M077.postman_collection.json` (12 requ
 
 Catatan: bila Runner dijalankan tepat di 00.00 sampai 01.00 WIB, `04.2` bisa merah karena catatan seed hari ini dibuat pukul 01.00 WIB; ulangi sesudah pukul 01.00. Isi yang diperiksa: satu titik per hari WIB, catatan terakhir menang, 7 dan 30 hari berbeda, `days` liar ditolak 422, B tidak melihat data A, belum terverifikasi 403, tanpa token 401.
 
+## H. API-M020 sampai M022: buku harian (TASK-M078)
+
+Koleksi terpisah: `docs/postman/RelaxMate-M078.postman_collection.json` (25 request, repo web). Data uji dari `docs/postman/m078-seed.php`. Tanpa AI, consent, atau migration baru.
+
+1. Repo web terbaru (sudah ada kode M078). Terminal: `php artisan config:clear`, lalu `php artisan route:list --path=api/v1`. Harus muncul `GET|HEAD api/v1/mood-journal`, `PATCH api/v1/mood-entries/{entry}`, dan `DELETE api/v1/mood-entries/{entry}` (selain `GET` dan `POST mood-entries` yang lama).
+2. `php artisan serve` (biarkan jalan). Terminal kedua: `php artisan tinker`, lalu `include 'docs/postman/m078-seed.php';`. Skrip membuat `m078-a`, `m078-b`, `m078-c` (`@example.test`) dan mencetak `tokenA`, `tokenB`, `tokenC`; keluaran terakhir harus `Entri A: 14 ..., dengan catatan: 13 ..., entri B: 1`.
+3. Postman: Import `RelaxMate-M078.postman_collection.json`. Di Variables isi `tokenA`, `tokenB`, `tokenC` (nilai utuh, termasuk angka dan tanda `|`), pastikan `baseUrl` benar. Simpan.
+4. Runner: pilih seluruh folder 00 sampai 03, Iterations 1, **Keep variable values** tercentang, Delay 0. Hasil yang diharapkan: **25 request, semua test hijau**.
+5. Periksa mata: kirim `01.1` lewat Send. Harus 10 entri, tiap entri punya `note`, `next_before` terisi, dan tidak ada teks `RAHASIA-M078-B`.
+6. Cek tinker: `App\Models\MoodEntry::where('user_id', App\Models\User::where('email','m078-a@example.test')->value('id'))->count();` harus `14` (14 hasil seed; entri uji dibuat di 02.1 lalu dihapus di 03.3).
+7. Cek enkripsi: `DB::table('mood_entries')->whereNotNull('note')->limit(1)->value('note');` harus berupa teks acak berformat JSON terenkripsi, **bukan** `RAHASIA-...`.
+8. Cek log: `grep -c "RAHASIA-M078" storage/logs/laravel.log` harus `0` (PowerShell: `Select-String -Path storage\logs\laravel.log -Pattern 'RAHASIA-M078'` tidak menampilkan apa pun).
+9. Cek web: buka Mood Tracker di web dengan akun biasa, catat mood dengan catatan lebih dari 500 karakter (sampai 1.500) dan pastikan tersimpan; penghitung menampilkan `/1500`.
+10. Uji ulang kapan saja: jalankan lagi `include` seed (akun lama dihapus, token baru dicetak), perbarui tiga token, ulang Runner.
+11. Pembersihan: di tinker `$ids = App\Models\User::where('email','like','m078-%@example.test')->pluck('id'); Laravel\Sanctum\PersonalAccessToken::whereIn('tokenable_id',$ids)->delete(); App\Models\User::whereIn('id',$ids)->delete();`
+
+Yang diperiksa: halaman berkursor (10 lalu 3), hanya entri bercatatan, urut terbaru dulu, isolasi pengguna (B tidak melihat atau mengubah atau menghapus data A, 404), ubah sebagian kolom, kosongkan catatan dan tenaga dengan `null`, batas 1.500 (1.501 ditolak), badan kosong 422, hapus 204 lalu 404, id bukan angka 404, belum terverifikasi 403, tanpa token 401, isi catatan terenkripsi di basis data dan tidak ada di log.
+
 ## Change Log
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 1.3 | 2026-11-21 | Bagian H: uji API-M020 sampai M022 (buku harian, TASK-M078), koleksi `RelaxMate-M078` terpisah. |
 | 1.2 | 2026-11-13 | Bagian G: uji API-M019 `GET /mood-entries` (TASK-M077), koleksi `RelaxMate-M077` terpisah. |
 | 1.1 | 2026-11-07 | Langkah Runner disesuaikan dengan Postman versi baru (Deselect All, Keep variable values, Stop run). |
 | 1.0 | 2026-11-07 | Panduan awal TASK-M017. |
